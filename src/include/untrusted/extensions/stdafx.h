@@ -17,7 +17,7 @@
 #include <limits.h>
 
 #include <utils/array.h>
-#include <utils/arrayaccess.h>
+//#include <utils/arrayaccess.h>
 #include "utils/builtins.h"
 
 #include "defs.h"

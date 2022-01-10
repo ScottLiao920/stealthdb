@@ -502,7 +502,7 @@ Datum
     char* pSrc2 = (char*)palloc((ENC_INT32_LENGTH_B64) * sizeof(char));
     char* pTemp = (char*)palloc((ENC_INT32_LENGTH_B64) * sizeof(char));
 
-    array_iterator = array_create_iterator(v, 0, my_extra);
+    array_iterator = array_create_iterator(v, 0); //, my_extra);
     array_iterate(array_iterator, &value, &isnull);
 
     memcpy(pSrc1, DatumGetCString(value), ENC_INT32_LENGTH_B64);
@@ -540,7 +540,7 @@ Datum
     char* pSrc2 = (char*)palloc((ENC_INT32_LENGTH_B64) * sizeof(char));
     char* pTemp = (char*)palloc((ENC_INT32_LENGTH_B64) * sizeof(char) * bulk_size);
 
-    array_iterator = array_create_iterator(v, 0, my_extra);
+    array_iterator = array_create_iterator(v, 0); //, my_extra);
     while (array_iterate(array_iterator, &value, &isnull))
     {
         //      ereport(INFO, (errmsg("add %d:  %s", current_position, DatumGetCString(value))));
@@ -593,7 +593,7 @@ Datum
     char* pSrc2 = (char*)palloc((ENC_INT32_LENGTH_B64) * sizeof(char));
     char* pTemp = (char*)palloc((ENC_INT32_LENGTH_B64) * sizeof(char));
 
-    array_iterator = array_create_iterator(v, 0, my_extra);
+    array_iterator = array_create_iterator(v, 0); //, my_extra);
     array_iterate(array_iterator, &value, &isnull);
 
     memcpy(pSrc1, DatumGetCString(value), ENC_INT32_LENGTH_B64);
@@ -641,7 +641,7 @@ Datum
     char* pSrc2 = (char*)palloc((ENC_INT32_LENGTH_B64) * sizeof(char));
     char* pTemp = (char*)palloc((ENC_INT32_LENGTH_B64) * sizeof(char) * bulk_size);
 
-    array_iterator = array_create_iterator(v, 0, my_extra);
+    array_iterator = array_create_iterator(v, 0);//, my_extra);
 
     while (array_iterate(array_iterator, &value, &isnull))
     {
@@ -706,7 +706,7 @@ Datum
     char* pTemp = (char*)palloc((ENC_INT32_LENGTH_B64) * sizeof(char));
     char* pDst = (char*)palloc((INT32_LENGTH) * sizeof(char));
 
-    array_iterator = array_create_iterator(v, 0, my_extra);
+    array_iterator = array_create_iterator(v, 0);//, my_extra);
     array_iterate(array_iterator, &value, &isnull);
 
     memcpy(pSrc1, DatumGetCString(value), ENC_INT32_LENGTH_B64);
@@ -752,7 +752,7 @@ Datum
     char* pTemp = (char*)palloc((ENC_INT32_LENGTH_B64) * sizeof(char));
     char* pDst = (char*)palloc((INT32_LENGTH) * sizeof(char));
 
-    array_iterator = array_create_iterator(v, 0, my_extra);
+    array_iterator = array_create_iterator(v, 0);//, my_extra);
     array_iterate(array_iterator, &value, &isnull);
 
     memcpy(pSrc1, DatumGetCString(value), ENC_INT32_LENGTH_B64);
@@ -804,7 +804,7 @@ Datum
     char* pTemp = (char*)palloc((ENC_INT32_LENGTH_B64) * sizeof(char));
     char* pDst = (char*)palloc((INT32_LENGTH) * sizeof(char));
 
-    array_iterator = array_create_iterator(v, 0, my_extra);
+    array_iterator = array_create_iterator(v, 0);//, my_extra);
     array_iterate(array_iterator, &value, &isnull);
 
     memcpy(pSrc1, DatumGetCString(value), ENC_INT32_LENGTH_B64);
@@ -850,7 +850,7 @@ Datum
     char* pTemp = (char*)palloc((ENC_INT32_LENGTH_B64) * sizeof(char));
     char* pDst = (char*)palloc((INT32_LENGTH) * sizeof(char));
 
-    array_iterator = array_create_iterator(v, 0, my_extra);
+    array_iterator = array_create_iterator(v, 0); //, my_extra);
     array_iterate(array_iterator, &value, &isnull);
 
     memcpy(pSrc1, DatumGetCString(value), ENC_INT32_LENGTH_B64);

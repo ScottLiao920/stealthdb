@@ -95,7 +95,7 @@ Datum
     char* pSrc2 = (char*)palloc((ENC_FLOAT4_LENGTH_B64 + 1) * sizeof(char));
     char* pTemp = (char*)palloc((ENC_FLOAT4_LENGTH_B64 + 1) * sizeof(char));
     ArrayMetaState* my_extra = (ArrayMetaState*)fcinfo->flinfo->fn_extra;
-    ArrayIterator array_iterator = array_create_iterator(v, 0, my_extra);
+    ArrayIterator array_iterator = array_create_iterator(v, 0); //, my_extra);
 
     array_iterate(array_iterator, &value, &isnull);
     memcpy(pSrc1, DatumGetCString(value), ENC_FLOAT4_LENGTH_B64);
@@ -133,7 +133,7 @@ Datum
     char* pSrc2 = (char*)palloc((ENC_FLOAT4_LENGTH_B64) * sizeof(char));
     char* pTemp = (char*)palloc((ENC_FLOAT4_LENGTH_B64) * sizeof(char) * bulk_size);
 
-    array_iterator = array_create_iterator(v, 0, my_extra);
+    array_iterator = array_create_iterator(v, 0); //, my_extra);
     while (array_iterate(array_iterator, &value, &isnull))
     {
         //      ereport(INFO, (errmsg("add %d:  %s", current_position, DatumGetCString(value))));
@@ -184,7 +184,7 @@ Datum
     char* pSrc2 = palloc((ENC_FLOAT4_LENGTH_B64 + 1) * sizeof(*pSrc2));
     char* pTemp = palloc((ENC_FLOAT4_LENGTH_B64 + 1) * sizeof(*pTemp));
     ArrayMetaState* my_extra = (ArrayMetaState*)fcinfo->flinfo->fn_extra;
-    ArrayIterator array_iterator = array_create_iterator(v, 0, my_extra);
+    ArrayIterator array_iterator = array_create_iterator(v, 0); //, my_extra);
 
     array_iterate(array_iterator, &value, &isnull);
     memcpy(pSrc1, DatumGetCString(value), ENC_FLOAT4_LENGTH_B64);
@@ -232,7 +232,7 @@ Datum
     char* pSrc2 = (char*)palloc((ENC_FLOAT4_LENGTH_B64) * sizeof(char));
     char* pTemp = (char*)palloc((ENC_FLOAT4_LENGTH_B64) * sizeof(char) * bulk_size);
 
-    array_iterator = array_create_iterator(v, 0, my_extra);
+    array_iterator = array_create_iterator(v, 0); //, my_extra);
 
     while (array_iterate(array_iterator, &value, &isnull))
     {
@@ -295,7 +295,7 @@ Datum
     char* value_bytes = palloc(ENC_FLOAT4_LENGTH_B64 * sizeof(*value_bytes));
     char* res = palloc(FLOAT4_LENGTH * sizeof(*res));
 
-    array_iterator = array_create_iterator(v, 0, my_extra);
+    array_iterator = array_create_iterator(v, 0); //, my_extra);
     array_iterate(array_iterator, &value, &isnull);
 
     memcpy(max, DatumGetCString(value), ENC_FLOAT4_LENGTH_B64);
@@ -341,7 +341,7 @@ Datum
     char* value_bytes = palloc(ENC_FLOAT4_LENGTH_B64 * sizeof(*value_bytes));
     char* res = palloc(FLOAT4_LENGTH * sizeof(*res));
 
-    array_iterator = array_create_iterator(v, 0, my_extra);
+    array_iterator = array_create_iterator(v, 0); //, my_extra);
     array_iterate(array_iterator, &value, &isnull);
 
     memcpy(max, DatumGetCString(value), ENC_FLOAT4_LENGTH_B64);
@@ -396,7 +396,7 @@ Datum
     char* pTemp = palloc((ENC_FLOAT4_LENGTH_B64) * sizeof(*pTemp));
     char* pDst = palloc((FLOAT4_LENGTH) * sizeof(*pDst));
 
-    array_iterator = array_create_iterator(v, 0, my_extra);
+    array_iterator = array_create_iterator(v, 0); //, my_extra);
     array_iterate(array_iterator, &value, &isnull);
 
     memcpy(pSrc1, DatumGetCString(value), ENC_FLOAT4_LENGTH_B64);
@@ -444,7 +444,7 @@ Datum
     char* pTemp = palloc((ENC_FLOAT4_LENGTH_B64) * sizeof(*pTemp));
     char* pDst = palloc((FLOAT4_LENGTH) * sizeof(*pDst));
 
-    array_iterator = array_create_iterator(v, 0, my_extra);
+    array_iterator = array_create_iterator(v, 0); //, my_extra);
     array_iterate(array_iterator, &value, &isnull);
 
     memcpy(pSrc1, DatumGetCString(value), ENC_FLOAT4_LENGTH_B64);
