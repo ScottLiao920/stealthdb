@@ -79,7 +79,7 @@ int enc_int32_add(uint8_t* int1,
                   size_t int3_len)
 {
     int32_t decint1_int, decint2_int;
-    int64_t decint3_int;
+    int64_t decint3_int; // larger int size for possible overflow problem;
     int resp;
     uint8_t* dec_int1_v = (uint8_t*)malloc(INT32_LENGTH);
     uint8_t* dec_int2_v = (uint8_t*)malloc(INT32_LENGTH);

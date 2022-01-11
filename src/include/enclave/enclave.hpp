@@ -24,11 +24,11 @@ extern "C"
 {
 #endif
 
-    void free_allocated_memory(void* pointer);
+void free_allocated_memory(void* pointer);
 
-    // FUNCTIONS
-    int decrypt_bytes(uint8_t* pSrc, size_t srcLen, uint8_t* pDst, size_t dstLen);
-    int encrypt_bytes(uint8_t* pSrc, size_t srcLen, uint8_t* pDst, size_t dstLen);
+// FUNCTIONS
+int decrypt_bytes(uint8_t* pSrc, size_t srcLen, uint8_t* pDst, size_t dstLen);
+int encrypt_bytes(uint8_t* pSrc, size_t srcLen, uint8_t* pDst, size_t dstLen);
 #if defined(__cplusplus)
 }
 #endif

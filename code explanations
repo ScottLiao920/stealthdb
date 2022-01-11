@@ -1,0 +1,12 @@
+use a shared queue to deduce communication cost between enclaves and untrusted memory
+
+
+
+Authentication enclave
+
+Preprocessor enclave
+
+Operations enclave
+    basic union datastructures, consists of data in real values in bytes;
+    in every enclave operation function, use decrypt function to load input cipher values;
+    after operations, reset all intermediate results to zero for security;
