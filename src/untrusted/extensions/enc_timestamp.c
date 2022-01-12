@@ -18,7 +18,7 @@ static TimeOffset time2t(const int hour, const int min, const int sec, const fse
     return (((hour * MINS_PER_HOUR) + min) * SECS_PER_MINUTE) + sec + fsec;
 }
 
-/* Convert a string to internal timestamp type. This function based on native posygres function 'timestamp_in'
+/* Convert a string to internal timestamp type. This function based on native postgres function 'timestamp_in'
  * @input: string as a postgres argument
 `* @return: timestamp
 */

@@ -1,5 +1,22 @@
-use a shared queue to deduce communication cost between enclaves and untrusted memory
+Project Source Structure:
+    untrusted:
+        extensions: create psql extension functions, read encrypted inputs from SQL queries & calls functions in interface folder;
+        interface: generate request, inqueue job queue, feed encrypted input values to functions defined in enclave folder, get encrypted output
 
+
+PostgreSQL extension development:
+    in PG, values are passed from / to pgsql as Datums (a generic wrapper for actual values, no type information);
+
+
+use a shared queue to deduce communication cost between enclaves and untrusted memory
+    this queue maintains a int volatile variable to represent a lock;
+    at the beginning of enqueue/dequeue process, a compare&swap is used to determine whether the lock is held by others;
+    if held, __asm__(pause), system pause given in assembly language is used to hold to process;
+    basic element: request, it contains:
+        volatile int is_done to indicate work status;
+        int resp to store error;
+        int ocall_index to store the index of required operation;
+        buffer to store the address of inputs & result
 
 
 Authentication enclave
@@ -8,5 +25,7 @@ Preprocessor enclave
 
 Operations enclave
     basic union datastructures, consists of data in real values in bytes;
+        union: members share the same memory address, hence any updates on one of its members affect others as well &
+            only one member can be accessed at a time;
     in every enclave operation function, use decrypt function to load input cipher values;
     after operations, reset all intermediate results to zero for security;

@@ -2,26 +2,26 @@
 // #define(appropriate in c) or const int (c++ standard)
 // my vote for 'const int'
 
-typedef unsigned char BYTE; // 1byte
-typedef unsigned short WORD; // 2bytes
-typedef unsigned long DWORD; //4bytes
+typedef unsigned char BYTE;   // 1byte
+typedef unsigned short WORD;  // 2bytes
+typedef unsigned long DWORD;  // 4bytes
 
 #define SEALED_KEY_LENGTH 576
 
-#define ENC_INT32_LENGTH_B64 45 //((4 * n / 3) + 3) & ~3
+#define ENC_INT32_LENGTH_B64 45  //((4 * n / 3) + 3) & ~3
 #define ENC_INT32_LENGTH 32
 #define INT32_LENGTH sizeof(int)
 
-#define ENC_FLOAT4_LENGTH_B64 45 //((4 * n / 3) + 3) & ~3
+#define ENC_FLOAT4_LENGTH_B64 45  //((4 * n / 3) + 3) & ~3
 #define ENC_FLOAT4_LENGTH 32
 #define FLOAT4_LENGTH sizeof(float)
 
-#define ENC_TIMESTAMP_LENGTH_B64 49 //((4 * n / 3) + 3) & ~3
+#define ENC_TIMESTAMP_LENGTH_B64 49  //((4 * n / 3) + 3) & ~3
 #define ENC_TIMESTAMP_LENGTH 36
 #define TIMESTAMP int64_t
 #define TIMESTAMP_LENGTH sizeof(int64_t)
 
-#define ENC_STRING_LENGTH_B64 1405 //((4 * n / 3) + 3) & ~3
+#define ENC_STRING_LENGTH_B64 1405  //((4 * n / 3) + 3) & ~3
 #define ENC_STRING_LENGTH 1052
 #define STRING_LENGTH 1024
 #define INPUT_BUFFER_SIZE ENC_STRING_LENGTH_B64 + ENC_STRING_LENGTH_B64 + 1

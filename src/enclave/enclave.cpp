@@ -97,7 +97,9 @@ int decrypt_bytes(uint8_t* pSrc, size_t src_len, uint8_t* pDst,
     * SGX_error, if there was an error during encryption/decryption
     0, otherwise
 */
-int encrypt_bytes(uint8_t* pSrc, size_t src_len, uint8_t* pDst,
+int
+
+encrypt_bytes(uint8_t* pSrc, size_t src_len, uint8_t* pDst,
                   size_t dst_len) {
   unsigned char* nonce = new unsigned char[SGX_AESGCM_IV_SIZE];
 
