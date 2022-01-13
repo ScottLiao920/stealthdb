@@ -17,6 +17,7 @@ int Queue::enqueue(request* elem)
 
     if (rear - front == queue_size)
     {
+      // pre-allocated buffer size not enough alr
         spin_unlock(&_lock);
         abort();
         return -1;
@@ -36,6 +37,7 @@ Queue::dequeue()
 
     if (front == rear)
     {
+        // no element currently in the queue;
         spin_unlock(&_lock);
         return NULL;
     }

@@ -1,6 +1,6 @@
 #include "untrusted/extensions/stdafx.h"
 
-PG_MODULE_MAGIC;
+PG_MODULE_MAGIC; // magic block to detect compatibility issues with pg server
 bool debugMode = false;
 
 void sgxErrorHandler(int code)

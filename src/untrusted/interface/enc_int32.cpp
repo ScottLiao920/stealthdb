@@ -205,7 +205,7 @@ int enc_int32_encrypt(int pSrc, char* pDst) {
   std::array<BYTE, ENC_INT32_LENGTH> int1_v;
 
   memcpy(req->buffer, &pSrc, INT32_LENGTH);
-  req->ocall_index = MD_INT64_ENC;
+  req->ocall_index = CMD_INT64_ENC;
   req->is_done = -1;
 
   inQueue->enqueue(req);

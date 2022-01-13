@@ -5,11 +5,23 @@ Project Source Structure:
 
 
 PostgreSQL extension development:
-    in PG, values are passed from / to pgsql as Datums (a generic wrapper for actual values, no type information);
-
+    in PG, values are passed from / to pgsql as Datum (a generic wrapper for actual values, no type information);
+	extension functions are dynamically loaded by the server on demand;
+	The CREATE FUNCTION for a user-defined C function must  specify two pieces of information for the function:
+	    the name of the loadable object file,
+	    and the C name (link symbol) of the specific function to call within that object file.
+	        If the C name is not explicitly specified then it is assumed to be the same as the SQL function name.
+        if the function name is _PG_init, called immediately after loading the file;
+        if ... is _PG_fini, called immediately before unloading (unloads are disabled) the file;
+    Datum func_name(PG_FUNCTION_ARGS): c declaration of an extension function; PG_FUNCTION_INFO_V1(func_name) macro call;
+    postgres version of malloc & free: palloc & pfree, palloc automatically releases memory at the end of transaction;
+    extension functions should be compiled as a shared library linking Position-Independent-Component object files.
+        cc -fPIC -c xxx.c
+        cc -shared -o xxx.so xxx.o
+    then this .so file should be loaded in extension_name-version.sql files in AS xxx;
 
 use a shared queue to deduce communication cost between enclaves and untrusted memory
-    this queue maintains a int volatile variable to represent a lock;
+    this queue maintains an int volatile variable to represent a lock;
     at the beginning of enqueue/dequeue process, a compare&swap is used to determine whether the lock is held by others;
     if held, __asm__(pause), system pause given in assembly language is used to hold to process;
     basic element: request, it contains:
