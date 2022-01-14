@@ -118,7 +118,7 @@ encrypt_bytes(uint8_t* pSrc, size_t src_len, uint8_t* pDst,
 }
 
 int enclaveProcess(void* arg1) {
-  // void*: this pointer may points to anything not const or volatile
+  // void*: this pointer may point to anything not const or volatile
   size_t src_len = 0, src2_len = 0, src3_len = 0, dst_len = 0;
   uint8_t src1[INPUT_BUFFER_SIZE];
   uint8_t src2[INPUT_BUFFER_SIZE];

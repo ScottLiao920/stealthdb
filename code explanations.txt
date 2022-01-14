@@ -1,3 +1,12 @@
+How encdb extension works:
+    at the beginning of every function, check whether global bool indicator status (default false) is set to true;
+    if not, invoke initMultithreading process to create a background thread running for job queue & set status to true;
+    if set, create a new request with the addresses of inputs & outputs;
+    note: this background process c++ object is local to initMultithreading function in src/untrusted/interface/interface.cpp,
+    hence only quit current psql client can terminate this thread; (Drop extension doesn't work);
+
+
+
 Project Source Structure:
     untrusted:
         extensions: create psql extension functions, read encrypted inputs from SQL queries & calls functions in interface folder;
@@ -11,7 +20,7 @@ PostgreSQL extension development:
 	    the name of the loadable object file,
 	    and the C name (link symbol) of the specific function to call within that object file.
 	        If the C name is not explicitly specified then it is assumed to be the same as the SQL function name.
-        if the function name is _PG_init, called immediately after loading the file;
+        if the function name is _PG_init, called immediately after loading the file; (when create extension xxx);
         if ... is _PG_fini, called immediately before unloading (unloads are disabled) the file;
     Datum func_name(PG_FUNCTION_ARGS): c declaration of an extension function; PG_FUNCTION_INFO_V1(func_name) macro call;
     postgres version of malloc & free: palloc & pfree, palloc automatically releases memory at the end of transaction;

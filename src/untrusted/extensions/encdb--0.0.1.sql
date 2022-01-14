@@ -1,13 +1,24 @@
 -- complain if script is sourced in psql, rather than via CREATE EXTENSION
-\echo
-Use "CREATE EXTENSION encdb" to load this file.
-\quit
+\echo Use "CREATE EXTENSION encdb" to load this file. \quit
 
 CREATE FUNCTION launch() RETURNS integer
 AS '$libdir/encdb' --$libdir can be found by pg_config --pkglibdir,
 LANGUAGE C IMMUTABLE STRICT;
 --strict means any null input will produce a null output,
 -- hence no need to explicitly check null values (including null ptr);
+
+-- note: no need to create function for _pg_init or _pg_fini as the function manager from postgres will
+
+-- CREATE
+-- OR REPLACE FUNCTION _PG_init() RETURNS void
+-- AS '$libdir/encdb'
+-- LANGUAGE C IMMUTABLE STRICT;
+--
+--
+-- CREATE
+-- OR REPLACE FUNCTION _PG_fini() RETURNS void
+-- AS '$libdir/encdb'
+-- LANGUAGE C IMMUTABLE STRICT;
 
 CREATE
 OR REPLACE FUNCTION generate_key()
