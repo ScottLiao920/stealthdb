@@ -1,0 +1,99 @@
+make -C src -f untrusted.mk all
+make[1]: Entering directory '/home/scott/Projects/cstealthDB/src'
+cd untrusted && /opt/intel/sgxsdk/bin/x64/sgx_edger8r --untrusted ../enclave/enclave.edl
+echo "GEN  =>  untrusted/enclave_u.c"
+cc -m64 -O0 -g -fPIC -Wall -Wextra -Wpedantic -DTOKEN_FILENAME=\"/usr/local/lib/stealthDB/enclave.token\" -DENCLAVE_FILENAME=\"/usr/local/lib/stealthDB/enclave.signed.so\" -DDATA_FILENAME=\"/usr/local/lib/stealthDB/stealthDB.data\" -I/home/scott/Projects/cstealthDB/src/include -I/opt/intel/sgxsdk/include -Iuntrusted -c untrusted/enclave_u.c -o untrusted/enclave_u.o # untrusted/enclave_u.c: name of the first prerequisite
+echo "CC   <=  untrusted/enclave_u.c"
+g++ -m64 -O0 -g -fPIC -Wall -Wextra -Wpedantic -DTOKEN_FILENAME=\"/usr/local/lib/stealthDB/enclave.token\" -DENCLAVE_FILENAME=\"/usr/local/lib/stealthDB/enclave.signed.so\" -DDATA_FILENAME=\"/usr/local/lib/stealthDB/stealthDB.data\" -I/home/scott/Projects/cstealthDB/src/include -I/opt/intel/sgxsdk/include -Iuntrusted -std=c++11 -c tools/base64.cpp -o tools/base64.o # tools/base64.o: name of target
+echo "CXX  <=  tools/base64.cpp"
+g++ -m64 -O0 -g -fPIC -Wall -Wextra -Wpedantic -DTOKEN_FILENAME=\"/usr/local/lib/stealthDB/enclave.token\" -DENCLAVE_FILENAME=\"/usr/local/lib/stealthDB/enclave.signed.so\" -DDATA_FILENAME=\"/usr/local/lib/stealthDB/stealthDB.data\" -I/home/scott/Projects/cstealthDB/src/include -I/opt/intel/sgxsdk/include -Iuntrusted -std=c++11 -c tools/bytes.cpp -o tools/bytes.o # tools/bytes.o: name of target
+echo "CXX  <=  tools/bytes.cpp"
+g++ -m64 -O0 -g -fPIC -Wall -Wextra -Wpedantic -DTOKEN_FILENAME=\"/usr/local/lib/stealthDB/enclave.token\" -DENCLAVE_FILENAME=\"/usr/local/lib/stealthDB/enclave.signed.so\" -DDATA_FILENAME=\"/usr/local/lib/stealthDB/stealthDB.data\" -I/home/scott/Projects/cstealthDB/src/include -I/opt/intel/sgxsdk/include -Iuntrusted -std=c++11 -c tools/sync_utils.cpp -o tools/sync_utils.o # tools/sync_utils.o: name of target
+echo "CXX  <=  tools/sync_utils.cpp"
+g++ -m64 -O0 -g -fPIC -Wall -Wextra -Wpedantic -DTOKEN_FILENAME=\"/usr/local/lib/stealthDB/enclave.token\" -DENCLAVE_FILENAME=\"/usr/local/lib/stealthDB/enclave.signed.so\" -DDATA_FILENAME=\"/usr/local/lib/stealthDB/stealthDB.data\" -I/home/scott/Projects/cstealthDB/src/include -I/opt/intel/sgxsdk/include -Iuntrusted -std=c++11 -c tools/Queue.cpp -o tools/Queue.o # tools/Queue.o: name of target
+echo "CXX  <=  tools/Queue.cpp"
+g++ -m64 -O0 -g -fPIC -Wall -Wextra -Wpedantic -DTOKEN_FILENAME=\"/usr/local/lib/stealthDB/enclave.token\" -DENCLAVE_FILENAME=\"/usr/local/lib/stealthDB/enclave.signed.so\" -DDATA_FILENAME=\"/usr/local/lib/stealthDB/stealthDB.data\" -I/home/scott/Projects/cstealthDB/src/include -I/opt/intel/sgxsdk/include -Iuntrusted -std=c++11 -o untrusted/interface/enc_int32.o -c untrusted/interface/enc_int32.cpp # untrusted/interface/enc_int32.cpp: names of all the prerequisites
+echo "CXX interface <=  untrusted/interface/enc_int32.cpp"
+g++ -m64 -O0 -g -fPIC -Wall -Wextra -Wpedantic -DTOKEN_FILENAME=\"/usr/local/lib/stealthDB/enclave.token\" -DENCLAVE_FILENAME=\"/usr/local/lib/stealthDB/enclave.signed.so\" -DDATA_FILENAME=\"/usr/local/lib/stealthDB/stealthDB.data\" -I/home/scott/Projects/cstealthDB/src/include -I/opt/intel/sgxsdk/include -Iuntrusted -std=c++11 -o untrusted/interface/enc_timestamp.o -c untrusted/interface/enc_timestamp.cpp # untrusted/interface/enc_timestamp.cpp: names of all the prerequisites
+echo "CXX interface <=  untrusted/interface/enc_timestamp.cpp"
+g++ -m64 -O0 -g -fPIC -Wall -Wextra -Wpedantic -DTOKEN_FILENAME=\"/usr/local/lib/stealthDB/enclave.token\" -DENCLAVE_FILENAME=\"/usr/local/lib/stealthDB/enclave.signed.so\" -DDATA_FILENAME=\"/usr/local/lib/stealthDB/stealthDB.data\" -I/home/scott/Projects/cstealthDB/src/include -I/opt/intel/sgxsdk/include -Iuntrusted -std=c++11 -o untrusted/interface/interface.o -c untrusted/interface/interface.cpp # untrusted/interface/interface.cpp: names of all the prerequisites
+echo "CXX interface <=  untrusted/interface/interface.cpp"
+g++ -m64 -O0 -g -fPIC -Wall -Wextra -Wpedantic -DTOKEN_FILENAME=\"/usr/local/lib/stealthDB/enclave.token\" -DENCLAVE_FILENAME=\"/usr/local/lib/stealthDB/enclave.signed.so\" -DDATA_FILENAME=\"/usr/local/lib/stealthDB/stealthDB.data\" -I/home/scott/Projects/cstealthDB/src/include -I/opt/intel/sgxsdk/include -Iuntrusted -std=c++11 -o untrusted/interface/enc_float32.o -c untrusted/interface/enc_float32.cpp # untrusted/interface/enc_float32.cpp: names of all the prerequisites
+echo "CXX interface <=  untrusted/interface/enc_float32.cpp"
+g++ -m64 -O0 -g -fPIC -Wall -Wextra -Wpedantic -DTOKEN_FILENAME=\"/usr/local/lib/stealthDB/enclave.token\" -DENCLAVE_FILENAME=\"/usr/local/lib/stealthDB/enclave.signed.so\" -DDATA_FILENAME=\"/usr/local/lib/stealthDB/stealthDB.data\" -I/home/scott/Projects/cstealthDB/src/include -I/opt/intel/sgxsdk/include -Iuntrusted -std=c++11 -o untrusted/interface/enc_text.o -c untrusted/interface/enc_text.cpp # untrusted/interface/enc_text.cpp: names of all the prerequisites
+echo "CXX interface <=  untrusted/interface/enc_text.cpp"
+echo "untrusted/extensions/enc_int4.c untrusted/extensions/enc_int4.o"
+cc -m64 -O0 -g -fPIC -Wall -Wextra -Wpedantic -DTOKEN_FILENAME=\"/usr/local/lib/stealthDB/enclave.token\" -DENCLAVE_FILENAME=\"/usr/local/lib/stealthDB/enclave.signed.so\" -DDATA_FILENAME=\"/usr/local/lib/stealthDB/stealthDB.data\" -I/home/scott/Projects/cstealthDB/src/include -I/opt/intel/sgxsdk/include -Iuntrusted -I/home/scott/Projects/cstealthDB/src -I/usr/local/pgsql/include/server -I/usr/local/pgsql/include -o untrusted/extensions/enc_int4.o -c untrusted/extensions/enc_int4.c
+echo "CC extension <=  untrusted/extensions/enc_int4.c"
+echo "untrusted/extensions/enc_text.c untrusted/extensions/enc_text.o"
+cc -m64 -O0 -g -fPIC -Wall -Wextra -Wpedantic -DTOKEN_FILENAME=\"/usr/local/lib/stealthDB/enclave.token\" -DENCLAVE_FILENAME=\"/usr/local/lib/stealthDB/enclave.signed.so\" -DDATA_FILENAME=\"/usr/local/lib/stealthDB/stealthDB.data\" -I/home/scott/Projects/cstealthDB/src/include -I/opt/intel/sgxsdk/include -Iuntrusted -I/home/scott/Projects/cstealthDB/src -I/usr/local/pgsql/include/server -I/usr/local/pgsql/include -o untrusted/extensions/enc_text.o -c untrusted/extensions/enc_text.c
+echo "CC extension <=  untrusted/extensions/enc_text.c"
+echo "untrusted/extensions/enc_float4.c untrusted/extensions/enc_float4.o"
+cc -m64 -O0 -g -fPIC -Wall -Wextra -Wpedantic -DTOKEN_FILENAME=\"/usr/local/lib/stealthDB/enclave.token\" -DENCLAVE_FILENAME=\"/usr/local/lib/stealthDB/enclave.signed.so\" -DDATA_FILENAME=\"/usr/local/lib/stealthDB/stealthDB.data\" -I/home/scott/Projects/cstealthDB/src/include -I/opt/intel/sgxsdk/include -Iuntrusted -I/home/scott/Projects/cstealthDB/src -I/usr/local/pgsql/include/server -I/usr/local/pgsql/include -o untrusted/extensions/enc_float4.o -c untrusted/extensions/enc_float4.c
+echo "CC extension <=  untrusted/extensions/enc_float4.c"
+echo "untrusted/extensions/encdb.c untrusted/extensions/encdb.o"
+cc -m64 -O0 -g -fPIC -Wall -Wextra -Wpedantic -DTOKEN_FILENAME=\"/usr/local/lib/stealthDB/enclave.token\" -DENCLAVE_FILENAME=\"/usr/local/lib/stealthDB/enclave.signed.so\" -DDATA_FILENAME=\"/usr/local/lib/stealthDB/stealthDB.data\" -I/home/scott/Projects/cstealthDB/src/include -I/opt/intel/sgxsdk/include -Iuntrusted -I/home/scott/Projects/cstealthDB/src -I/usr/local/pgsql/include/server -I/usr/local/pgsql/include -o untrusted/extensions/encdb.o -c untrusted/extensions/encdb.c
+echo "CC extension <=  untrusted/extensions/encdb.c"
+echo "untrusted/extensions/enc_timestamp.c untrusted/extensions/enc_timestamp.o"
+cc -m64 -O0 -g -fPIC -Wall -Wextra -Wpedantic -DTOKEN_FILENAME=\"/usr/local/lib/stealthDB/enclave.token\" -DENCLAVE_FILENAME=\"/usr/local/lib/stealthDB/enclave.signed.so\" -DDATA_FILENAME=\"/usr/local/lib/stealthDB/stealthDB.data\" -I/home/scott/Projects/cstealthDB/src/include -I/opt/intel/sgxsdk/include -Iuntrusted -I/home/scott/Projects/cstealthDB/src -I/usr/local/pgsql/include/server -I/usr/local/pgsql/include -o untrusted/extensions/enc_timestamp.o -c untrusted/extensions/enc_timestamp.c
+echo "CC extension <=  untrusted/extensions/enc_timestamp.c"
+cc -O2 -Wall -Wmissing-prototypes -Wpointer-arith -Wdeclaration-after-statement -Wendif-labels -Wmissing-format-attribute -Wformat-security -fno-strict-aliasing -fwrapv -fexcess-precision=standard -g -fpic --std=c11 -I. -I. -I/usr/local/pgsql/include/server -I/usr/local/pgsql/include/internal -D_GNU_SOURCE -I/home/scott/Projects/cstealthDB/src/include -o untrusted/cstore/cstore.pb-c.o -c untrusted/cstore/cstore.pb-c.c
+echo "Column STORE CC extension <=  untrusted/cstore/cstore.pb-c.c"
+cc -O2 -Wall -Wmissing-prototypes -Wpointer-arith -Wdeclaration-after-statement -Wendif-labels -Wmissing-format-attribute -Wformat-security -fno-strict-aliasing -fwrapv -fexcess-precision=standard -g -fpic --std=c11 -I. -I. -I/usr/local/pgsql/include/server -I/usr/local/pgsql/include/internal -D_GNU_SOURCE -I/home/scott/Projects/cstealthDB/src/include -o untrusted/cstore/cstore_fdw.o -c untrusted/cstore/cstore_fdw.c
+echo "Column STORE CC extension <=  untrusted/cstore/cstore_fdw.c"
+cc -O2 -Wall -Wmissing-prototypes -Wpointer-arith -Wdeclaration-after-statement -Wendif-labels -Wmissing-format-attribute -Wformat-security -fno-strict-aliasing -fwrapv -fexcess-precision=standard -g -fpic --std=c11 -I. -I. -I/usr/local/pgsql/include/server -I/usr/local/pgsql/include/internal -D_GNU_SOURCE -I/home/scott/Projects/cstealthDB/src/include -o untrusted/cstore/cstore_writer.o -c untrusted/cstore/cstore_writer.c
+echo "Column STORE CC extension <=  untrusted/cstore/cstore_writer.c"
+cc -O2 -Wall -Wmissing-prototypes -Wpointer-arith -Wdeclaration-after-statement -Wendif-labels -Wmissing-format-attribute -Wformat-security -fno-strict-aliasing -fwrapv -fexcess-precision=standard -g -fpic --std=c11 -I. -I. -I/usr/local/pgsql/include/server -I/usr/local/pgsql/include/internal -D_GNU_SOURCE -I/home/scott/Projects/cstealthDB/src/include -o untrusted/cstore/cstore_reader.o -c untrusted/cstore/cstore_reader.c
+echo "Column STORE CC extension <=  untrusted/cstore/cstore_reader.c"
+cc -O2 -Wall -Wmissing-prototypes -Wpointer-arith -Wdeclaration-after-statement -Wendif-labels -Wmissing-format-attribute -Wformat-security -fno-strict-aliasing -fwrapv -fexcess-precision=standard -g -fpic --std=c11 -I. -I. -I/usr/local/pgsql/include/server -I/usr/local/pgsql/include/internal -D_GNU_SOURCE -I/home/scott/Projects/cstealthDB/src/include -o untrusted/cstore/cstore_metadata_serialization.o -c untrusted/cstore/cstore_metadata_serialization.c
+echo "Column STORE CC extension <=  untrusted/cstore/cstore_metadata_serialization.c"
+cc -O2 -Wall -Wmissing-prototypes -Wpointer-arith -Wdeclaration-after-statement -Wendif-labels -Wmissing-format-attribute -Wformat-security -fno-strict-aliasing -fwrapv -fexcess-precision=standard -g -fpic --std=c11 -I. -I. -I/usr/local/pgsql/include/server -I/usr/local/pgsql/include/internal -D_GNU_SOURCE -I/home/scott/Projects/cstealthDB/src/include -o untrusted/cstore/cstore_compression.o -c untrusted/cstore/cstore_compression.c
+echo "Column STORE CC extension <=  untrusted/cstore/cstore_compression.c"
+cc -O2 -Wall -Wmissing-prototypes -Wpointer-arith -Wdeclaration-after-statement -Wendif-labels -Wmissing-format-attribute -Wformat-security -fno-strict-aliasing -fwrapv -fexcess-precision=standard -g -fpic -shared -L/usr/local/pgsql/lib untrusted/enclave_u.o tools/base64.o tools/bytes.o tools/sync_utils.o tools/Queue.o untrusted/interface/enc_int32.o untrusted/interface/enc_timestamp.o untrusted/interface/interface.o untrusted/interface/enc_float32.o untrusted/interface/enc_text.o untrusted/extensions/enc_int4.o untrusted/extensions/enc_text.o untrusted/extensions/enc_float4.o untrusted/extensions/encdb.o untrusted/extensions/enc_timestamp.o untrusted/cstore/cstore.pb-c.o untrusted/cstore/cstore_fdw.o untrusted/cstore/cstore_writer.o untrusted/cstore/cstore_reader.o untrusted/cstore/cstore_metadata_serialization.o untrusted/cstore/cstore_compression.o -o untrusted/encdb.so -lsgx_urts -lpthread -lprotobuf-c -Wl,--as-needed -Wl,-rpath /usr/local/pgsql/lib --enable-new-dtags
+echo "CC extension <=  untrusted/enclave_u.o"
+mkdir -p /home/scott/Projects/cstealthDB/src/../build
+mv untrusted/encdb.so /home/scott/Projects/cstealthDB/src/../build
+cp untrusted/extensions/*.control /home/scott/Projects/cstealthDB/src/../build
+cp untrusted/extensions/*.sql /home/scott/Projects/cstealthDB/src/../build
+protoc-c --c_out=. untrusted/cstore/cstore.proto
+make[1]: Leaving directory '/home/scott/Projects/cstealthDB/src'
+make -C src -f enclave.mk all
+make[1]: Entering directory '/home/scott/Projects/cstealthDB/src'
+echo "BUILT_TARGET=non_oblvs" > status.mk
+cd enclave && /opt/intel/sgxsdk/bin/x64/sgx_edger8r --trusted enclave.edl
+mv enclave/enclave_t.h include/enclave
+echo "GEN  =>  enclave/enclave_t.c"
+cc -Iinclude/enclave -m64 -O0 -g -fvisibility=hidden -fpie -fstack-protector -fno-builtin-printf -Wall -Wextra -Wpedantic -Iinclude -I/opt/intel/sgxsdk/include -I/opt/intel/sgxsdk/include/tlibc -nostdinc -std=c11 -c enclave/enclave_t.c -o enclave/enclave_t.o
+echo "CC  <=  enclave/enclave_t.c"
+g++ -m64 -O0 -g -fvisibility=hidden -fpie -fstack-protector -fno-builtin-printf -Wall -Wextra -Wpedantic -Iinclude -I/opt/intel/sgxsdk/include -I/opt/intel/sgxsdk/include/tlibc -nostdinc++ -std=c++11 -c tools/base64.cpp -o tools/base64.o
+echo "CXX  <=  tools/base64.cpp"
+g++ -m64 -O0 -g -fvisibility=hidden -fpie -fstack-protector -fno-builtin-printf -Wall -Wextra -Wpedantic -Iinclude -I/opt/intel/sgxsdk/include -I/opt/intel/sgxsdk/include/tlibc -nostdinc++ -std=c++11 -c tools/bytes.cpp -o tools/bytes.o
+echo "CXX  <=  tools/bytes.cpp"
+g++ -m64 -O0 -g -fvisibility=hidden -fpie -fstack-protector -fno-builtin-printf -Wall -Wextra -Wpedantic -Iinclude -I/opt/intel/sgxsdk/include -I/opt/intel/sgxsdk/include/tlibc -nostdinc++ -std=c++11 -c tools/sync_utils.cpp -o tools/sync_utils.o
+echo "CXX  <=  tools/sync_utils.cpp"
+g++ -m64 -O0 -g -fvisibility=hidden -fpie -fstack-protector -fno-builtin-printf -Wall -Wextra -Wpedantic -Iinclude -I/opt/intel/sgxsdk/include -I/opt/intel/sgxsdk/include/tlibc -nostdinc++ -std=c++11 -c tools/Queue.cpp -o tools/Queue.o
+echo "CXX  <=  tools/Queue.cpp"
+g++ -m64 -O0 -g -fvisibility=hidden -fpie -fstack-protector -fno-builtin-printf -Wall -Wextra -Wpedantic -Iinclude -I/opt/intel/sgxsdk/include -I/opt/intel/sgxsdk/include/tlibc -nostdinc++ -std=c++11 -c enclave/enclave.cpp -o enclave/enclave.o
+echo "CXX  <=  enclave/enclave.cpp"
+g++ -m64 -O0 -g -fvisibility=hidden -fpie -fstack-protector -fno-builtin-printf -Wall -Wextra -Wpedantic -Iinclude -I/opt/intel/sgxsdk/include -I/opt/intel/sgxsdk/include/tlibc -nostdinc++ -std=c++11 -c enclave/enc_timestamp_ops.cpp -o enclave/enc_timestamp_ops.o
+echo "CXX  <=  enclave/enc_timestamp_ops.cpp"
+g++ -m64 -O0 -g -fvisibility=hidden -fpie -fstack-protector -fno-builtin-printf -Wall -Wextra -Wpedantic -Iinclude -I/opt/intel/sgxsdk/include -I/opt/intel/sgxsdk/include/tlibc -nostdinc++ -std=c++11 -c enclave/enc_float32_ops.cpp -o enclave/enc_float32_ops.o
+echo "CXX  <=  enclave/enc_float32_ops.cpp"
+g++ -m64 -O0 -g -fvisibility=hidden -fpie -fstack-protector -fno-builtin-printf -Wall -Wextra -Wpedantic -Iinclude -I/opt/intel/sgxsdk/include -I/opt/intel/sgxsdk/include/tlibc -nostdinc++ -std=c++11 -c enclave/enc_text_ops.cpp -o enclave/enc_text_ops.o
+echo "CXX  <=  enclave/enc_text_ops.cpp"
+g++ -m64 -O0 -g -fvisibility=hidden -fpie -fstack-protector -fno-builtin-printf -Wall -Wextra -Wpedantic -Iinclude -I/opt/intel/sgxsdk/include -I/opt/intel/sgxsdk/include/tlibc -nostdinc++ -std=c++11 -c enclave/enc_int32_ops.cpp -o enclave/enc_int32_ops.o
+echo "CXX  <=  enclave/enc_int32_ops.cpp"
+nasm -f elf64 tools/oblvs_int32_ops.S -o tools/oblvs_int32_ops.o
+echo "NASM  <=  tools/oblvs_int32_ops.S"
+g++ enclave/enclave_t.o tools/base64.o tools/bytes.o tools/sync_utils.o tools/Queue.o enclave/enclave.o enclave/enc_timestamp_ops.o enclave/enc_float32_ops.o enclave/enc_text_ops.o enclave/enc_int32_ops.o tools/oblvs_int32_ops.o tools/like_match.o tools/timestamp.o -o enclave/enclave.so -Wl,--no-undefined -nostdlib -nodefaultlibs -nostartfiles -L/opt/intel/sgxsdk/lib64 -Wl,--whole-archive -lsgx_trts -Wl,--no-whole-archive -Wl,--start-group -lsgx_tstdc -lsgx_tcxx -lsgx_tcrypto -lsgx_tservice -Wl,--end-group -Wl,-Bstatic -Wl,-Bsymbolic -Wl,--no-undefined -Wl,-pie,-eenclave_entry -Wl,--export-dynamic -Wl,--defsym,__ImageBase=0 -Wl,--version-script=enclave/enclave.lds
+echo "LINK =>  enclave/enclave.so"
+openssl genrsa -out enclave/enclave.debug.key -3 3072
+openssl rsa -out enclave/enclave.debug.pub -in enclave/enclave.debug.key -pubout
+/opt/intel/sgxsdk/bin/x64/sgx_sign gendata -out enclave/enclave.debug.signdata -enclave enclave/enclave.so -config enclave/enclave.debug.config.xml
+echo "GENDATA =>  enclave/enclave.debug.signdata"
+openssl dgst -sha256 -out enclave/enclave.debug.sig -sign enclave/enclave.debug.key enclave/enclave.debug.signdata
+/opt/intel/sgxsdk/bin/x64/sgx_sign catsig -enclave enclave/enclave.so -unsigned enclave/enclave.debug.signdata -out enclave/enclave.debug.signed.so -config enclave/enclave.debug.config.xml -key enclave/enclave.debug.pub -sig enclave/enclave.debug.sig
+cp enclave/enclave.debug.signed.so /home/scott/Projects/cstealthDB/src/../build
+echo "SIGN =>  enclave/enclave.debug.signed.so"
+make[1]: Leaving directory '/home/scott/Projects/cstealthDB/src'
+echo "Make all succeed!"
