@@ -2,4 +2,5 @@
 .idea
 html
 latex
+
 *.o
