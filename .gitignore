@@ -2,4 +2,7 @@
 .idea
 html
 latex
+src/untrusted/lz4
 *.o
+*.s
+src/enclave

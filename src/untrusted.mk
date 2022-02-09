@@ -4,6 +4,7 @@ UNTRUSTED_DIR=untrusted
 INTERFACE_DIR=untrusted/interface
 EXTENSION_DIR=untrusted/extensions
 CSTORE_DIR=untrusted/cstore
+LZ4_DIR=untrusted/lz4
 PSQL_PKG_LIBDIR = $(shell pg_config --pkglibdir)
 PSQL_SHAREDIR = $(shell pg_config --sharedir)/extension
 PSQL_LIBDIR = $(shell pg_config --libdir)
@@ -24,15 +25,20 @@ PSQL_CPPFLAGS := $(addprefix -I, $(CURDIR) $(shell pg_config --includedir-server
 CPPFLAGS := -DTOKEN_FILENAME=\"$(STEALTHDIR)/$(ENCLAVE_NAME).token\" \
 			-DENCLAVE_FILENAME=\"$(STEALTHDIR)/$(ENCLAVE_NAME).signed.so\" \
 			-DDATA_FILENAME=\"$(STEALTHDIR)/stealthDB.data\" \
-			$(addprefix -I, $(CURDIR)/include $(SGX_INCLUDE_PATH) $(UNTRUSTED_DIR) $(CSTORE_DIR))
+			$(addprefix -I, $(CURDIR)/include $(SGX_INCLUDE_PATH) $(UNTRUSTED_DIR) $(CSTORE_DIR) $(LZ4_DIR)/lib)
 
 FLAGS := -m64 -O0 -g -fPIC -Wall -Wextra -Wpedantic
 CFLAGS := $(FLAGS) $(CPPFLAGS)
 CXXFLAGS := $(FLAGS) $(CPPFLAGS) -std=c++11
-LDFLAGS := -lsgx_urts -lpthread -lprotobuf-c -Wl,--as-needed -Wl,-rpath $(PSQL_LIBDIR) --enable-new-dtags
+LDFLAGS := -lsgx_urts -lpthread -lprotobuf-c -llz4 -Wl,--as-needed -Wl,-rpath $(PSQL_LIBDIR) --enable-new-dtags
 
 .PHONY: all
-all: $(UNTRUSTED_DIR)/encdb.so cstore.pb-c.c
+all: $(UNTRUSTED_DIR)/encdb.so cstore.pb-c.c lz4
+
+lz4:
+	cd $(LZ4_DIR) && $(MAKE)
+	cd $(LZ4_DIR) && $(MAKE) install
+
 
 tools/%.o: tools/%.cpp
 	@$(CXX) $(CXXFLAGS) -c $< -o $@ # $@: name of target

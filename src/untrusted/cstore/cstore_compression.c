@@ -13,14 +13,15 @@
  */
 #include "postgres.h"
 #include "cstore/cstore_fdw.h"
+#include "lz4.h" // for lz4 compression
 
 #if PG_VERSION_NUM >= 90500
 #include "common/pg_lzcompress.h"
 #else
+
 #include "utils/pg_lzcompress.h"
+
 #endif
-
-
 
 
 #if PG_VERSION_NUM >= 90500
@@ -28,30 +29,35 @@
  *	The information at the start of the compressed data. This decription is taken
  *	from pg_lzcompress in pre-9.5 version of PostgreSQL.
  */
-typedef struct CStoreCompressHeader
-{
-	int32		vl_len_;		/* varlena header (do not touch directly!) */
-	int32		rawsize;
+typedef struct CStoreCompressHeader {
+    int32 vl_len_;        /* varlena header (do not touch directly!) */
+    int32 rawsize;
 } CStoreCompressHeader;
-
 /*
  * Utilities for manipulation of header information for compressed data
  */
 
-#define CSTORE_COMPRESS_HDRSZ		((int32) sizeof(CStoreCompressHeader))
+#define CSTORE_COMPRESS_HDRSZ        ((int32) sizeof(CStoreCompressHeader))
 #define CSTORE_COMPRESS_RAWSIZE(ptr) (((CStoreCompressHeader *) (ptr))->rawsize)
 #define CSTORE_COMPRESS_RAWDATA(ptr) (((char *) (ptr)) + CSTORE_COMPRESS_HDRSZ)
 #define CSTORE_COMPRESS_SET_RAWSIZE(ptr, len) (((CStoreCompressHeader *) (ptr))->rawsize = (len))
 
 #else
 
-#define CSTORE_COMPRESS_HDRSZ		(0)
+#define CSTORE_COMPRESS_HDRSZ        (0)
 #define CSTORE_COMPRESS_RAWSIZE(ptr) (PGLZ_RAW_SIZE((PGLZ_Header *) buffer->data))
 #define CSTORE_COMPRESS_RAWDATA(ptr) (((PGLZ_Header *) (ptr)))
-#define CSTORE_COMPRESS_SET_RAWSIZE(ptr, len) (((CStoreCompressHeader *) (ptr))->rawsize = (len))
+#define CSTORE_COMPRESS_SET_RAWSIZE(ptr, len) (((PGLZ_Header *) (ptr))->rawsize = (len))
+
+typedef struct LZ4CompressHeader {
+    int32 rawsize;
+} LZ4CompressHeader;
+#define CSTORE_COMPRESS_HDRSZ_LZ4       ((int32) sizeof(LZ4CompressHeader))
+#define CSTORE_COMPRESS_RAWSIZE_LZ4(ptr) (((LZ4CompressHeader *) (ptr))->rawsize)
+#define CSTORE_COMPRESS_RAWDATA_LZ4(ptr) (((char *) (ptr)) + CSTORE_COMPRESS_HDRSZ_LZ4)
+#define CSTORE_COMPRESS_SET_RAWSIZE_LZ4(ptr, len) (((LZ4CompressHeader *) (ptr))->rawsize = (len))
 
 #endif
-
 
 
 /*
@@ -62,47 +68,64 @@ typedef struct CStoreCompressHeader
  */
 bool
 CompressBuffer(StringInfo inputBuffer, StringInfo outputBuffer,
-			   CompressionType compressionType)
-{
-	uint64 maximumLength = PGLZ_MAX_OUTPUT(inputBuffer->len) + CSTORE_COMPRESS_HDRSZ;
-	bool compressionResult = false;
+               CompressionType compressionType) {
+    uint64 maximumLength = PGLZ_MAX_OUTPUT(inputBuffer->len) + CSTORE_COMPRESS_HDRSZ;
+    bool compressionResult = false;
 #if PG_VERSION_NUM >= 90500
-	int32 compressedByteCount = 0;
+    int32 compressedByteCount = 0;
 #endif
 
-	if (compressionType != COMPRESSION_PG_LZ)
-	{
-		return false;
-	}
+    if (compressionType != COMPRESSION_PG_LZ && compressionType != COMPRESSION_LZ4) {
+        return false;
+    }
 
-	resetStringInfo(outputBuffer);
-	enlargeStringInfo(outputBuffer, maximumLength);
 
+    if (compressionType == COMPRESSION_PG_LZ) {
+        resetStringInfo(outputBuffer);
+        enlargeStringInfo(outputBuffer, maximumLength);
 #if PG_VERSION_NUM >= 90500
-	compressedByteCount = pglz_compress((const char *) inputBuffer->data,
-										inputBuffer->len,
-										CSTORE_COMPRESS_RAWDATA(outputBuffer->data),
-										PGLZ_strategy_always);
-	if (compressedByteCount >= 0)
-	{
-		CSTORE_COMPRESS_SET_RAWSIZE(outputBuffer->data, inputBuffer->len);
-		SET_VARSIZE_COMPRESSED(outputBuffer->data,
-							   compressedByteCount + CSTORE_COMPRESS_HDRSZ);
-		compressionResult = true;
-	}
+        compressedByteCount = pglz_compress((const char *) inputBuffer->data,
+                                            inputBuffer->len,
+                                            CSTORE_COMPRESS_RAWDATA(outputBuffer->data),
+                                            PGLZ_strategy_always);
+        if (compressedByteCount >= 0) {
+            CSTORE_COMPRESS_SET_RAWSIZE(outputBuffer->data, inputBuffer->len);
+            SET_VARSIZE_COMPRESSED(outputBuffer->data,
+                                   compressedByteCount + CSTORE_COMPRESS_HDRSZ);
+            compressionResult = true;
+        }
 #else
-
-	compressionResult = pglz_compress(inputBuffer->data, inputBuffer->len,
-									  CSTORE_COMPRESS_RAWDATA(outputBuffer->data),
-									  PGLZ_strategy_always);
+        compressionResult = pglz_compress(inputBuffer->data, inputBuffer->len,
+                                          (PGLZ_Header *) CSTORE_COMPRESS_RAWDATA(outputBuffer->data),
+                                          PGLZ_strategy_always);
 #endif
+    } else {
+        int compressed_bytes = 0; // for lz4 compression
+        int min_dst_len = LZ4_compressBound(inputBuffer->len) + CSTORE_COMPRESS_HDRSZ_LZ4;
+        resetStringInfo(outputBuffer);
+        enlargeStringInfo(outputBuffer, min_dst_len);
+        Assert(outputBuffer->maxlen >= min_src_len);
+        compressed_bytes = LZ4_compress_default(inputBuffer->data, CSTORE_COMPRESS_RAWDATA_LZ4(outputBuffer->data),
+                                                inputBuffer->len,
+                                                outputBuffer->maxlen);
+        if (compressed_bytes <= 0) {
+            ereport(ERROR, (errmsg("\"LZ4 Compression Failed!"),
+                    errdetail("Expected at least %u bytes, but received %u bytes",
+                              min_dst_len, compressed_bytes)));
+        } else {
+            compressionResult = true;
+            printf("We successfully compressed some data! Ratio: %.2f\n",
+                   (float) compressed_bytes / inputBuffer->len);
+            CSTORE_COMPRESS_SET_RAWSIZE_LZ4(outputBuffer->data, inputBuffer->len);
+            SET_VARSIZE_COMPRESSED(outputBuffer->data,
+                                   compressed_bytes + CSTORE_COMPRESS_HDRSZ_LZ4);
+        }
+    }
+    if (compressionResult) {
+        outputBuffer->len = VARSIZE(outputBuffer->data);
+    }
 
-	if (compressionResult)
-	{
-		outputBuffer->len = VARSIZE(outputBuffer->data);
-	}
-
-	return compressionResult;
+    return compressionResult;
 }
 
 
@@ -111,61 +134,81 @@ CompressBuffer(StringInfo inputBuffer, StringInfo outputBuffer,
  * type. This function returns the buffer as-is when no compression is applied.
  */
 StringInfo
-DecompressBuffer(StringInfo buffer, CompressionType compressionType)
-{
-	StringInfo decompressedBuffer = NULL;
+DecompressBuffer(StringInfo buffer, CompressionType compressionType) {
+    StringInfo decompressedBuffer = NULL;
 
-	Assert(compressionType == COMPRESSION_NONE || compressionType == COMPRESSION_PG_LZ);
+    Assert(compressionType == COMPRESSION_NONE || compressionType == COMPRESSION_PG_LZ ||
+           compressionType == COMPRESSION_LZ4);
 
-	if (compressionType == COMPRESSION_NONE)
-	{
-		/* in case of no compression, return buffer */
-		decompressedBuffer = buffer;
-	}
-	else if (compressionType == COMPRESSION_PG_LZ)
-	{
-		uint32 compressedDataSize = VARSIZE(buffer->data) - CSTORE_COMPRESS_HDRSZ;
-		uint32 decompressedDataSize = CSTORE_COMPRESS_RAWSIZE(buffer->data);
-		char *decompressedData = NULL;
+    if (compressionType == COMPRESSION_NONE) {
+        /* in case of no compression, return buffer */
+        decompressedBuffer = buffer;
+    } else {
+        if (compressionType == COMPRESSION_PG_LZ) {
+            uint32 compressedDataSize = VARSIZE(buffer->data) - CSTORE_COMPRESS_HDRSZ;
+            uint32 decompressedDataSize = CSTORE_COMPRESS_RAWSIZE(buffer->data);
+            char *decompressedData = NULL;
 #if PG_VERSION_NUM >= 90500
-		int32 decompressedByteCount = 0;
+            int32 decompressedByteCount = 0;
 #endif
 
-		if (compressedDataSize + CSTORE_COMPRESS_HDRSZ != buffer->len)
-		{
-			ereport(ERROR, (errmsg("cannot decompress the buffer"),
-							errdetail("Expected %u bytes, but received %u bytes",
-									  compressedDataSize, buffer->len)));
-		}
+            if (compressedDataSize + CSTORE_COMPRESS_HDRSZ != buffer->len) {
+                ereport(ERROR, (errmsg("cannot decompress the buffer"),
+                        errdetail("Expected %u bytes, but received %u bytes",
+                                  compressedDataSize, buffer->len)));
+            }
 
-		decompressedData = palloc0(decompressedDataSize);
+            decompressedData = palloc0(decompressedDataSize);
 
 #if PG_VERSION_NUM >= 90500
 
 #if PG_VERSION_NUM >= 120000
-		decompressedByteCount = pglz_decompress(CSTORE_COMPRESS_RAWDATA(buffer->data),
-												compressedDataSize, decompressedData,
-												decompressedDataSize, true);
+            decompressedByteCount = pglz_decompress(CSTORE_COMPRESS_RAWDATA(buffer->data),
+                                                    compressedDataSize, decompressedData,
+                                                    decompressedDataSize, true);
 #else
-		decompressedByteCount = pglz_decompress(CSTORE_COMPRESS_RAWDATA(buffer->data),
-												compressedDataSize, decompressedData,
-												decompressedDataSize);
+            decompressedByteCount = pglz_decompress(CSTORE_COMPRESS_RAWDATA(buffer->data),
+                                                    compressedDataSize, decompressedData,
+                                                    decompressedDataSize);
 #endif
 
-		if (decompressedByteCount < 0)
-		{
-			ereport(ERROR, (errmsg("cannot decompress the buffer"),
-							errdetail("compressed data is corrupted")));
-		}
+            if (decompressedByteCount < 0)
+            {
+                ereport(ERROR, (errmsg("cannot decompress the buffer"),
+                                errdetail("compressed data is corrupted")));
+            }
 #else
-		pglz_decompress((PGLZ_Header *) buffer->data, decompressedData);
+            pglz_decompress((PGLZ_Header *) buffer->data, decompressedData);
 #endif
 
-		decompressedBuffer = palloc0(sizeof(StringInfoData));
-		decompressedBuffer->data = decompressedData;
-		decompressedBuffer->len = decompressedDataSize;
-		decompressedBuffer->maxlen = decompressedDataSize;
-	}
-
-	return decompressedBuffer;
+            decompressedBuffer = palloc0(sizeof(StringInfoData));
+            decompressedBuffer->data = decompressedData;
+            decompressedBuffer->len = decompressedDataSize;
+            decompressedBuffer->maxlen = decompressedDataSize;
+        } else {
+            uint32 compressedDataSize = VARSIZE(buffer->data) - CSTORE_COMPRESS_HDRSZ_LZ4;
+            int decompressedDataSize_expected = (int) CSTORE_COMPRESS_RAWSIZE_LZ4(buffer->data);
+            int decompressedDataSize_real = 0;
+            char *decompressedData = NULL;
+            if (compressedDataSize + CSTORE_COMPRESS_HDRSZ_LZ4 != buffer->len) {
+                ereport(ERROR, (errmsg("cannot decompress the buffer"),
+                        errdetail("Expected %u bytes, but received %u bytes",
+                                  compressedDataSize, buffer->len)));
+            }
+            decompressedData = palloc0(decompressedDataSize_expected);
+            decompressedDataSize_real = LZ4_decompress_safe(CSTORE_COMPRESS_RAWDATA_LZ4(buffer->data), decompressedData,
+                                                            compressedDataSize, // TODO: check why decompress failed
+                                                            decompressedDataSize_expected);
+            if (decompressedDataSize_real < 0) {
+                ereport(ERROR, (errmsg("lz4 cannot decompress the buffer, malformed source string"),
+                        errdetail("Expected %u bytes, but received %u bytes",
+                                  compressedDataSize, buffer->len)));
+            }
+            decompressedBuffer = palloc0(sizeof(StringInfoData));
+            decompressedBuffer->data = decompressedData;
+            decompressedBuffer->len = decompressedDataSize_real;
+            decompressedBuffer->maxlen = decompressedDataSize_real;
+        }
+    }
+    return decompressedBuffer;
 }

@@ -125,7 +125,7 @@ CStoreBeginRead(const char *filename, TupleDesc tupleDescriptor,
 	}
 
 	/*
-	 * We allocate all stripe specific data in the stripeReadContext, and reset
+	 * We allocate all st33ripe specific data in the stripeReadContext, and reset
 	 * this memory context before loading a new stripe. This is to avoid memory
 	 * leaks.
 	 */

@@ -1615,7 +1615,10 @@ ParseCompressionType(const char *compressionTypeString)
 	else if (strncmp(compressionTypeString, COMPRESSION_STRING_PG_LZ, NAMEDATALEN) == 0)
 	{
 		compressionType = COMPRESSION_PG_LZ;
-	}
+	}if (strncmp(compressionTypeString, COMPRESSION_STRING_LZ4, NAMEDATALEN) == 0)
+    {
+        compressionType = COMPRESSION_LZ4;
+    }
 
 	return compressionType;
 }

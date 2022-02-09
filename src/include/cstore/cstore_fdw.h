@@ -43,7 +43,8 @@
 /* String representations of compression types */
 #define COMPRESSION_STRING_NONE "none"
 #define COMPRESSION_STRING_PG_LZ "pglz"
-#define COMPRESSION_STRING_DELIMITED_LIST "none, pglz"
+#define COMPRESSION_STRING_LZ4 "lz4"
+#define COMPRESSION_STRING_DELIMITED_LIST "none, pglz, lz4"
 
 /* CStore file signature */
 #define CSTORE_MAGIC_NUMBER "citus_cstore"
@@ -99,7 +100,7 @@ typedef enum
 	COMPRESSION_TYPE_INVALID = -1,
 	COMPRESSION_NONE = 0,
 	COMPRESSION_PG_LZ = 1,
-
+    COMPRESSION_LZ4 = 2,
 	COMPRESSION_COUNT
 
 } CompressionType;

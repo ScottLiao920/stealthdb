@@ -28,6 +28,7 @@
 #else
 #include "optimizer/var.h"
 #endif
+#include "lz4.h"
 #include "port.h"
 #include "storage/fd.h"
 #include "utils/memutils.h"
@@ -812,7 +813,7 @@ SerializeBlockData(TableWriteState *writeState, uint32 blockIndex, uint32 rowCou
 		if (compressed)
 		{
 			serializedValueBuffer = compressionBuffer;
-			actualCompressionType = COMPRESSION_PG_LZ;
+			actualCompressionType = requestedCompressionType;
 		}
 
 		/* store (compressed) value buffer */
