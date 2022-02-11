@@ -270,8 +270,11 @@ CStoreWriteRow(TableWriteState *writeState, Datum *columnValues, bool *columnNul
 
 			blockData->existsArray[blockRowIndex] = true;
 
+            // if the column data type is not encrypted, append it to the valueBuffer directly
+            //TODO: if the column data type is encrypted, compress & encrypt whole block first then fill;
 			SerializeSingleDatum(blockData->valueBuffer, columnValues[columnIndex],
 								 columnTypeByValue, columnTypeLength, columnTypeAlign);
+            // read from columnValues and append to valueBuffer of blockData (block of a column in target table)
 
 			UpdateBlockSkipNodeMinMax(blockSkipNode, columnValues[columnIndex],
 									  columnTypeByValue, columnTypeLength,
