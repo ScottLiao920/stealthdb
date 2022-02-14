@@ -2216,7 +2216,7 @@ CStoreBeginForeignInsert(ModifyTableState *modifyTableState, ResultRelInfo *rela
     // change the attribute type from encrypted to plaintext directly
     //TODO: change the type required by plan
     for (int i = 0; i < tupleDescriptor->natts; i++) {
-        Type target_type = typeidType(tupleDescriptor->attrs[0]->atttypid);
+        Type target_type = typeidType(tupleDescriptor->attrs[i]->atttypid);
         char *target_type_name = typeTypeName(target_type);
         const char *enc_name = "enc_";
         char *is_enc = malloc(5 * sizeof(char));
@@ -2225,16 +2225,21 @@ CStoreBeginForeignInsert(ModifyTableState *modifyTableState, ResultRelInfo *rela
         is_enc[4] = 0;
         if (strcmp(is_enc, enc_name) == 0) {
             //change the type required by query (encrypted types to unencrypted types)
-            PlanState *ps = modifyTableState->mt_plans;
+            PlanState *ps = modifyTableState->mt_plans[0];
             ListCell *lc;
             Oid typeID_query;
             TargetEntry *tle;
+            int cnt = 0;
             foreach(lc, ps->targetlist) {
                 tle = (TargetEntry *) lfirst(lc);
-                typeID_query = ((SubPlan *) tle->expr)->firstColType;
+                SubPlan *sp = (SubPlan *) tle->expr;
+                if (sp->firstColType == NULL)
+                    continue;
+                typeID_query = sp->firstColType;
                 if (typeID_query == tupleDescriptor->attrs[i]->atttypid) {
                     break; // found the corresponding plan state, change the required type id in the following switch statement
                 }
+                cnt += 1;
             }
 
             char *dec_type = target_type_name + 4;
