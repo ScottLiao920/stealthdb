@@ -372,7 +372,7 @@ int enc_text_cmp(char* src1,
     return resp;
 }
 
-int enc_text_decrypt(char* pSrc, size_t src_len, char* pDst, size_t dst_len)
+int enc_text_decrypt(char* pSrc, size_t src_len, char* pDst, size_t *dst_len)
 {
     int resp = ENCLAVE_IS_NOT_RUNNING;
     if (!status)
@@ -388,7 +388,7 @@ int enc_text_decrypt(char* pSrc, size_t src_len, char* pDst, size_t dst_len)
     src_bytearray_len = FromBase64Fast((const BYTE*)pSrc, src_len, dst, src_len);
     src_decrypted_len = src_bytearray_len - SGX_AESGCM_IV_SIZE - SGX_AESGCM_MAC_SIZE;
 
-    if (src_decrypted_len > dst_len)
+    if (src_decrypted_len > (*dst_len))
         return MEMORY_ALLOCATION_ERROR;
 
     memcpy(req->buffer, &src_bytearray_len, INT32_LENGTH);
@@ -408,7 +408,7 @@ int enc_text_decrypt(char* pSrc, size_t src_len, char* pDst, size_t dst_len)
         else
         {
             memcpy(
-                &dst_len, req->buffer + src_bytearray_len + INT32_LENGTH, INT32_LENGTH);
+                dst_len, req->buffer + src_bytearray_len + INT32_LENGTH, INT32_LENGTH);
             memcpy(pDst,
                    req->buffer + src_bytearray_len + 2 * INT32_LENGTH,
                    src_bytearray_len);
@@ -418,7 +418,7 @@ int enc_text_decrypt(char* pSrc, size_t src_len, char* pDst, size_t dst_len)
         }
     }
 
-    pDst[dst_len] = '\0';
+    pDst[*dst_len] = '\0';
 
     delete req;
     delete[] dst;

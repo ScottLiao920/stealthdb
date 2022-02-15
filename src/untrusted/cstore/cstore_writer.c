@@ -792,6 +792,8 @@ SerializeBlockData(TableWriteState *writeState, uint32 blockIndex, uint32 rowCou
                 size_t enc_src_b64_len = ((int) (4 * (double) (enc_src_len) / 3) + 3) & ~3;
                 enlargeStringInfo(serializedValueBuffer, (enc_src_b64_len + 1) * sizeof(char));
                 resp = enc_text_encrypt(compressionBuffer->data, src_len, serializedValueBuffer->data, enc_src_b64_len);
+                serializedValueBuffer->len = enc_src_b64_len;
+                serializedValueBuffer->cursor = src_len;
                 sgxErrorHandler(resp);
             } else {
                 serializedValueBuffer = compressionBuffer;

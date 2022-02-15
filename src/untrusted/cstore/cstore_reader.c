@@ -1142,6 +1142,7 @@ DeserializeBlockData(StripeBuffers *stripeBuffers, uint64 blockIndex,
 
             // TODO: if it's encrypted data type, decrypt it first (completed)
             // fixme: check buffer read from files, currently have errors from decryption
+            // fixme: the error above is fixed. It comes from mismatched
             Type requestedDataType = typeidType(tupleDescriptor->attrs[columnIndex]->atttypid);
             char *target_type_name = typeTypeName(requestedDataType);
             const char *enc_name = "enc_";
@@ -1154,10 +1155,11 @@ DeserializeBlockData(StripeBuffers *stripeBuffers, uint64 blockIndex,
                 int resp;
                 StringInfo decryptedBuffer = palloc0(sizeof(StringInfoData));
                 size_t src_len = blockBuffers->valueBuffer->len; // included header for lz4 compression
+//                size_t dec_len = blockBuffers->valueBuffer->cursor;
                 size_t dec_len = src_len - SGX_AESGCM_IV_SIZE - SGX_AESGCM_MAC_SIZE;
                 decryptedBuffer->data = palloc(dec_len * sizeof(char));
                 resp = enc_text_decrypt(blockBuffers->valueBuffer->data, src_len, decryptedBuffer->data,
-                                        dec_len);
+                                        &dec_len);
                 sgxErrorHandler(resp);
                 decryptedBuffer->len = dec_len;
                 decryptedBuffer->maxlen = blockBuffers->valueBuffer->maxlen;

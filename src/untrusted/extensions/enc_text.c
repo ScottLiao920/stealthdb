@@ -50,7 +50,7 @@ Datum
     // if it returns an error encrypt it
     if (srcLen > min_enctext_len - 1)
     {
-        resp = enc_text_decrypt(pSrc, srcLen, pDst, dst_len);
+        resp = enc_text_decrypt(pSrc, srcLen, pDst, &dst_len);
         memset(pDst, 0, dst_len);
         if (resp == SGX_SUCCESS)
         {
@@ -109,7 +109,7 @@ Datum
 
     if (debugMode == true)
     {
-        resp = enc_text_decrypt(pSrc->src, pSrc->length, pDst, pSrc->length);
+        resp = enc_text_decrypt(pSrc->src, pSrc->length, pDst, (size_t *) &(pSrc->length));
         sgxErrorHandler(resp);
         //ereport(INFO, (errmsg("auto decryption: DEC('%s') = %s", pSrc->src, pDst)));
     }
@@ -359,7 +359,7 @@ Datum
     size_t dst_len = enc_str_var->length - SGX_AESGCM_IV_SIZE - SGX_AESGCM_MAC_SIZE;
     char* pDst = palloc(dst_len * sizeof(char));
 
-    ans = enc_text_decrypt(enc_str_var->src, enc_str_var->length, pDst, dst_len);
+    ans = enc_text_decrypt(enc_str_var->src, enc_str_var->length, pDst, &dst_len);
     sgxErrorHandler(ans);
 
     PG_RETURN_CSTRING(pDst);
