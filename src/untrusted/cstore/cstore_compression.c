@@ -50,6 +50,7 @@ typedef struct CStoreCompressHeader {
 #define CSTORE_COMPRESS_SET_RAWSIZE(ptr, len) (((PGLZ_Header *) (ptr))->rawsize = (len))
 
 typedef struct LZ4CompressHeader {
+    int32 vl_len_;
     int32 rawsize;
 } LZ4CompressHeader;
 #define CSTORE_COMPRESS_HDRSZ_LZ4       ((int32) sizeof(LZ4CompressHeader))

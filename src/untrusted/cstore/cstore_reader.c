@@ -1142,7 +1142,7 @@ DeserializeBlockData(StripeBuffers *stripeBuffers, uint64 blockIndex,
 
             // TODO: if it's encrypted data type, decrypt it first (completed)
             // fixme: check buffer read from files, currently have errors from decryption
-            // fixme: the error above is fixed. It comes from mismatched
+            // fixme: the error above is fixed. It comes from mismatched buffer length
             Type requestedDataType = typeidType(tupleDescriptor->attrs[columnIndex]->atttypid);
             char *target_type_name = typeTypeName(requestedDataType);
             const char *enc_name = "enc_";

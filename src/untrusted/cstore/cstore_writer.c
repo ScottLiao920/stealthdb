@@ -780,7 +780,7 @@ SerializeBlockData(TableWriteState *writeState, uint32 blockIndex, uint32 rowCou
             Type requestedDataType = typeidType(writeState->tupleDescriptor->attrs[columnIndex]->atttypid);
             char *target_type_name = typeTypeName(requestedDataType);
             const char *enc_name = "enc_";
-            char *is_enc = malloc(5 * sizeof(char));
+            char *is_enc = palloc(5 * sizeof(char));
             strncpy(is_enc, target_type_name,
                     4 * sizeof(char)); // store the first 4 characters of type name in target table
             is_enc[4] = 0;
@@ -798,7 +798,7 @@ SerializeBlockData(TableWriteState *writeState, uint32 blockIndex, uint32 rowCou
             } else {
                 serializedValueBuffer = compressionBuffer;
             }
-            free(is_enc);
+            pfree(is_enc);
             actualCompressionType = requestedCompressionType;
         }
 
