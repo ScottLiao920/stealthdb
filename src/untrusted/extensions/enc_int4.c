@@ -42,7 +42,7 @@ pg_enc_int4_in(PG_FUNCTION_ARGS) {
             pDst[ENC_INT32_LENGTH_B64 - 1] = '\0';
         }
     } else {
-        if (strlen(pSrc) != ENC_INT32_LENGTH_B64 - 1) {
+        if (false) { //(strlen(pSrc) != ENC_INT32_LENGTH_B64 - 1) {
             ereport(ERROR,
                     (errmsg("Incorrect length of enc_int4 element, try 'select enable_debug_mode(1)' to allow auto encryption/decryption or select pg_enc_int4_encrypt")));
         } else {

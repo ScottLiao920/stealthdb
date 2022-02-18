@@ -341,6 +341,23 @@ int enc_text_cmp(char *src1,
     return resp;
 }
 
+int enc_text_compress_n_encrypt(char *pSrc, size_t src_len, char *pDst, size_t dst_len) {
+    int compBytes = 0;
+    int resp;
+    compBytes = LZ4_compress_default(pSrc, pDst, src_len, dst_len);
+    if (compBytes != 0) {
+        resp = enc_text_encrypt(pSrc, src_len, pDst, dst_len);
+        return resp;
+    } else {
+        return compBytes;
+    }
+}
+
+int enc_text_decrypt_n_decompress(char *pSrc, size_t src_len, char *pDst, size_t dst_len) {
+    return 0;
+}
+
+
 int enc_text_decrypt(char *pSrc, size_t src_len, char *pDst, size_t dst_len) {
     int resp = ENCLAVE_IS_NOT_RUNNING;
     if (!status) {
