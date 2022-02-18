@@ -350,7 +350,7 @@ pg_enc_text_decrypt(PG_FUNCTION_ARGS) {
     char *pDst = palloc(dst_len * sizeof(char));
 
     ans = enc_text_decrypt(enc_str_var->src, enc_str_var->length, pDst, dst_len);
-    ans -= (ans >> 4);
+    ans -= (ans >> 4);// for passing dst_len out
     sgxErrorHandler(ans);
 
     PG_RETURN_CSTRING(pDst);
