@@ -44,7 +44,7 @@ int enc_text_substring(char *in1, size_t in1_size, char *in2, size_t in2_size, c
 int enc_text_like(char *in1, size_t in1_size, char *in2, size_t in2_size, int *out);
 
 int enc_text_encrypt(char *arg1, size_t arg1_len, char *res, size_t dst_len);
-int enc_text_decrypt(char *arg1, size_t arg1_len, char *res, size_t *dst_len);
+int enc_text_decrypt(char *arg1, size_t arg1_len, char *res, size_t dst_len);
 
 int enc_float32_cmp(char *arg1, char *arg2, char *res);
 int enc_float32_encrypt(float pSrc, char *pDst);

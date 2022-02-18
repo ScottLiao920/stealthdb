@@ -1159,7 +1159,9 @@ DeserializeBlockData(StripeBuffers *stripeBuffers, uint64 blockIndex,
                 size_t dec_len = src_len - SGX_AESGCM_IV_SIZE - SGX_AESGCM_MAC_SIZE;
                 decryptedBuffer->data = palloc(dec_len * sizeof(char));
                 resp = enc_text_decrypt(blockBuffers->valueBuffer->data, src_len, decryptedBuffer->data,
-                                        &dec_len);
+                                        dec_len);
+                dec_len = (resp >> 4);
+                resp -= dec_len;
                 sgxErrorHandler(resp);
                 decryptedBuffer->len = dec_len;
                 decryptedBuffer->maxlen = blockBuffers->valueBuffer->maxlen;
