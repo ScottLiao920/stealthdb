@@ -198,7 +198,7 @@ DecompressBuffer(StringInfo buffer, CompressionType compressionType) {
             }
             decompressedData = palloc0(decompressedDataSize_expected);
             decompressedDataSize_real = LZ4_decompress_safe(CSTORE_COMPRESS_RAWDATA_LZ4(buffer->data), decompressedData,
-                                                            compressedDataSize, // TODO: check why decompress failed
+                                                            compressedDataSize,
                                                             decompressedDataSize_expected);
             if (decompressedDataSize_real < 0) {
                 ereport(ERROR, (errmsg("lz4 cannot decompress the buffer, malformed source string"),

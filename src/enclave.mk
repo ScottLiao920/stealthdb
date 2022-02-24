@@ -41,10 +41,10 @@ CFLAGS := $(FLAGS) $(CPPFLAGS) -nostdinc -std=c11
 CXXFLAGS :=  $(FLAGS) $(CPPFLAGS) -nostdinc++ -std=c++11
 
 LDFLAGS := \
-	-Wl,--no-undefined -nostdlib -nodefaultlibs -nostartfiles -L$(SDK_INSTALL_PATH)/lib64\
+	-Wl,--no-undefined -nostdlib -nodefaultlibs -nostartfiles -L$(SDK_INSTALL_PATH)/lib64 -L/usr/local/include\
 	-Wl,--whole-archive -lsgx_trts -Wl,--no-whole-archive \
-	-Wl,--start-group -lsgx_tstdc -lsgx_tcxx -lsgx_tcrypto -lsgx_tservice -llz4 -Wl,--end-group \
-	-Wl,-Bstatic -Wl,-Bsymbolic -Wl,--no-undefined \
+	-Wl,--start-group -lsgx_tstdc -lsgx_tcxx -lsgx_tcrypto -lsgx_tservice -Wl,--end-group \
+	-Wl,-Bstatic -llz4 -Wl,-Bsymbolic -Wl,--no-undefined \
 	-Wl,-pie,-eenclave_entry -Wl,--export-dynamic  \
 	-Wl,--defsym,__ImageBase=0 \
 	-Wl,--version-script=$(ENCLAVE_DIR)/enclave.lds

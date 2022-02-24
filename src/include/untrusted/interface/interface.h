@@ -7,6 +7,7 @@
 #include <stdarg.h>
 #include "sgx_eid.h"     /* sgx_enclave_id_t */
 #include "enclave_u.h"
+#include "lz4.h"
 
 #ifndef TRUE
 # define TRUE 1
@@ -46,8 +47,8 @@ int enc_text_like(char *in1, size_t in1_size, char *in2, size_t in2_size, int *o
 int enc_text_encrypt(char *arg1, size_t arg1_len, char *res, size_t dst_len);
 int enc_text_decrypt(char *arg1, size_t arg1_len, char *res, size_t dst_len);
 
-int enc_text_compress_n_encrypt(char *pSrc, size_t src_len, char *pDst, size_t dst_len);
-int enc_text_decrypt_n_decompress(char *pSrc, size_t src_len, char *pDst, size_t dst_len);
+int enc_text_compress_n_encrypt(char *pSrc, size_t src_len, char *pDst);
+int enc_text_decrypt_n_decompress(char *pSrc, size_t src_len, char *pDst);
 
 int enc_float32_cmp(char *arg1, char *arg2, char *res);
 int enc_float32_encrypt(float pSrc, char *pDst);

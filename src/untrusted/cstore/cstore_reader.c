@@ -43,6 +43,7 @@
 #include "utils/memutils.h"
 #include "utils/lsyscache.h"
 #include "utils/rel.h"
+#include "tools/base64.hpp"
 
 
 /* static function declarations */
@@ -1140,9 +1141,6 @@ DeserializeBlockData(StripeBuffers *stripeBuffers, uint64 blockIndex,
             pfree(blockData->valueBuffer->data);
             pfree(blockData->valueBuffer);
 
-            // TODO: if it's encrypted data type, decrypt it first (completed)
-            // fixme: check buffer read from files, currently have errors from decryption
-            // fixme: the error above is fixed. It comes from mismatched buffer length
             Type requestedDataType = typeidType(tupleDescriptor->attrs[columnIndex]->atttypid);
             char *target_type_name = typeTypeName(requestedDataType);
             const char *enc_name = "enc_";
@@ -1153,26 +1151,39 @@ DeserializeBlockData(StripeBuffers *stripeBuffers, uint64 blockIndex,
             if (strcmp(is_enc, enc_name) == 0) {
                 // current processing column is requesting an encrypted type;
                 int resp;
-                StringInfo decryptedBuffer = palloc0(sizeof(StringInfoData));
+                StringInfo decryptedBuffer = makeStringInfo();
                 size_t src_len = blockBuffers->valueBuffer->len; // included header for lz4 compression
-//                size_t dec_len = blockBuffers->valueBuffer->cursor;
-                size_t dec_len = src_len - SGX_AESGCM_IV_SIZE - SGX_AESGCM_MAC_SIZE;
-                decryptedBuffer->data = palloc(dec_len * sizeof(char));
-                resp = enc_text_decrypt(blockBuffers->valueBuffer->data, src_len, decryptedBuffer->data,
-                                        dec_len);
-                dec_len = (resp >> 4);
-                resp -= dec_len;
-                sgxErrorHandler(resp);
-                decryptedBuffer->len = dec_len;
-                decryptedBuffer->maxlen = blockBuffers->valueBuffer->maxlen;
-                pfree(blockBuffers->valueBuffer);
-                pfree(blockBuffers->valueBuffer->data);
-                blockBuffers->valueBuffer = decryptedBuffer;
-            }
+                size_t dec_len = 2 * src_len; // doesnt really matter, just need to be large enough to hold decrypted (compressed) data
+                enlargeStringInfo(decryptedBuffer, dec_len * sizeof(char));
+                BYTE *tmpPtr = palloc0(sizeof(BYTE));
+                if (FromBase64Fast_C((const BYTE *) blockBuffers->valueBuffer->data, ENC_INT32_LENGTH_B64 - 1,
+                                     tmpPtr, ENC_INT32_LENGTH) == 0) {
+                    valueBuffer = makeStringInfo();
+                    enlargeStringInfo(valueBuffer, dec_len * sizeof(char));
+                    resp = enc_text_decrypt_n_decompress(blockBuffers->valueBuffer->data, src_len, valueBuffer->data);
+                    dec_len = (resp >> 4);
+                    resp -= (dec_len << 4);
+                } else {
+                    decryptedBuffer->data = palloc(dec_len * sizeof(char));
+                    resp = enc_text_decrypt(blockBuffers->valueBuffer->data, src_len, decryptedBuffer->data,
+                                            dec_len);
+                    dec_len = (resp >> 4);
+                    resp -= (dec_len << 4);
+                    decryptedBuffer->len = dec_len;
+                    decryptedBuffer->maxlen = blockBuffers->valueBuffer->maxlen;
+                    pfree(blockBuffers->valueBuffer);
+                    pfree(blockBuffers->valueBuffer->data);
+                    blockBuffers->valueBuffer = decryptedBuffer;
 
-            /* decompress and deserialize current block's data */
-            valueBuffer = DecompressBuffer(blockBuffers->valueBuffer,
-                                           blockBuffers->valueCompressionType);
+                    /* decompress and deserialize current block's data */
+                    valueBuffer = DecompressBuffer(blockBuffers->valueBuffer,
+                                                   blockBuffers->valueCompressionType);
+                }
+                sgxErrorHandler(resp);
+            } else {
+                valueBuffer = DecompressBuffer(blockBuffers->valueBuffer,
+                                               blockBuffers->valueCompressionType);
+            }
 
             if (blockBuffers->valueCompressionType != COMPRESSION_NONE) {
                 /* compressed data is not needed anymore */

@@ -133,3 +133,55 @@ int loadKey(int item)
     data_file.close();
     return 0;
 }
+
+int enc_text_compress_n_encrypt(char *pSrc, size_t src_len, char *pDst) {
+    if (!status)
+    {
+        int resp = initMultithreading();
+        if (resp != SGX_SUCCESS)
+            return resp;
+    }
+    int compBytes = 0;
+    int resp = 0;
+    int comp_len = LZ4_compressBound(src_len) + 2 * sizeof(int);
+    char *comp_buffer = (char *) malloc(comp_len);
+    resp = compressBufferEnclave(global_eid, &compBytes, pSrc, comp_buffer + 2 * sizeof(int), src_len,
+                                 comp_len - 2 * sizeof(int));
+    if (resp != SGX_SUCCESS) {
+        return SGX_ERROR_UNEXPECTED;
+    }
+    memcpy(comp_buffer, &src_len, sizeof(int));
+    memcpy(comp_buffer + sizeof(int), &compBytes, sizeof(int));
+    compBytes += 2 * sizeof(int);
+    size_t enc_len = compBytes + SGX_AESGCM_IV_SIZE + SGX_AESGCM_MAC_SIZE;
+    size_t enc_b64_len = ((int) (4 * (double) (enc_len) / 3) + 3) & ~3;
+    if (compBytes != 0) {
+        resp = enc_text_encrypt(comp_buffer, compBytes, pDst, enc_b64_len);
+    }
+    free(comp_buffer);
+    return resp + (enc_b64_len << 4);
+}
+
+int enc_text_decrypt_n_decompress(char *pSrc, size_t src_len, char *pDst) {
+    if (!status)
+    {
+        int resp = initMultithreading();
+        if (resp != SGX_SUCCESS)
+            return resp;
+    }
+    int resp;
+    char *decry_buffer = (char *) malloc(2 * src_len * sizeof(char));
+    //TODO: mac address doesnt match
+    resp = enc_text_decrypt(pSrc, src_len, decry_buffer, 2 * src_len);
+    int dec_len = (resp >> 4);
+    int raw_bytes, comp_bytes;
+    memcpy(&raw_bytes, decry_buffer, sizeof(int));
+    memcpy(&comp_bytes, decry_buffer + sizeof(int), sizeof(int));
+    int dec_bytes;
+    resp = decompressBufferEnclave(global_eid, &dec_bytes, decry_buffer + 2 * sizeof(int), pDst, comp_bytes,
+                                        raw_bytes);
+    if (dec_bytes < 0 || dec_bytes != (int) raw_bytes) {
+        printf("unable to decompress it properly!");
+    }
+    return resp + (dec_len << 4);
+}

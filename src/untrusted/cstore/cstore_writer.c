@@ -40,7 +40,7 @@
 #include "utils/lsyscache.h"
 #include "utils/rel.h"
 #include "untrusted/interface/interface.h"
-//#include "tools/base64.hpp" // for verification of enc_types
+#include "tools/base64.hpp" // for verification of enc_types
 
 
 static void CStoreWriteFooter(StringInfo footerFileName, TableFooter *tableFooter);
@@ -779,17 +779,16 @@ SerializeBlockData(TableWriteState *writeState, uint32 blockIndex, uint32 rowCou
         is_enc[4] = 0;
         if (strcmp(is_enc, enc_name) == 0) {
             int resp;
-            BYTE *tmpPtr = palloc0(sizeof(BYTE *));
-            if (true) {
+            BYTE *tmpPtr = palloc0(sizeof(BYTE));
+            if (FromBase64Fast_C((const BYTE *) serializedValueBuffer->data, ENC_INT32_LENGTH_B64 - 1,
+                                 tmpPtr, ENC_INT32_LENGTH) == 0) {
                 // unable to convert it from base64, not encrypted data in buffer
-                // !FromBase64Fast((const BYTE *) compressionBuffer->data, ENC_INT32_LENGTH_B64 - 1,
-                //                                (BYTE *) tmpPtr, ENC_INT32_LENGTH)
                 size_t src_len = serializedValueBuffer->len; // included header for lz4 compression
-                size_t enc_src_len = src_len + SGX_AESGCM_IV_SIZE + SGX_AESGCM_MAC_SIZE;
-                size_t enc_src_b64_len = ((int) (4 * (double) (enc_src_len) / 3) + 3) & ~3;
-                enlargeStringInfo(serializedValueBuffer, (enc_src_b64_len + 1) * sizeof(char));
-                resp = enc_text_compress_n_encrypt(serializedValueBuffer->data, src_len, compressionBuffer->data,
-                                                   enc_src_b64_len);
+                int enc_len;
+                resp = enc_text_compress_n_encrypt(serializedValueBuffer->data, src_len, compressionBuffer->data);
+                enc_len = (resp >> 4);
+                resp -= (enc_len << 4);
+                serializedValueBuffer->len = enc_len;
             } else {
                 compressed = CompressBuffer(serializedValueBuffer, compressionBuffer,
                                             requestedCompressionType);
@@ -803,7 +802,7 @@ SerializeBlockData(TableWriteState *writeState, uint32 blockIndex, uint32 rowCou
                     serializedValueBuffer->len = enc_src_b64_len;
                 }
             }
-            sgxErrorHandler(resp);
+//            sgxErrorHandler(resp);
             pfree(is_enc);
         } else {
             compressed = CompressBuffer(serializedValueBuffer, compressionBuffer,

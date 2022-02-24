@@ -18,6 +18,8 @@ extern "C" {
 int generateKeyEnclave(uint8_t* sealed_key, size_t sealedkey_len);
 int loadKeyEnclave(uint8_t* key, size_t len);
 int enclaveProcess(void* inQueue);
+int compressBufferEnclave(char* pSrc, char* pDst, size_t src_len, size_t dst_len);
+int decompressBufferEnclave(char* pSrc, char* pDst, size_t src_len, size_t dst_len);
 
 
 #ifdef __cplusplus

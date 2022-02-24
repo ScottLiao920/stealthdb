@@ -1,5 +1,6 @@
 #include "enclave/enclave.hpp"
 #include "enclave/enclave_t.h"
+#include "lz4.h"
 
 sgx_aes_ctr_128bit_key_t *p_key = NULL;
 
@@ -8,6 +9,35 @@ void free_allocated_memory(void *pointer) {
         free(pointer);
         pointer = NULL;
     }
+}
+
+/* Compress buffer inside enclave
+ *
+ * */
+int compressBufferEnclave(char *pSrc, char *pDst, size_t src_len, size_t dst_len) {
+    int compressed_bytes = 0;
+    int min_cap = LZ4_compressBound(src_len);
+    if ((int) dst_len < min_cap) {
+        return -1;
+    }
+    compressed_bytes = LZ4_compress_default(pSrc, pDst, src_len, dst_len);
+    if (compressed_bytes <= 0) {
+        return -1;
+    } else { return compressed_bytes; }
+}
+
+/* Decompress buffer inside enclave
+ *
+ * */
+int decompressBufferEnclave(char *pSrc, char *pDst, size_t src_len, size_t dst_len) {
+    int decompressed_bytes = 0;
+    if ((int) dst_len < LZ4_compressBound(src_len)) {
+        return SGX_ERROR_UNEXPECTED;
+    }
+    decompressed_bytes = LZ4_decompress_safe(pSrc, pDst, src_len, dst_len);
+    if (decompressed_bytes <= 0) {
+        return SGX_ERROR_UNEXPECTED;
+    } else { return decompressed_bytes; }
 }
 
 /* Generate a master key
@@ -97,10 +127,8 @@ int decrypt_bytes(uint8_t *pSrc, size_t src_len, uint8_t *pDst,
     * SGX_error, if there was an error during encryption/decryption
     0, otherwise
 */
-int
-
-encrypt_bytes(uint8_t *pSrc, size_t src_len, uint8_t *pDst,
-              size_t dst_len) {
+int encrypt_bytes(uint8_t *pSrc, size_t src_len, uint8_t *pDst,
+                  size_t dst_len) {
     unsigned char *nonce = new unsigned char[SGX_AESGCM_IV_SIZE];
 
     int resp = sgx_read_rand(nonce, SGX_AESGCM_IV_SIZE);
@@ -113,13 +141,13 @@ encrypt_bytes(uint8_t *pSrc, size_t src_len, uint8_t *pDst,
             src_len, // length of input to be encrypted
             pDst +
             SGX_AESGCM_IV_SIZE, // pointer to output encrypted data buffer, added a bias since memcpy the init vector b4
-                // the calling code (sgx_rijndael128GCM_encrypt) will allocate the buffer
+            // the calling code (sgx_rijndael128GCM_encrypt) will allocate the buffer
             nonce, // pointer to the initialization vector (set by sgx_read_rand)
             SGX_AESGCM_IV_SIZE,
             NULL, //pointer to an optional additional authentication data buffer which is used in GCM MAC calculation
             0,
             (sgx_aes_gcm_128bit_tag_t *) (pDst + SGX_AESGCM_IV_SIZE + src_len)
-                // output GCM MAC performed over the input data buffer, allocated by calling code
+            // output GCM MAC performed over the input data buffer, allocated by calling code
     );
 
     delete[] nonce;
@@ -127,7 +155,7 @@ encrypt_bytes(uint8_t *pSrc, size_t src_len, uint8_t *pDst,
     return resp;
 }
 
-int enclaveProcess(void *arg1) {
+[[noreturn]] int enclaveProcess(void *arg1) {
     // void*: this pointer may point to anything not const or volatile
     size_t src_len = 0, src2_len = 0, src3_len = 0, dst_len = 0;
     uint8_t src1[INPUT_BUFFER_SIZE];
