@@ -75,3 +75,6 @@ typedef unsigned long DWORD;  // 4bytes
 #define CMD_TIMESTAMP_ENC 151
 #define CMD_TIMESTAMP_DEC 152
 #define CMD_TIMESTAMP_EXTRACT_YEAR 153
+
+#define CMD_COMPRESS 920
+#define CMD_DECOMPRESS 626

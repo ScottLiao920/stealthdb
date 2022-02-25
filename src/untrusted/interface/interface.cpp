@@ -10,24 +10,22 @@ sgx_enclave_id_t global_eid = 0;
 
 uint8_t INPUT_BUFFER[INPUT_BUFFER_SIZE];
 uint8_t OUTPUT_BUFFER[INPUT_BUFFER_SIZE];
-Queue* inQueue;
+Queue *inQueue;
 bool status = false;
 
-int launch_enclave(sgx_launch_token_t* token, int* updated)
-{
+int launch_enclave(sgx_launch_token_t *token, int *updated) {
     sgx_status_t ret = SGX_ERROR_UNEXPECTED;
 
     ret = sgx_create_enclave(
-        ENCLAVE_FILENAME, TRUE, token, updated, &global_eid, NULL);
+            ENCLAVE_FILENAME, TRUE, token, updated, &global_eid, NULL);
     if (ret != SGX_SUCCESS)
         return ret;
     else
         return 0;
 }
 
-int init()
-{
-    sgx_launch_token_t token = { 0 };
+int init() {
+    sgx_launch_token_t token = {0};
     int updated = 0;
     int resp = launch_enclave(&token, &updated);
 
@@ -35,14 +33,13 @@ int init()
 }
 
 // void *enclaveThread(void *) {
-void enclaveThread()
-{
+void enclaveThread() {
     int resp = 0;
     enclaveProcess(global_eid, &resp, inQueue);
 }
-int initMultithreading()
-{
-    sgx_launch_token_t token = { 0 };
+
+int initMultithreading() {
+    sgx_launch_token_t token = {0};
     int updated = 0;
     status = true;
     int ans = launch_enclave(&token, &updated);
@@ -59,51 +56,44 @@ int initMultithreading()
     return ans;
 }
 
-int generateKey()
-{
-    if (!status)
-    {
+int generateKey() {
+    if (!status) {
         int resp = initMultithreading();
         if (resp != SGX_SUCCESS)
             return resp;
     }
 
     int resp, resp_enclave, flength;
-    uint8_t* sealed_key_b = new uint8_t[SEALED_KEY_LENGTH];
+    uint8_t *sealed_key_b = new uint8_t[SEALED_KEY_LENGTH];
 
     std::fstream data_file;
     data_file.open(DATA_FILENAME,
                    std::fstream::in | std::fstream::out | std::fstream::binary);
-    if (data_file)
-    {
+    if (data_file) {
         data_file.seekg(0, data_file.end);
         flength = data_file.tellg();
 
         if (flength == SEALED_KEY_LENGTH)
             return 0;
 
-        else
-        {
+        else {
             resp = generateKeyEnclave(
-                global_eid, &resp_enclave, sealed_key_b, SEALED_KEY_LENGTH);
+                    global_eid, &resp_enclave, sealed_key_b, SEALED_KEY_LENGTH);
             if (resp != SGX_SUCCESS)
                 return resp;
-            data_file.write((char*)sealed_key_b, SEALED_KEY_LENGTH);
+            data_file.write((char *) sealed_key_b, SEALED_KEY_LENGTH);
         }
-    }
-    else
+    } else
         return NO_KEYS_STORAGE;
 
     data_file.close();
     delete[] sealed_key_b;
 
-    return (int)flength / SEALED_KEY_LENGTH;
+    return (int) flength / SEALED_KEY_LENGTH;
 }
 
-int loadKey(int item)
-{
-    if (!status)
-    {
+int loadKey(int item) {
+    if (!status) {
         int resp = initMultithreading();
         if (resp != SGX_SUCCESS)
             return resp;
@@ -113,30 +103,80 @@ int loadKey(int item)
 
     std::fstream data_file;
     data_file.open(DATA_FILENAME, std::fstream::in | std::fstream::binary);
-    if (data_file)
-    {
+    if (data_file) {
         data_file.seekg(0, data_file.end);
         int flength = data_file.tellg();
         if (flength < item * SEALED_KEY_LENGTH + SEALED_KEY_LENGTH)
             return NO_KEY_ID;
 
         data_file.seekg(item * SEALED_KEY_LENGTH);
-        data_file.read((char*)sealed_key_b, SEALED_KEY_LENGTH);
+        data_file.read((char *) sealed_key_b, SEALED_KEY_LENGTH);
         resp = loadKeyEnclave(
-            global_eid, &resp_enclave, sealed_key_b, SEALED_KEY_LENGTH);
+                global_eid, &resp_enclave, sealed_key_b, SEALED_KEY_LENGTH);
         if (resp != SGX_SUCCESS)
             return resp;
-    }
-    else
+    } else
         return NO_KEYS_STORAGE;
 
     data_file.close();
     return 0;
 }
 
+//int enc_text_compress_n_encrypt(char *pSrc, size_t src_len, char *pDst) {
+//    if (!status)
+//    {
+//        int resp = initMultithreading();
+//        resp = loadKey(0);
+//        if (resp != SGX_SUCCESS)
+//            return resp;
+//    }
+//    int compBytes = 0;
+//    int resp = 0;
+//    int comp_len = LZ4_compressBound(src_len) + 2 * sizeof(int);
+//    char *comp_buffer = (char *) malloc(comp_len);
+//    resp = compressBufferEnclave(global_eid, &compBytes, pSrc, comp_buffer + 2 * sizeof(int), src_len,
+//                                 comp_len - 2 * sizeof(int));
+//    if (resp != SGX_SUCCESS) {
+//        return resp;
+//    }
+//    memcpy(comp_buffer, &src_len, sizeof(int));
+//    memcpy(comp_buffer + sizeof(int), &compBytes, sizeof(int));
+//    compBytes += 2 * sizeof(int);
+//    size_t enc_len = compBytes + SGX_AESGCM_IV_SIZE + SGX_AESGCM_MAC_SIZE;
+//    size_t enc_b64_len = ((int) (4 * (double) (enc_len) / 3) + 3) & ~3;
+//    if (compBytes != 2 * sizeof(int)) {
+//        resp = enc_text_encrypt(comp_buffer, compBytes, pDst, enc_b64_len);
+//    }
+//    free(comp_buffer);
+//    return resp + (enc_b64_len << 4);
+//}
+
+//int enc_text_decrypt_n_decompress(char *pSrc, size_t src_len, char *pDst) {
+//    if (!status)
+//    {
+//        int resp = initMultithreading();
+//        resp = loadKey(0);
+//        if (resp != SGX_SUCCESS)
+//            return resp;
+//    }
+//    int resp;
+//    char *decry_buffer = (char *) malloc(2 * src_len * sizeof(char));
+//    resp = enc_text_decrypt(pSrc, src_len, decry_buffer, 2 * src_len);
+//    int dec_len = (resp >> 4);
+//    int raw_bytes, comp_bytes;
+//    memcpy(&raw_bytes, decry_buffer, sizeof(int));
+//    memcpy(&comp_bytes, decry_buffer + sizeof(int), sizeof(int));
+//
+//    resp = decompressBufferEnclave(global_eid, &dec_len, decry_buffer + 2 * sizeof(int), pDst, comp_bytes,
+//                                   raw_bytes);
+//    if (dec_len < 0 || dec_len != (int) raw_bytes) {
+//        printf("unable to decompress it properly!");
+//    }
+//    return resp + (dec_len << 4);
+//}
+
 int enc_text_compress_n_encrypt(char *pSrc, size_t src_len, char *pDst) {
-    if (!status)
-    {
+    if (!status) {
         int resp = initMultithreading();
         resp = loadKey(0);
         if (resp != SGX_SUCCESS)
@@ -144,14 +184,36 @@ int enc_text_compress_n_encrypt(char *pSrc, size_t src_len, char *pDst) {
     }
     int compBytes = 0;
     int resp = 0;
-    int comp_len = LZ4_compressBound(src_len) + 2 * sizeof(int);
-    char *comp_buffer = (char *) malloc(comp_len);
-    resp = compressBufferEnclave(global_eid, &compBytes, pSrc, comp_buffer + 2 * sizeof(int), src_len,
-                                 comp_len - 2 * sizeof(int));
-    if (resp != SGX_SUCCESS) {
-        return resp;
+    size_t comp_len = LZ4_compressBound(src_len);
+    char *comp_buffer = NULL;
+    request *comp_req = new request;
+    comp_req->ocall_index = CMD_COMPRESS;
+    comp_req->is_done = -1;
+    memcpy(comp_req->buffer, &src_len, sizeof(size_t));
+    memcpy(comp_req->buffer + sizeof(size_t), &comp_len, sizeof(size_t));
+    memcpy(comp_req->buffer + 2 * sizeof(size_t), pSrc, src_len);
+    inQueue->enqueue(comp_req);
+
+    while (true) {
+        if (comp_req->is_done == -1) {
+            __asm__("pause");
+        } else {
+            compBytes = comp_req->resp;
+            comp_buffer = (char *) (malloc(compBytes * sizeof(char) + 2 * sizeof(int)));
+            memcpy(comp_buffer + 2 * sizeof(int), comp_req->buffer + 2 * sizeof(size_t) + src_len,
+                   compBytes * sizeof(char));
+            spin_unlock(&comp_req->is_done);
+            break;
+        }
     }
-    memcpy(comp_buffer, &src_len, sizeof(int));
+
+    if (compBytes <= 0) {
+        return SGX_ERROR_UNEXPECTED;
+    }
+
+    // comp_buffer format: (int) src_len, (int) compressed_len, (char*) compressed data
+    int src_len_int = (int) src_len;
+    memcpy(comp_buffer, &src_len_int, sizeof(int));
     memcpy(comp_buffer + sizeof(int), &compBytes, sizeof(int));
     compBytes += 2 * sizeof(int);
     size_t enc_len = compBytes + SGX_AESGCM_IV_SIZE + SGX_AESGCM_MAC_SIZE;
@@ -160,12 +222,13 @@ int enc_text_compress_n_encrypt(char *pSrc, size_t src_len, char *pDst) {
         resp = enc_text_encrypt(comp_buffer, compBytes, pDst, enc_b64_len);
     }
     free(comp_buffer);
+    delete comp_req;
+
     return resp + (enc_b64_len << 4);
 }
 
 int enc_text_decrypt_n_decompress(char *pSrc, size_t src_len, char *pDst) {
-    if (!status)
-    {
+    if (!status) {
         int resp = initMultithreading();
         resp = loadKey(0);
         if (resp != SGX_SUCCESS)
@@ -173,17 +236,39 @@ int enc_text_decrypt_n_decompress(char *pSrc, size_t src_len, char *pDst) {
     }
     int resp;
     char *decry_buffer = (char *) malloc(2 * src_len * sizeof(char));
-    //TODO: mac address doesnt match
     resp = enc_text_decrypt(pSrc, src_len, decry_buffer, 2 * src_len);
-    int dec_len = (resp >> 4);
+    size_t dec_len = (resp >> 4); // length of decrypted data (length of compress data + 2 * sizeof(int) )
     int raw_bytes, comp_bytes;
-    memcpy(&raw_bytes, decry_buffer, sizeof(int));
-    memcpy(&comp_bytes, decry_buffer + sizeof(int), sizeof(int));
+    memcpy(&raw_bytes, decry_buffer, sizeof(int)); // length of raw data
+    memcpy(&comp_bytes, decry_buffer + sizeof(int), sizeof(int)); // length of compressed data
+    assert(dec_len == (comp_bytes + 2 * sizeof(int)));
 
-    resp = decompressBufferEnclave(global_eid, &dec_len, decry_buffer + 2 * sizeof(int), pDst, comp_bytes,
-                                        raw_bytes);
+    // buffer format: (int) decrypted length, (int) expected no. of raw bytes, decrypted data
+    request *req = new request;
+    req->ocall_index = CMD_DECOMPRESS;
+    req->is_done = -1;
+    size_t comp_bytes_st = (size_t) comp_bytes;
+    size_t raw_bytes_st = (size_t) raw_bytes;
+    memcpy(req->buffer, &comp_bytes_st, sizeof(size_t));
+    memcpy(req->buffer + sizeof(size_t), &raw_bytes_st, sizeof(size_t));
+    memcpy(req->buffer + 2 * sizeof(size_t), decry_buffer + 2 * sizeof(int), comp_bytes);
+    inQueue->enqueue(req);
+
+    while (true) {
+        if (req->is_done == -1) {
+            __asm__("pause");
+        } else {
+            dec_len = req->resp;
+            memcpy(pDst, req->buffer + 2 * sizeof(size_t) + comp_bytes,
+                   raw_bytes * sizeof(char));
+            spin_unlock(&req->is_done);
+            break;
+        }
+    }
+
     if (dec_len < 0 || dec_len != (int) raw_bytes) {
         printf("unable to decompress it properly!");
     }
+
     return resp + (dec_len << 4);
 }

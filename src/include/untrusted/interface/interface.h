@@ -66,6 +66,9 @@ int enc_timestamp_encrypt(char *src, char *dst);
 int enc_timestamp_cmp(char *src1, char *src2, char *dst);
 int enc_timestamp_extract_year(char *in, char *out);
 
+int enc_compress(char *pSrc, size_t src_len, char *pDst);
+int enc_decompress(char *pSrc, size_t src_len, char *pDst);
+
 #if defined(__cplusplus)
 }
 #endif

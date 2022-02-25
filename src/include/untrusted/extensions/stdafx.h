@@ -21,7 +21,7 @@
 #include "utils/builtins.h"
 
 #include "defs.h"
-#include "include/untrusted/interface/interface.h"
+#include "untrusted/interface/interface.h"
 
 typedef struct _sgx_errlist_t {
     sgx_status_t err;

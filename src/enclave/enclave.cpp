@@ -456,6 +456,21 @@ int encrypt_bytes(uint8_t *pSrc, size_t src_len, uint8_t *pDst,
                                               req->buffer + ENC_TIMESTAMP_LENGTH,
                                               TIMESTAMP_LENGTH);
                     break;
+
+                case CMD_COMPRESS:
+                    memcpy(&src_len, req->buffer, sizeof(size_t));
+                    memcpy(&dst_len, req->buffer + sizeof(size_t), sizeof(size_t));
+                    req->resp = compressBufferEnclave(reinterpret_cast<char *>(req->buffer + 2 * sizeof(size_t)),
+                                                      reinterpret_cast<char *>(req->buffer + src_len +
+                                                                               2 * sizeof(size_t)), src_len, dst_len);
+                    break;
+
+                case CMD_DECOMPRESS:
+                    memcpy(&src_len, req->buffer, sizeof(size_t));
+                    memcpy(&dst_len, req->buffer + sizeof(size_t), sizeof(size_t));
+                    req->resp = decompressBufferEnclave(reinterpret_cast<char *>(req->buffer + 2 * sizeof(size_t)),
+                                                        reinterpret_cast<char *>(req->buffer + src_len +
+                                                                                 2 * sizeof(size_t)), src_len, dst_len);
             }
             req->is_done = 1;
         }
