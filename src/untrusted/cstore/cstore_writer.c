@@ -789,6 +789,9 @@ SerializeBlockData(TableWriteState *writeState, uint32 blockIndex, uint32 rowCou
                 enc_len = (resp >> 4);
                 resp -= (enc_len << 4);
                 serializedValueBuffer->len = enc_len;
+                enlargeStringInfo(serializedValueBuffer, (enc_len + 1) * sizeof(char));
+                memcpy(serializedValueBuffer->data, compressionBuffer->data, enc_len);
+                serializedValueBuffer->data[enc_len] = '\0';
             } else {
                 compressed = CompressBuffer(serializedValueBuffer, compressionBuffer,
                                             requestedCompressionType);
@@ -802,7 +805,7 @@ SerializeBlockData(TableWriteState *writeState, uint32 blockIndex, uint32 rowCou
                     serializedValueBuffer->len = enc_src_b64_len;
                 }
             }
-//            sgxErrorHandler(resp);
+            sgxErrorHandler(resp);
             pfree(is_enc);
         } else {
             compressed = CompressBuffer(serializedValueBuffer, compressionBuffer,

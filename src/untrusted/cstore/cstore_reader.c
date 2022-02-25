@@ -1153,7 +1153,8 @@ DeserializeBlockData(StripeBuffers *stripeBuffers, uint64 blockIndex,
                 int resp;
                 StringInfo decryptedBuffer = makeStringInfo();
                 size_t src_len = blockBuffers->valueBuffer->len; // included header for lz4 compression
-                size_t dec_len = 2 * src_len; // doesnt really matter, just need to be large enough to hold decrypted (compressed) data
+                size_t dec_len = 2 *
+                                 src_len; // doesnt really matter, just need to be large enough to hold decrypted (compressed) data
                 enlargeStringInfo(decryptedBuffer, dec_len * sizeof(char));
                 BYTE *tmpPtr = palloc0(sizeof(BYTE));
                 if (FromBase64Fast_C((const BYTE *) blockBuffers->valueBuffer->data, ENC_INT32_LENGTH_B64 - 1,
@@ -1162,6 +1163,7 @@ DeserializeBlockData(StripeBuffers *stripeBuffers, uint64 blockIndex,
                     enlargeStringInfo(valueBuffer, dec_len * sizeof(char));
                     resp = enc_text_decrypt_n_decompress(blockBuffers->valueBuffer->data, src_len, valueBuffer->data);
                     dec_len = (resp >> 4);
+                    valueBuffer->len = dec_len;
                     resp -= (dec_len << 4);
                 } else {
                     decryptedBuffer->data = palloc(dec_len * sizeof(char));
@@ -1171,8 +1173,6 @@ DeserializeBlockData(StripeBuffers *stripeBuffers, uint64 blockIndex,
                     resp -= (dec_len << 4);
                     decryptedBuffer->len = dec_len;
                     decryptedBuffer->maxlen = blockBuffers->valueBuffer->maxlen;
-                    pfree(blockBuffers->valueBuffer);
-                    pfree(blockBuffers->valueBuffer->data);
                     blockBuffers->valueBuffer = decryptedBuffer;
 
                     /* decompress and deserialize current block's data */
