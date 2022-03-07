@@ -1,68 +1,39 @@
 make -C src -f untrusted.mk all
 make[1]: Entering directory '/home/scott/Projects/stealthdb/src'
-echo "untrusted/cstore/cstore.pb-c.c untrusted/cstore/cstore.pb-c.o"
-cc -m64 -O0 -g -fPIC -Wall -Wextra -Wpedantic -DTOKEN_FILENAME=\"/usr/local/lib/stealthDB/enclave.token\" -DENCLAVE_FILENAME=\"/usr/local/lib/stealthDB/enclave.signed.so\" -DDATA_FILENAME=\"/usr/local/lib/stealthDB/stealthDB.data\" -I/home/scott/Projects/stealthdb/src/include -I/opt/intel/sgxsdk/include -Iuntrusted -Iuntrusted/cstore -Iuntrusted/lz4/lib -I/home/scott/Projects/stealthdb/src -I/usr/local/pgsql/include/server -I/usr/local/pgsql/include -o untrusted/cstore/cstore.pb-c.o -c untrusted/cstore/cstore.pb-c.c
-echo "CC extension <=  untrusted/cstore/cstore.pb-c.c"
-cc -shared -L/usr/local/pgsql/lib untrusted/enclave_u.o tools/base64.o tools/bytes.o tools/sync_utils.o tools/Queue.o untrusted/interface/enc_int32.o untrusted/interface/enc_timestamp.o untrusted/interface/interface.o untrusted/interface/enc_float32.o untrusted/interface/enc_text.o untrusted/extensions/enc_int4.o untrusted/extensions/enc_text.o untrusted/extensions/enc_float4.o untrusted/extensions/encdb.o untrusted/extensions/enc_timestamp.o untrusted/cstore/cstore.pb-c.o untrusted/cstore/cstore_reader.o untrusted/cstore/cstore_compression.o untrusted/cstore/cstore_fdw.o untrusted/cstore/cstore_writer.o untrusted/cstore/cstore_metadata_serialization.o -o untrusted/encdb.so -lsgx_urts -lpthread -lprotobuf-c -llz4 -Wl,--as-needed -Wl,-rpath /usr/local/pgsql/lib --enable-new-dtags
-echo "CC extension <=  untrusted/enclave_u.o"
-mkdir -p /home/scott/Projects/stealthdb/src/../build
-mv untrusted/encdb.so /home/scott/Projects/stealthdb/src/../build
-cp untrusted/extensions/*.control /home/scott/Projects/stealthdb/src/../build
-cp untrusted/extensions/*.sql /home/scott/Projects/stealthdb/src/../build
-protoc-c --c_out=. untrusted/cstore/cstore.proto
-cd untrusted/lz4 && make
-make[2]: Entering directory '/home/scott/Projects/stealthdb/src/untrusted/lz4'
-make -C lib lib-release
-make[3]: Entering directory '/home/scott/Projects/stealthdb/src/untrusted/lz4/lib'
-make[3]: Leaving directory '/home/scott/Projects/stealthdb/src/untrusted/lz4/lib'
-make -C programs lz4-release
-make[3]: Entering directory '/home/scott/Projects/stealthdb/src/untrusted/lz4/programs'
-make[3]: Leaving directory '/home/scott/Projects/stealthdb/src/untrusted/lz4/programs'
-cp programs/lz4 .
-make[2]: Leaving directory '/home/scott/Projects/stealthdb/src/untrusted/lz4'
-cd untrusted/lz4 && make install
-make[2]: Entering directory '/home/scott/Projects/stealthdb/src/untrusted/lz4'
-make -C lib install
-make[3]: Entering directory '/home/scott/Projects/stealthdb/src/untrusted/lz4/lib'
-install -d -m 755 /usr/local/lib/pkgconfig/ /usr/local/include/ /usr/local/lib/ /usr/local/bin/
-install -m 644 liblz4.pc /usr/local/lib/pkgconfig/
-echo Installing libraries in /usr/local/lib
-install -m 644 liblz4.a /usr/local/lib/liblz4.a
-install -m 644 lz4frame_static.h /usr/local/include/lz4frame_static.h
-install -m 755 liblz4.so.1.9.3 /usr/local/lib
-ln -sf liblz4.so.1.9.3 /usr/local/lib/liblz4.so.1
-ln -sf liblz4.so.1.9.3 /usr/local/lib/liblz4.so
-echo Installing headers in /usr/local/include
-install -m 644 lz4.h /usr/local/include/lz4.h
-install -m 644 lz4hc.h /usr/local/include/lz4hc.h
-install -m 644 lz4frame.h /usr/local/include/lz4frame.h
-echo lz4 libraries installed
-make[3]: Leaving directory '/home/scott/Projects/stealthdb/src/untrusted/lz4/lib'
-make -C programs install
-make[3]: Entering directory '/home/scott/Projects/stealthdb/src/untrusted/lz4/programs'
-echo Installing binaries in /usr/local/bin
-install -d -m 755 /usr/local/bin/ /usr/local/share/man/man1/
-install -m 755 lz4 /usr/local/bin/lz4
-ln -sf lz4 /usr/local/bin/lz4c
-ln -sf lz4 /usr/local/bin/lz4cat
-ln -sf lz4 /usr/local/bin/unlz4
-echo Installing man pages in /usr/local/share/man/man1
-install -m 644 lz4.1 /usr/local/share/man/man1/lz4.1
-ln -sf lz4.1 /usr/local/share/man/man1/lz4c.1
-ln -sf lz4.1 /usr/local/share/man/man1/lz4cat.1
-ln -sf lz4.1 /usr/local/share/man/man1/unlz4.1
-echo lz4 installation completed
-make[3]: Leaving directory '/home/scott/Projects/stealthdb/src/untrusted/lz4/programs'
-make[2]: Leaving directory '/home/scott/Projects/stealthdb/src/untrusted/lz4'
+GEN  =>  untrusted/enclave_u.c
+CC   <=  untrusted/enclave_u.c
+CXX  <=  tools/base64.cpp
+CXX  <=  tools/bytes.cpp
+CXX  <=  tools/sync_utils.cpp
+CXX  <=  tools/Queue.cpp
+CXX interface <=  untrusted/interface/enc_int32.cpp
+CXX interface <=  untrusted/interface/enc_timestamp.cpp
+CXX interface <=  untrusted/interface/interface.cpp
+CXX interface <=  untrusted/interface/enc_compression.cpp
+CXX interface <=  untrusted/interface/enc_float32.cpp
+CXX interface <=  untrusted/interface/enc_text.cpp
+untrusted/extensions/enc_int4.c untrusted/extensions/enc_int4.o
+CC extension <=  untrusted/extensions/enc_int4.c
+untrusted/extensions/enc_text.c untrusted/extensions/enc_text.o
+CC extension <=  untrusted/extensions/enc_text.c
+untrusted/extensions/enc_float4.c untrusted/extensions/enc_float4.o
+CC extension <=  untrusted/extensions/enc_float4.c
+untrusted/extensions/encdb.c untrusted/extensions/encdb.o
+CC extension <=  untrusted/extensions/encdb.c
+untrusted/extensions/enc_timestamp.c untrusted/extensions/enc_timestamp.o
+CC extension <=  untrusted/extensions/enc_timestamp.c
+untrusted/cstore/cstore.pb-c.c untrusted/cstore/cstore.pb-c.o
+CC extension <=  untrusted/cstore/cstore.pb-c.c
+untrusted/cstore/cstore_reader.c untrusted/cstore/cstore_reader.o
+CC extension <=  untrusted/cstore/cstore_reader.c
+untrusted/cstore/cstore_compression.c untrusted/cstore/cstore_compression.o
+CC extension <=  untrusted/cstore/cstore_compression.c
+untrusted/cstore/cstore_fdw.c untrusted/cstore/cstore_fdw.o
+CC extension <=  untrusted/cstore/cstore_fdw.c
+untrusted/cstore/cstore_writer.c untrusted/cstore/cstore_writer.o
+CC extension <=  untrusted/cstore/cstore_writer.c
+untrusted/cstore/cstore_metadata_serialization.c untrusted/cstore/cstore_metadata_serialization.o
+CC extension <=  untrusted/cstore/cstore_metadata_serialization.c
+untrusted.mk:73: recipe for target 'untrusted/encdb.so' failed
 make[1]: Leaving directory '/home/scott/Projects/stealthdb/src'
-make -C src -f enclave.mk all
-make[1]: Entering directory '/home/scott/Projects/stealthdb/src'
-echo "BUILT_TARGET=non_oblvs" > status.mk
-/opt/intel/sgxsdk/bin/x64/sgx_sign gendata -out enclave/enclave.debug.signdata -enclave enclave/enclave.so -config enclave/enclave.debug.config.xml
-echo "GENDATA =>  enclave/enclave.debug.signdata"
-openssl dgst -sha256 -out enclave/enclave.debug.sig -sign enclave/enclave.debug.key enclave/enclave.debug.signdata
-/opt/intel/sgxsdk/bin/x64/sgx_sign catsig -enclave enclave/enclave.so -unsigned enclave/enclave.debug.signdata -out enclave/enclave.debug.signed.so -config enclave/enclave.debug.config.xml -key enclave/enclave.debug.pub -sig enclave/enclave.debug.sig
-cp enclave/enclave.debug.signed.so /home/scott/Projects/stealthdb/src/../build
-echo "SIGN =>  enclave/enclave.debug.signed.so"
-make[1]: Leaving directory '/home/scott/Projects/stealthdb/src'
-echo "Make all succeed!"
+Makefile:6: recipe for target 'all' failed

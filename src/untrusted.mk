@@ -33,7 +33,7 @@ CXXFLAGS := $(FLAGS) $(CPPFLAGS) -std=c++11
 LDFLAGS := -lsgx_urts -lpthread -lprotobuf-c -llz4 -Wl,--as-needed -Wl,-rpath $(PSQL_LIBDIR) --enable-new-dtags
 
 .PHONY: all
-all: $(UNTRUSTED_DIR)/encdb.so cstore.pb-c.c lz4
+all: cstore.pb-c.c lz4 $(UNTRUSTED_DIR)/encdb.so
 
 lz4:
 	cd $(LZ4_DIR) && $(MAKE)
