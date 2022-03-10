@@ -14,7 +14,7 @@ enclave {
         public int generateKeyEnclave([out, size = sealedkey_len] uint8_t *sealed_key, size_t sealedkey_len);
         public int loadKeyEnclave ([in, size = len]  uint8_t *key, size_t len);
         public int enclaveProcess ([user_check]void* inQueue);
-        public int compressBufferEnclave([in, size=src_len] char * pSrc, [out, size=dst_len] char *pDst, size_t src_len, size_t dst_len);
-        public int decompressBufferEnclave([in, size=src_len] char * pSrc, [out, size=dst_len] char *pDst, size_t src_len, size_t dst_len);
+        public int compressBufferEnclave([in, size=src_len] char * pSrc, [in,out, size=dst_len] char *pDst, size_t src_len, size_t dst_len);
+        public int decompressBufferEnclave([in, size=src_len] char * pSrc, [in,out, size=dst_len] char *pDst, size_t src_len, size_t dst_len);
     };
 };

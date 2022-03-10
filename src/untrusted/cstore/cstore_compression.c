@@ -50,13 +50,13 @@ typedef struct CStoreCompressHeader {
 #define CSTORE_COMPRESS_SET_RAWSIZE(ptr, len) (((PGLZ_Header *) (ptr))->rawsize = (len))
 
 typedef struct LZ4CompressHeader {
-    int32 vl_len_;
-    int32 rawsize;
+    size_t src_len; // original string length
+    size_t comp_len; // length of compressed string
 } LZ4CompressHeader;
 #define CSTORE_COMPRESS_HDRSZ_LZ4       ((int32) sizeof(LZ4CompressHeader))
-#define CSTORE_COMPRESS_RAWSIZE_LZ4(ptr) (((LZ4CompressHeader *) (ptr))->rawsize)
+#define CSTORE_COMPRESS_RAWSIZE_LZ4(ptr) (((LZ4CompressHeader *) (ptr))->src_len)
 #define CSTORE_COMPRESS_RAWDATA_LZ4(ptr) (((char *) (ptr)) + CSTORE_COMPRESS_HDRSZ_LZ4)
-#define CSTORE_COMPRESS_SET_RAWSIZE_LZ4(ptr, len) (((LZ4CompressHeader *) (ptr))->rawsize = (len))
+#define CSTORE_COMPRESS_SET_RAWSIZE_LZ4(ptr, len) (((LZ4CompressHeader *) (ptr))->src_len = (len))
 
 #endif
 
@@ -97,7 +97,7 @@ CompressBuffer(StringInfo inputBuffer, StringInfo outputBuffer,
         }
 #else
         compressionResult = pglz_compress(inputBuffer->data, inputBuffer->len,
-                                          (PGLZ_Header *) CSTORE_COMPRESS_RAWDATA(outputBuffer->data),
+                                          CSTORE_COMPRESS_RAWDATA(outputBuffer->data),
                                           PGLZ_strategy_always);
 #endif
     } else {
@@ -118,11 +118,13 @@ CompressBuffer(StringInfo inputBuffer, StringInfo outputBuffer,
             printf("We successfully compressed some data! Ratio: %.2f\n",
                    (float) compressed_bytes / inputBuffer->len);
             CSTORE_COMPRESS_SET_RAWSIZE_LZ4(outputBuffer->data, inputBuffer->len);
-            SET_VARSIZE_COMPRESSED(outputBuffer->data,
-                                   compressed_bytes + CSTORE_COMPRESS_HDRSZ_LZ4);
+            ((LZ4CompressHeader*) outputBuffer->data)->comp_len = compressed_bytes;
+            outputBuffer->len = compressed_bytes + CSTORE_COMPRESS_HDRSZ_LZ4;
+//            SET_VARSIZE_COMPRESSED(outputBuffer->data,
+//                                   compressed_bytes + CSTORE_COMPRESS_HDRSZ_LZ4); //not used since we not using postgres vl length
         }
     }
-    if (compressionResult) {
+    if (compressionResult && compressionType != COMPRESSION_LZ4) {
         outputBuffer->len = VARSIZE(outputBuffer->data);
     }
 

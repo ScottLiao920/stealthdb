@@ -768,6 +768,7 @@ SerializeBlockData(TableWriteState *writeState, uint32 blockIndex, uint32 rowCou
         /* the only other supported compression type is pg_lz for now */
         Assert(requestedCompressionType == COMPRESSION_NONE ||
                requestedCompressionType == COMPRESSION_PG_LZ || requestedCompressionType == COMPRESSION_LZ4);
+        resetStringInfo(compressionBuffer);
 
         // check whether it is requiring an encrypted data type fist
         Type requestedDataType = typeidType(writeState->tupleDescriptor->attrs[columnIndex]->atttypid);
@@ -780,18 +781,20 @@ SerializeBlockData(TableWriteState *writeState, uint32 blockIndex, uint32 rowCou
         if (strcmp(is_enc, enc_name) == 0) {
             int resp;
             BYTE *tmpPtr = palloc0(sizeof(BYTE));
-            if (FromBase64Fast_C((const BYTE *) serializedValueBuffer->data, ENC_INT32_LENGTH_B64 - 1,
-                                 tmpPtr, ENC_INT32_LENGTH) == 0) {
+            if ((requestedCompressionType == COMPRESSION_LZ4) &&
+                (FromBase64Fast_C((const BYTE *) serializedValueBuffer->data, ENC_INT32_LENGTH_B64 - 1,
+                                  tmpPtr, ENC_INT32_LENGTH) == 0)) {
                 // unable to convert it from base64, not encrypted data in buffer
                 size_t src_len = serializedValueBuffer->len; // included header for lz4 compression
                 int enc_len;
                 resp = enc_text_compress_n_encrypt(serializedValueBuffer->data, src_len, compressionBuffer->data);
                 enc_len = (resp >> 4);
                 resp -= (enc_len << 4);
+                resetStringInfo(serializedValueBuffer);
                 serializedValueBuffer->len = enc_len;
                 enlargeStringInfo(serializedValueBuffer, (enc_len + 1) * sizeof(char));
                 memcpy(serializedValueBuffer->data, compressionBuffer->data, enc_len);
-                serializedValueBuffer->data[enc_len] = '\0';
+//                serializedValueBuffer->data[enc_len] = '\0';
             } else {
                 compressed = CompressBuffer(serializedValueBuffer, compressionBuffer,
                                             requestedCompressionType);
@@ -806,18 +809,20 @@ SerializeBlockData(TableWriteState *writeState, uint32 blockIndex, uint32 rowCou
                 }
             }
             sgxErrorHandler(resp);
-            pfree(is_enc);
         } else {
             compressed = CompressBuffer(serializedValueBuffer, compressionBuffer,
                                         requestedCompressionType);
             if (compressed) { serializedValueBuffer = compressionBuffer; }
         }
+        pfree(is_enc);
+
         actualCompressionType = requestedCompressionType;
 
         /* store (compressed) value buffer */
         blockBuffers->valueCompressionType = actualCompressionType;
         blockBuffers->valueBuffer = CopyStringInfo(serializedValueBuffer);
-
+        pfree(serializedValueBuffer->data);
+        pfree(serializedValueBuffer);
         /* valueBuffer needs to be reset for next block's data */
         resetStringInfo(blockData->valueBuffer);
     }

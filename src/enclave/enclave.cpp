@@ -471,6 +471,7 @@ int encrypt_bytes(uint8_t *pSrc, size_t src_len, uint8_t *pDst,
                     req->resp = decompressBufferEnclave(reinterpret_cast<char *>(req->buffer + 2 * sizeof(size_t)),
                                                         reinterpret_cast<char *>(req->buffer + src_len +
                                                                                  2 * sizeof(size_t)), src_len, dst_len);
+                    break;
             }
             req->is_done = 1;
         }

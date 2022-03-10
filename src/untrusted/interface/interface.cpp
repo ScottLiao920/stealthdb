@@ -185,8 +185,8 @@ int enc_text_compress_n_encrypt(char *pSrc, size_t src_len, char *pDst) {
     int compBytes = 0;
     int resp = 0;
     size_t comp_len = LZ4_compressBound(src_len);
-    char *comp_buffer = NULL;
-    request *comp_req = new request;
+    char *comp_buffer = nullptr;
+    auto *comp_req = new request;
     comp_req->ocall_index = CMD_COMPRESS;
     comp_req->is_done = -1;
     memcpy(comp_req->buffer, &src_len, sizeof(size_t));
@@ -199,8 +199,8 @@ int enc_text_compress_n_encrypt(char *pSrc, size_t src_len, char *pDst) {
             __asm__("pause");
         } else {
             compBytes = comp_req->resp;
-            comp_buffer = (char *) (malloc(compBytes * sizeof(char) + 2 * sizeof(int)));
-            memcpy(comp_buffer + 2 * sizeof(int), comp_req->buffer + 2 * sizeof(size_t) + src_len,
+            comp_buffer = (char *) (malloc(compBytes * sizeof(char) + 2 * sizeof(size_t)));
+            memcpy(comp_buffer + 2 * sizeof(size_t), comp_req->buffer + 2 * sizeof(size_t) + src_len,
                    compBytes * sizeof(char));
             spin_unlock(&comp_req->is_done);
             break;
@@ -211,14 +211,13 @@ int enc_text_compress_n_encrypt(char *pSrc, size_t src_len, char *pDst) {
         return SGX_ERROR_UNEXPECTED;
     }
 
-    // comp_buffer format: (int) src_len, (int) compressed_len, (char*) compressed data
-    int src_len_int = (int) src_len;
-    memcpy(comp_buffer, &src_len_int, sizeof(int));
-    memcpy(comp_buffer + sizeof(int), &compBytes, sizeof(int));
-    compBytes += 2 * sizeof(int);
+    // comp_buffer format: (size_t) src_len, (size_t) compressed_len, (char*) compressed data
+    memcpy(comp_buffer, &src_len, sizeof(size_t));
+    memcpy(comp_buffer + sizeof(size_t), &compBytes, sizeof(size_t));
+    compBytes += 2 * sizeof(size_t);
     size_t enc_len = compBytes + SGX_AESGCM_IV_SIZE + SGX_AESGCM_MAC_SIZE;
     size_t enc_b64_len = ((int) (4 * (double) (enc_len) / 3) + 3) & ~3;
-    if (compBytes != 2 * sizeof(int)) {
+    if (compBytes != 2 * sizeof(size_t)) {
         resp = enc_text_encrypt(comp_buffer, compBytes, pDst, enc_b64_len);
     }
     free(comp_buffer);
@@ -237,21 +236,19 @@ int enc_text_decrypt_n_decompress(char *pSrc, size_t src_len, char *pDst) {
     int resp;
     char *decry_buffer = (char *) malloc(2 * src_len * sizeof(char));
     resp = enc_text_decrypt(pSrc, src_len, decry_buffer, 2 * src_len);
-    size_t dec_len = (resp >> 4); // length of decrypted data (length of compress data + 2 * sizeof(int) )
-    int raw_bytes, comp_bytes;
-    memcpy(&raw_bytes, decry_buffer, sizeof(int)); // length of raw data
-    memcpy(&comp_bytes, decry_buffer + sizeof(int), sizeof(int)); // length of compressed data
-    assert(dec_len == (comp_bytes + 2 * sizeof(int)));
+    int dec_len = (resp >> 4); // length of decrypted data (length of compress data + 2 * sizeof(int) )
+    size_t raw_bytes, comp_bytes;
+    memcpy(&raw_bytes, decry_buffer, sizeof(size_t)); // length of raw data
+    memcpy(&comp_bytes, decry_buffer + sizeof(size_t), sizeof(size_t)); // length of compressed data
+    assert(dec_len == (comp_bytes + 2 * sizeof(size_t)));
 
-    // buffer format: (int) decrypted length, (int) expected no. of raw bytes, decrypted data
-    request *req = new request;
+    // buffer format: (size_t) decrypted length, (size_t) expected no. of raw bytes, decrypted data
+    auto req = new request;
     req->ocall_index = CMD_DECOMPRESS;
     req->is_done = -1;
-    size_t comp_bytes_st = (size_t) comp_bytes;
-    size_t raw_bytes_st = (size_t) raw_bytes;
-    memcpy(req->buffer, &comp_bytes_st, sizeof(size_t));
-    memcpy(req->buffer + sizeof(size_t), &raw_bytes_st, sizeof(size_t));
-    memcpy(req->buffer + 2 * sizeof(size_t), decry_buffer + 2 * sizeof(int), comp_bytes);
+    memcpy(req->buffer, &comp_bytes, sizeof(size_t));
+    memcpy(req->buffer + sizeof(size_t), &raw_bytes, sizeof(size_t));
+    memcpy(req->buffer + 2 * sizeof(size_t), decry_buffer + 2 * sizeof(size_t), comp_bytes);
     inQueue->enqueue(req);
 
     while (true) {

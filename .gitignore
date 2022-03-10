@@ -4,3 +4,5 @@ html
 latex
 src/untrusted/lz4
 src/enclave/enclave.debug.*
+*.o
+build

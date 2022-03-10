@@ -1148,41 +1148,46 @@ DeserializeBlockData(StripeBuffers *stripeBuffers, uint64 blockIndex,
             strncpy(is_enc, target_type_name,
                     4 * sizeof(char)); // store the first 4 characters of type name in target table
             is_enc[4] = 0;
-            if (strcmp(is_enc, enc_name) == 0) {
+            if (strcmp(is_enc, enc_name) == 0 && blockBuffers->valueCompressionType == COMPRESSION_LZ4) {
                 // current processing column is requesting an encrypted type;
                 int resp;
                 StringInfo decryptedBuffer = makeStringInfo();
                 size_t src_len = blockBuffers->valueBuffer->len; // included header for lz4 compression
-                size_t dec_len = 2 *
-                                 src_len; // doesnt really matter, just need to be large enough to hold decrypted (compressed) data
+                int dec_len = 2 *
+                              blockBuffers->valueBuffer->len; // doesn't really matter, just need to be large enough to hold decrypted (compressed) data
                 enlargeStringInfo(decryptedBuffer, dec_len * sizeof(char));
-                BYTE *tmpPtr = palloc0(sizeof(BYTE));
-                if (FromBase64Fast_C((const BYTE *) blockBuffers->valueBuffer->data, ENC_INT32_LENGTH_B64 - 1,
-                                     tmpPtr, ENC_INT32_LENGTH) == 0) {
-                    valueBuffer = makeStringInfo();
-                    enlargeStringInfo(valueBuffer, dec_len * sizeof(char));
-                    resp = enc_text_decrypt_n_decompress(blockBuffers->valueBuffer->data, src_len, valueBuffer->data);
-                    dec_len = (resp >> 4);
-                    valueBuffer->len = dec_len;
-                    resp -= (dec_len << 4);
-                } else {
-                    decryptedBuffer->data = palloc(dec_len * sizeof(char));
-                    resp = enc_text_decrypt(blockBuffers->valueBuffer->data, src_len, decryptedBuffer->data,
-                                            dec_len);
-                    dec_len = (resp >> 4);
-                    resp -= (dec_len << 4);
-                    decryptedBuffer->len = dec_len;
-                    decryptedBuffer->maxlen = blockBuffers->valueBuffer->maxlen;
-                    blockBuffers->valueBuffer = decryptedBuffer;
-
-                    /* decompress and deserialize current block's data */
-                    valueBuffer = DecompressBuffer(blockBuffers->valueBuffer,
-                                                   blockBuffers->valueCompressionType);
-                }
+//                BYTE *tmpPtr = palloc0(sizeof(BYTE));
+//                if (FromBase64Fast_C((const BYTE *) blockBuffers->valueBuffer->data, ENC_INT32_LENGTH_B64 - 1,
+//                                     tmpPtr, ENC_INT32_LENGTH) == 0) {
+//                pfree(tmpPtr);
+                // not loading from a base64 encoded file, so it's in plain text format
+                valueBuffer = makeStringInfo();
+                enlargeStringInfo(valueBuffer, dec_len * sizeof(char));
+                resp = enc_text_decrypt_n_decompress(blockBuffers->valueBuffer->data, src_len, valueBuffer->data);
+                dec_len = (resp >> 4);
+                valueBuffer->len = dec_len;
+                resp -= (dec_len << 4);
+                pfree(decryptedBuffer);
                 sgxErrorHandler(resp);
-            } else {
+            } else if (strcmp(is_enc, enc_name) != 0) {
                 valueBuffer = DecompressBuffer(blockBuffers->valueBuffer,
                                                blockBuffers->valueCompressionType);
+            } else {
+                int resp;
+                size_t src_len = blockBuffers->valueBuffer->len;
+                int dec_len = 2 * blockBuffers->valueBuffer->len;
+                StringInfo decryptedBuffer = makeStringInfo();
+                decryptedBuffer->data = palloc(dec_len * sizeof(char));
+                resp = enc_text_decrypt(blockBuffers->valueBuffer->data, src_len, decryptedBuffer->data,
+                                        dec_len);
+                dec_len = (resp >> 4);
+                resp -= (dec_len << 4);
+                decryptedBuffer->len = dec_len;
+                decryptedBuffer->maxlen = blockBuffers->valueBuffer->maxlen;
+                /* decompress and deserialize current block's data */
+                valueBuffer = DecompressBuffer(decryptedBuffer,
+                                               blockBuffers->valueCompressionType);
+                pfree(decryptedBuffer->data);
             }
 
             if (blockBuffers->valueCompressionType != COMPRESSION_NONE) {
