@@ -386,5 +386,6 @@ int enc_text_decrypt(char *pSrc, size_t src_len, char *pDst, size_t dst_len) {
     delete req;
     delete[] dst;
 
+
     return (dst_len << 4) + resp;
 }

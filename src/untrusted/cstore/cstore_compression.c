@@ -53,7 +53,7 @@ typedef struct LZ4CompressHeader {
     size_t src_len; // original string length
     size_t comp_len; // length of compressed string
 } LZ4CompressHeader;
-#define CSTORE_COMPRESS_HDRSZ_LZ4       ((int32) sizeof(LZ4CompressHeader))
+#define CSTORE_COMPRESS_HDRSZ_LZ4       (sizeof(LZ4CompressHeader))
 #define CSTORE_COMPRESS_RAWSIZE_LZ4(ptr) (((LZ4CompressHeader *) (ptr))->src_len)
 #define CSTORE_COMPRESS_RAWDATA_LZ4(ptr) (((char *) (ptr)) + CSTORE_COMPRESS_HDRSZ_LZ4)
 #define CSTORE_COMPRESS_SET_RAWSIZE_LZ4(ptr, len) (((LZ4CompressHeader *) (ptr))->src_len = (len))
@@ -102,7 +102,7 @@ CompressBuffer(StringInfo inputBuffer, StringInfo outputBuffer,
 #endif
     } else {
         int compressed_bytes = 0; // for lz4 compression
-        int min_dst_len = LZ4_compressBound(inputBuffer->len) + CSTORE_COMPRESS_HDRSZ_LZ4;
+        size_t min_dst_len = LZ4_compressBound(inputBuffer->len) + CSTORE_COMPRESS_HDRSZ_LZ4;
         resetStringInfo(outputBuffer);
         enlargeStringInfo(outputBuffer, min_dst_len);
         Assert(outputBuffer->maxlen >= min_src_len);
@@ -118,7 +118,7 @@ CompressBuffer(StringInfo inputBuffer, StringInfo outputBuffer,
             printf("We successfully compressed some data! Ratio: %.2f\n",
                    (float) compressed_bytes / inputBuffer->len);
             CSTORE_COMPRESS_SET_RAWSIZE_LZ4(outputBuffer->data, inputBuffer->len);
-            ((LZ4CompressHeader*) outputBuffer->data)->comp_len = compressed_bytes;
+            ((LZ4CompressHeader *) outputBuffer->data)->comp_len = compressed_bytes;
             outputBuffer->len = compressed_bytes + CSTORE_COMPRESS_HDRSZ_LZ4;
 //            SET_VARSIZE_COMPRESSED(outputBuffer->data,
 //                                   compressed_bytes + CSTORE_COMPRESS_HDRSZ_LZ4); //not used since we not using postgres vl length
@@ -189,14 +189,14 @@ DecompressBuffer(StringInfo buffer, CompressionType compressionType) {
             decompressedBuffer->len = decompressedDataSize;
             decompressedBuffer->maxlen = decompressedDataSize;
         } else {
-            uint32 compressedDataSize = VARSIZE(buffer->data) - CSTORE_COMPRESS_HDRSZ_LZ4;
+            size_t compressedDataSize = ((LZ4CompressHeader *) (buffer->data))->comp_len;
             int decompressedDataSize_expected = (int) CSTORE_COMPRESS_RAWSIZE_LZ4(buffer->data);
             int decompressedDataSize_real = 0;
             char *decompressedData = NULL;
             if (compressedDataSize + CSTORE_COMPRESS_HDRSZ_LZ4 != buffer->len) {
                 ereport(ERROR, (errmsg("cannot decompress the buffer"),
                         errdetail("Expected %u bytes, but received %u bytes",
-                                  compressedDataSize, buffer->len)));
+                                  buffer->len, compressedDataSize + CSTORE_COMPRESS_HDRSZ_LZ4)));
             }
             decompressedData = palloc0(decompressedDataSize_expected);
             decompressedDataSize_real = LZ4_decompress_safe(CSTORE_COMPRESS_RAWDATA_LZ4(buffer->data), decompressedData,

@@ -2213,76 +2213,76 @@ CStoreBeginForeignInsert(ModifyTableState *modifyTableState, ResultRelInfo *rela
     relation = relation_open(foreignTableOid, ShareUpdateExclusiveLock);
     cstoreFdwOptions = CStoreGetOptions(foreignTableOid);
     tupleDescriptor = RelationGetDescr(relationInfo->ri_RelationDesc);
-    // change the attribute type from encrypted to plaintext directly
-    //TODO: change the type required by plan
-    for (int i = 0; i < tupleDescriptor->natts; i++) {
-        Type target_type = typeidType(tupleDescriptor->attrs[i]->atttypid);
-        char *target_type_name = typeTypeName(target_type);
-        const char *enc_name = "enc_";
-        char *is_enc = malloc(5 * sizeof(char));
-        strncpy(is_enc, target_type_name,
-                4 * sizeof(char)); // store the first 4 characters of type name in target table
-        is_enc[4] = 0;
-        if (strcmp(is_enc, enc_name) == 0) {
-            //change the type required by query (encrypted types to unencrypted types)
-            PlanState *ps = modifyTableState->mt_plans[0];
-            ListCell *lc;
-            Oid typeID_query;
-            TargetEntry *tle;
-            int cnt = 0;
-            foreach(lc, ps->targetlist) {
-                tle = (TargetEntry *) lfirst(lc);
-                SubPlan *sp = (SubPlan *) tle->expr;
-                if (sp->firstColType == NULL)
-                    continue;
-                typeID_query = sp->firstColType;
-                if (typeID_query == tupleDescriptor->attrs[i]->atttypid) {
-                    break; // found the corresponding plan state, change the required type id in the following switch statement
-                }
-                cnt += 1;
-            }
-
-            char *dec_type = target_type_name + 4;
-            // here dec_type should be int4, float4, timestamp or text (4 encrypted data types)
-            // as switch condition cannot be string, use the 2nd character for identification (timestamp & text overlap on t)
-            switch (*(dec_type + 1)) {
-                case 'n': { // enc_iNt4 type
-                    ((SubPlan *) tle->expr)->firstColType = INT4OID;
-                    tupleDescriptor->attrs[i]->atttypid = INT4OID;
-                    tupleDescriptor->attrs[i]->attlen = 4;
-                    tupleDescriptor->attrs[i]->attbyval = true;
-                    tupleDescriptor->attrs[i]->attalign = 'i';
-                    break;
-                };
-                case 'l': { //enc_fLoat4 type
-                    ((SubPlan *) tle->expr)->firstColType = FLOAT4OID;
-                    tupleDescriptor->attrs[i]->atttypid = FLOAT4OID;
-                    tupleDescriptor->attrs[i]->attlen = 4;
-                    tupleDescriptor->attrs[i]->attbyval = true;
-                    tupleDescriptor->attrs[i]->attalign = 'i';
-                    break;
-                }
-                case 'e': { //enc_tExt type
-                    ((SubPlan *) tle->expr)->firstColType = CSTRINGOID;
-                    tupleDescriptor->attrs[i]->atttypid = CSTRINGOID;
-                    tupleDescriptor->attrs[i]->attlen = -2;
-                    tupleDescriptor->attrs[i]->attbyval = false;
-                    tupleDescriptor->attrs[i]->attalign = 'c';
-                    break;
-                }
-                case 'i': { //enc_tImestamp type
-                    ((SubPlan *) tle->expr)->firstColType = TIMESTAMPOID;
-                    tupleDescriptor->attrs[i]->atttypid = TIMESTAMPOID;
-                    tupleDescriptor->attrs[i]->attlen = 8;
-                    tupleDescriptor->attrs[i]->attbyval = true;
-                    tupleDescriptor->attrs[i]->attalign = 'd';
-                    break;
-                }
-                default:
-                    break;
-            }
-        }
-    }
+//    // change the attribute type from encrypted to plaintext directly
+//    //TODO: change the type required by plan
+//    for (int i = 0; i < tupleDescriptor->natts; i++) {
+//        Type target_type = typeidType(tupleDescriptor->attrs[i]->atttypid);
+//        char *target_type_name = typeTypeName(target_type);
+//        const char *enc_name = "enc_";
+//        char *is_enc = malloc(5 * sizeof(char));
+//        strncpy(is_enc, target_type_name,
+//                4 * sizeof(char)); // store the first 4 characters of type name in target table
+//        is_enc[4] = 0;
+//        if (strcmp(is_enc, enc_name) == 0) {
+//            //change the type required by query (encrypted types to unencrypted types)
+//            PlanState *ps = modifyTableState->mt_plans[0];
+//            ListCell *lc;
+//            Oid typeID_query;
+//            TargetEntry *tle;
+//            int cnt = 0;
+//            foreach(lc, ps->targetlist) {
+//                tle = (TargetEntry *) lfirst(lc);
+//                SubPlan *sp = (SubPlan *) tle->expr;
+//                if (sp->firstColType == NULL)
+//                    continue;
+//                typeID_query = sp->firstColType;
+//                if (typeID_query == tupleDescriptor->attrs[i]->atttypid) {
+//                    break; // found the corresponding plan state, change the required type id in the following switch statement
+//                }
+//                cnt += 1;
+//            }
+//
+//            char *dec_type = target_type_name + 4;
+//            // here dec_type should be int4, float4, timestamp or text (4 encrypted data types)
+//            // as switch condition cannot be string, use the 2nd character for identification (timestamp & text overlap on t)
+//            switch (*(dec_type + 1)) {
+//                case 'n': { // enc_iNt4 type
+//                    ((SubPlan *) tle->expr)->firstColType = INT4OID;
+//                    tupleDescriptor->attrs[i]->atttypid = INT4OID;
+//                    tupleDescriptor->attrs[i]->attlen = 4;
+//                    tupleDescriptor->attrs[i]->attbyval = true;
+//                    tupleDescriptor->attrs[i]->attalign = 'i';
+//                    break;
+//                };
+//                case 'l': { //enc_fLoat4 type
+//                    ((SubPlan *) tle->expr)->firstColType = FLOAT4OID;
+//                    tupleDescriptor->attrs[i]->atttypid = FLOAT4OID;
+//                    tupleDescriptor->attrs[i]->attlen = 4;
+//                    tupleDescriptor->attrs[i]->attbyval = true;
+//                    tupleDescriptor->attrs[i]->attalign = 'i';
+//                    break;
+//                }
+//                case 'e': { //enc_tExt type
+//                    ((SubPlan *) tle->expr)->firstColType = CSTRINGOID;
+//                    tupleDescriptor->attrs[i]->atttypid = CSTRINGOID;
+//                    tupleDescriptor->attrs[i]->attlen = -2;
+//                    tupleDescriptor->attrs[i]->attbyval = false;
+//                    tupleDescriptor->attrs[i]->attalign = 'c';
+//                    break;
+//                }
+//                case 'i': { //enc_tImestamp type
+//                    ((SubPlan *) tle->expr)->firstColType = TIMESTAMPOID;
+//                    tupleDescriptor->attrs[i]->atttypid = TIMESTAMPOID;
+//                    tupleDescriptor->attrs[i]->attlen = 8;
+//                    tupleDescriptor->attrs[i]->attbyval = true;
+//                    tupleDescriptor->attrs[i]->attalign = 'd';
+//                    break;
+//                }
+//                default:
+//                    break;
+//            }
+//        }
+//    }
 
 
     writeState = CStoreBeginWrite(cstoreFdwOptions->filename,

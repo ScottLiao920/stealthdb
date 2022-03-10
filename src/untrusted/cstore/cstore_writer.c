@@ -783,7 +783,7 @@ SerializeBlockData(TableWriteState *writeState, uint32 blockIndex, uint32 rowCou
             BYTE *tmpPtr = palloc0(sizeof(BYTE));
             if ((requestedCompressionType == COMPRESSION_LZ4) &&
                 (FromBase64Fast_C((const BYTE *) serializedValueBuffer->data, ENC_INT32_LENGTH_B64 - 1,
-                                  tmpPtr, ENC_INT32_LENGTH) == 0)) {
+                                  tmpPtr, ENC_INT32_LENGTH) != 0)) {
                 // unable to convert it from base64, not encrypted data in buffer
                 size_t src_len = serializedValueBuffer->len; // included header for lz4 compression
                 int enc_len;
@@ -799,6 +799,7 @@ SerializeBlockData(TableWriteState *writeState, uint32 blockIndex, uint32 rowCou
                 compressed = CompressBuffer(serializedValueBuffer, compressionBuffer,
                                             requestedCompressionType);
                 if (compressed) {
+                    resetStringInfo(serializedValueBuffer);
                     size_t src_len = compressionBuffer->len; // included header for lz4 compression
                     size_t enc_src_len = src_len + SGX_AESGCM_IV_SIZE + SGX_AESGCM_MAC_SIZE;
                     size_t enc_src_b64_len = ((int) (4 * (double) (enc_src_len) / 3) + 3) & ~3;
@@ -809,10 +810,15 @@ SerializeBlockData(TableWriteState *writeState, uint32 blockIndex, uint32 rowCou
                 }
             }
             sgxErrorHandler(resp);
+            pfree(tmpPtr);
         } else {
+            // column not requiring an encrypted data type, no encryption need, just use conventional methods
             compressed = CompressBuffer(serializedValueBuffer, compressionBuffer,
                                         requestedCompressionType);
-            if (compressed) { serializedValueBuffer = compressionBuffer; }
+            if (compressed) {
+                serializedValueBuffer = compressionBuffer;
+                // use deep copy instead of direct assign to prevent memory overwrite by palloc in late codes
+            }
         }
         pfree(is_enc);
 
@@ -821,8 +827,6 @@ SerializeBlockData(TableWriteState *writeState, uint32 blockIndex, uint32 rowCou
         /* store (compressed) value buffer */
         blockBuffers->valueCompressionType = actualCompressionType;
         blockBuffers->valueBuffer = CopyStringInfo(serializedValueBuffer);
-        pfree(serializedValueBuffer->data);
-        pfree(serializedValueBuffer);
         /* valueBuffer needs to be reset for next block's data */
         resetStringInfo(blockData->valueBuffer);
     }
@@ -981,10 +985,12 @@ SyncAndCloseFile(FILE *file) {
  */
 static StringInfo
 CopyStringInfo(StringInfo sourceString) {
-    StringInfo targetString = palloc0(sizeof(StringInfoData));
-
+    StringInfo targetString = palloc(sizeof(StringInfoData));
+    if (targetString == sourceString) {
+        return targetString;
+    }
     if (sourceString->len > 0) {
-        targetString->data = palloc0(sourceString->len);
+        targetString->data = palloc(sourceString->len);
         targetString->len = sourceString->len;
         targetString->maxlen = sourceString->len;
         memcpy(targetString->data, sourceString->data, sourceString->len);
