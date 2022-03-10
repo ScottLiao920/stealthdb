@@ -24,6 +24,8 @@
 #include "nodes/makefuncs.h"
 #include "untrusted/extensions/stdafx.h"
 #include <parser/parse_type.h>
+#include "utils/syscache.h"
+
 
 #if PG_VERSION_NUM >= 120000
 #include "nodes/pathnodes.h"
@@ -1147,7 +1149,7 @@ DeserializeBlockData(StripeBuffers *stripeBuffers, uint64 blockIndex,
             char *is_enc = palloc0(5 * sizeof(char));
             strncpy(is_enc, target_type_name,
                     4 * sizeof(char)); // store the first 4 characters of type name in target table
-            is_enc[4] = 0;
+            is_enc[4] = '\0';
             if (strcmp(is_enc, enc_name) == 0 && blockBuffers->valueCompressionType == COMPRESSION_LZ4) {
                 // current processing column is requesting an encrypted type;
                 int resp;
@@ -1188,7 +1190,7 @@ DeserializeBlockData(StripeBuffers *stripeBuffers, uint64 blockIndex,
                 pfree(decryptedBuffer->data);
             }
             pfree(is_enc);
-
+            ReleaseSysCache(requestedDataType);
 
             if (blockBuffers->valueCompressionType != COMPRESSION_NONE) {
                 /* compressed data is not needed anymore */

@@ -38,6 +38,7 @@
 #include "storage/fd.h"
 #include "utils/memutils.h"
 #include "utils/lsyscache.h"
+#include "utils/syscache.h"
 #include "utils/rel.h"
 #include "untrusted/interface/interface.h"
 #include "tools/base64.hpp" // for verification of enc_types
@@ -777,7 +778,7 @@ SerializeBlockData(TableWriteState *writeState, uint32 blockIndex, uint32 rowCou
         char *is_enc = palloc0(5 * sizeof(char));
         strncpy(is_enc, target_type_name,
                 4 * sizeof(char)); // store the first 4 characters of type name in target table
-        is_enc[4] = 0;
+        is_enc[4] = '\0';
         if (strcmp(is_enc, enc_name) == 0) {
             int resp;
             BYTE *tmpPtr = palloc0(sizeof(BYTE));
@@ -821,6 +822,7 @@ SerializeBlockData(TableWriteState *writeState, uint32 blockIndex, uint32 rowCou
             }
         }
         pfree(is_enc);
+        ReleaseSysCache(requestedDataType);
 
         actualCompressionType = requestedCompressionType;
 
