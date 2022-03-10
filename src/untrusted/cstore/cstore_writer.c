@@ -774,7 +774,7 @@ SerializeBlockData(TableWriteState *writeState, uint32 blockIndex, uint32 rowCou
         Type requestedDataType = typeidType(writeState->tupleDescriptor->attrs[columnIndex]->atttypid);
         char *target_type_name = typeTypeName(requestedDataType);
         const char *enc_name = "enc_";
-        char *is_enc = palloc(5 * sizeof(char));
+        char *is_enc = palloc0(5 * sizeof(char));
         strncpy(is_enc, target_type_name,
                 4 * sizeof(char)); // store the first 4 characters of type name in target table
         is_enc[4] = 0;
@@ -985,12 +985,11 @@ SyncAndCloseFile(FILE *file) {
  */
 static StringInfo
 CopyStringInfo(StringInfo sourceString) {
-    StringInfo targetString = palloc(sizeof(StringInfoData));
-    if (targetString == sourceString) {
-        return targetString;
-    }
+    StringInfo targetString = palloc0(sizeof(StringInfoData));
+
+
     if (sourceString->len > 0) {
-        targetString->data = palloc(sourceString->len);
+        targetString->data = palloc0(sourceString->len);
         targetString->len = sourceString->len;
         targetString->maxlen = sourceString->len;
         memcpy(targetString->data, sourceString->data, sourceString->len);

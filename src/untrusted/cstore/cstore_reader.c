@@ -1144,7 +1144,7 @@ DeserializeBlockData(StripeBuffers *stripeBuffers, uint64 blockIndex,
             Type requestedDataType = typeidType(tupleDescriptor->attrs[columnIndex]->atttypid);
             char *target_type_name = typeTypeName(requestedDataType);
             const char *enc_name = "enc_";
-            char *is_enc = malloc(5 * sizeof(char));
+            char *is_enc = palloc0(5 * sizeof(char));
             strncpy(is_enc, target_type_name,
                     4 * sizeof(char)); // store the first 4 characters of type name in target table
             is_enc[4] = 0;
@@ -1187,6 +1187,8 @@ DeserializeBlockData(StripeBuffers *stripeBuffers, uint64 blockIndex,
                                                blockBuffers->valueCompressionType);
                 pfree(decryptedBuffer->data);
             }
+            pfree(is_enc);
+
 
             if (blockBuffers->valueCompressionType != COMPRESSION_NONE) {
                 /* compressed data is not needed anymore */
