@@ -4,3 +4,6 @@
 [submodule "src/untrusted/postgres_vectorization_test"]
 	path = src/untrusted/postgres_vectorization_test
 	url = https://github.com/ScottLiao920/postgres_vectorization_test.git
+[submodule "src/untrusted/cstore"]
+	path = src/untrusted/cstore
+	url = https://github.com/ScottLiao920/cstore_fdw.git
