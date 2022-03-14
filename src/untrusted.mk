@@ -3,7 +3,7 @@ include vars.mk
 UNTRUSTED_DIR=untrusted
 INTERFACE_DIR=untrusted/interface
 EXTENSION_DIR=untrusted/extensions
-CSTORE_DIR=untrusted/cstore
+CSTORE_DIR=untrusted/cstore_fdw
 LZ4_DIR=untrusted/lz4
 PSQL_PKG_LIBDIR = $(shell pg_config --pkglibdir)
 PSQL_SHAREDIR = $(shell pg_config --sharedir)/extension
