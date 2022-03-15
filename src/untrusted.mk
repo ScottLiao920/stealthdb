@@ -56,8 +56,8 @@ $(INTERFACE_DIR)/%.o: $(INTERFACE_DIR)/%.cpp
 	@$(CXX) $(CXXFLAGS) -o $@ -c $^ # $^: names of all the prerequisites
 	@echo "CXX interface <=  $<"
 
-cstore.pb-c.c: untrusted/cstore/cstore.proto
-	protoc-c --c_out=. untrusted/cstore/cstore.proto
+cstore.pb-c.c: $(CSTORE_DIR)/cstore.proto
+	protoc-c --c_out=. $(CSTORE_DIR)/cstore.proto
 
 $(EXTENSION_DIR)/%.o: $(EXTENSION_DIR)/%.c
 	@echo "$^ $@"
