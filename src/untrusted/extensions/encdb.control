@@ -1,4 +1,4 @@
 # encrypted database extension 
-default_version = '1.0.1'
+default_version = '1.0.3'
 module_pathname = '$libdir/encdb'
 relocatable = true

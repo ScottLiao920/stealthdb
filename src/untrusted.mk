@@ -3,7 +3,6 @@ include vars.mk
 UNTRUSTED_DIR=untrusted
 INTERFACE_DIR=untrusted/interface
 EXTENSION_DIR=untrusted/extensions
-CSTORE_DIR=untrusted/cstore_fdw
 LZ4_DIR=untrusted/lz4
 PSQL_PKG_LIBDIR = $(shell pg_config --pkglibdir)
 PSQL_SHAREDIR = $(shell pg_config --sharedir)/extension
@@ -14,7 +13,13 @@ EXTENSION = $(EXTENSION_DIR)/encdb        # the extension's name
 DATA = $(EXTENSION_DIR)/encdb--1.0.1.sql  # scripts to install
 
 C_SRCS := $(wildcard $(EXTENSION_DIR)/*.c)
-C_SRCS += $(wildcard $(CSTORE_DIR)/*.c)
+VECTORIZED=yes
+ifeq ($(VECTORIZED), yes)
+	CSTORE_DIR=untrusted/postgres_vectorization_test
+else
+	CSTORE_DIR=untrusted/cstore_fdw
+	C_SRCS += $(wildcard $(CSTORE_DIR)/*.c)
+endif
 C_OBJS := $(C_SRCS:.c=.o)
 
 CXX_SRCS := $(wildcard tools/*.cpp) $(wildcard $(INTERFACE_DIR)/*.cpp)
@@ -33,7 +38,7 @@ CXXFLAGS := $(FLAGS) $(CPPFLAGS) -std=c++11
 LDFLAGS := -lsgx_urts -lpthread -lprotobuf-c -llz4 -Wl,--as-needed -Wl,-rpath $(PSQL_LIBDIR) --enable-new-dtags
 
 .PHONY: all
-all: cstore.pb-c.c lz4 $(UNTRUSTED_DIR)/encdb.so
+all: cstore.pb-c.c lz4 $(UNTRUSTED_DIR)/encdb.so cstore
 
 lz4:
 	cd $(LZ4_DIR) && $(MAKE)
@@ -57,17 +62,27 @@ $(INTERFACE_DIR)/%.o: $(INTERFACE_DIR)/%.cpp
 	@echo "CXX interface <=  $<"
 
 cstore.pb-c.c: $(CSTORE_DIR)/cstore.proto
+ifeq ($(VECTORIZED), yes)
+	@echo "cstore.pb generated in its own makefile"
+else
 	protoc-c --c_out=. $(CSTORE_DIR)/cstore.proto
+endif
 
 $(EXTENSION_DIR)/%.o: $(EXTENSION_DIR)/%.c
 	@echo "$^ $@"
 	@$(CC) $(CFLAGS) $(PSQL_CPPFLAGS) -o $@ -c $^
 	@echo "CC extension <=  $<"
 
-$(CSTORE_DIR)/%.o: $(CSTORE_DIR)/%.c
-	@echo "$^ $@"
-	@$(CC) $(CFLAGS) $(PSQL_CPPFLAGS) -o $@ -c $^
-	@echo "CC extension <=  $<"
+cstore:
+ifeq ($(VECTORIZED), yes)
+		cd $(CSTORE_DIR) && $(MAKE)
+		cd $(CSTORE_DIR) && $(MAKE) install
+else
+	$(CSTORE_DIR)/%.o: $(CSTORE_DIR)/%.c
+		@echo "$^ $@"
+		@$(CC) $(CFLAGS) $(PSQL_CPPFLAGS) -o $@ -c $^
+		@echo "CC extension <=  $<"
+endif
 
 $(UNTRUSTED_DIR)/encdb.so: $(UNTRUSTED_DIR)/enclave_u.o $(CXX_OBJS) $(C_OBJS)
 	@$(CC) -shared -L$(PSQL_LIBDIR) $^ -o $@ $(LDFLAGS)
@@ -99,3 +114,5 @@ uninstall:
 .PHONY: clean
 clean:
 	@$(RM) $(CXX_OBJS) $(C_OBJS) $(UNTRUSTED_DIR)/enclave_u.*
+	cd $(CSTORE_DIR) && $(MAKE) clean
+	cd $(LZ4_DIR) && $(MAKE) clean
