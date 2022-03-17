@@ -165,7 +165,7 @@ CStoreBeginWrite(const char *filename, CompressionType compressionType,
 
     /* get comparison function pointers for each of the columns */
     columnCount = tupleDescriptor->natts;
-    comparisonFunctionArray = palloc0(columnCount * sizeof(FmgrInfo *));
+    comparisonFunctionArray = palloc0(columnCount * sizeof(FmgrInfo * ));
     for (columnIndex = 0; columnIndex < columnCount; columnIndex++) {
         FmgrInfo *comparisonFunction = NULL;
         FormData_pg_attribute *attributeForm = TupleDescAttr(tupleDescriptor, columnIndex);
@@ -423,12 +423,12 @@ CreateEmptyStripeBuffers(uint32 stripeMaxRowCount, uint32 blockRowCount,
     StripeBuffers *stripeBuffers = NULL;
     uint32 columnIndex = 0;
     uint32 maxBlockCount = (stripeMaxRowCount / blockRowCount) + 1;
-    ColumnBuffers **columnBuffersArray = palloc0(columnCount * sizeof(ColumnBuffers *));
+    ColumnBuffers **columnBuffersArray = palloc0(columnCount * sizeof(ColumnBuffers * ));
 
     for (columnIndex = 0; columnIndex < columnCount; columnIndex++) {
         uint32 blockIndex = 0;
         ColumnBlockBuffers **blockBuffersArray =
-                palloc0(maxBlockCount * sizeof(ColumnBlockBuffers *));
+                palloc0(maxBlockCount * sizeof(ColumnBlockBuffers * ));
 
         for (blockIndex = 0; blockIndex < maxBlockCount; blockIndex++) {
             blockBuffersArray[blockIndex] = palloc0(sizeof(ColumnBlockBuffers));
@@ -463,7 +463,7 @@ CreateEmptyStripeSkipList(uint32 stripeMaxRowCount, uint32 blockRowCount,
     uint32 maxBlockCount = (stripeMaxRowCount / blockRowCount) + 1;
 
     ColumnBlockSkipNode **blockSkipNodeArray =
-            palloc0(columnCount * sizeof(ColumnBlockSkipNode *));
+            palloc0(columnCount * sizeof(ColumnBlockSkipNode * ));
     for (columnIndex = 0; columnIndex < columnCount; columnIndex++) {
         blockSkipNodeArray[columnIndex] =
                 palloc0(maxBlockCount * sizeof(ColumnBlockSkipNode));

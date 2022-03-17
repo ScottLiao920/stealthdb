@@ -363,7 +363,7 @@ CStoreEndRead(TableReadState *readState) {
 ColumnBlockData **
 CreateEmptyBlockDataArray(uint32 columnCount, bool *columnMask, uint32 blockRowCount) {
     uint32 columnIndex = 0;
-    ColumnBlockData **blockDataArray = palloc0(columnCount * sizeof(ColumnBlockData *));
+    ColumnBlockData **blockDataArray = palloc0(columnCount * sizeof(ColumnBlockData * ));
 
     /* allocate block memory for deserialized data */
     for (columnIndex = 0; columnIndex < columnCount; columnIndex++) {
@@ -426,7 +426,8 @@ CStoreTableRowCount(const char *filename) {
                 errmsg("could not open file \"%s\" for reading: %m", filename)));
     }
 
-    foreach(stripeMetadataCell, tableFooter->stripeMetadataList) {
+    foreach(stripeMetadataCell, tableFooter->stripeMetadataList)
+    {
         StripeMetadata *stripeMetadata = (StripeMetadata *) lfirst(stripeMetadataCell);
         totalRowCount += StripeRowCount(tableFile, stripeMetadata);
     }
@@ -496,7 +497,7 @@ LoadFilteredStripeBuffers(FILE *tableFile, StripeMetadata *stripeMetadata,
                                   selectedBlockMask);
 
     /* load column data for projected columns */
-    columnBuffersArray = palloc0(columnCount * sizeof(ColumnBuffers *));
+    columnBuffersArray = palloc0(columnCount * sizeof(ColumnBuffers * ));
     currentColumnFileOffset = stripeMetadata->fileOffset + stripeMetadata->skipListLength;
 
     for (columnIndex = 0; columnIndex < stripeFooter->columnCount; columnIndex++) {
@@ -548,7 +549,8 @@ ReadStripeNextRow(StripeBuffers *stripeBuffers, List *projectedColumnList,
     /* set all columns to null by default */
     memset(columnNulls, 1, stripeBuffers->columnCount * sizeof(bool));
 
-    foreach(projectedColumnCell, projectedColumnList) {
+    foreach(projectedColumnCell, projectedColumnList)
+    {
         Var *projectedColumn = lfirst(projectedColumnCell);
         uint32 projectedColumnIndex = projectedColumn->varattno - 1;
         ColumnBlockData *blockData = blockDataArray[projectedColumnIndex];
@@ -573,7 +575,7 @@ LoadColumnBuffers(FILE *tableFile, ColumnBlockSkipNode *blockSkipNodeArray,
     ColumnBuffers *columnBuffers = NULL;
     uint32 blockIndex = 0;
     ColumnBlockBuffers **blockBuffersArray =
-            palloc0(blockCount * sizeof(ColumnBlockBuffers *));
+            palloc0(blockCount * sizeof(ColumnBlockBuffers * ));
 
     for (blockIndex = 0; blockIndex < blockCount; blockIndex++) {
         blockBuffersArray[blockIndex] = palloc0(sizeof(ColumnBlockBuffers));
@@ -655,7 +657,7 @@ LoadStripeSkipList(FILE *tableFile, StripeMetadata *stripeMetadata,
     stripeBlockCount = DeserializeBlockCount(firstColumnSkipListBuffer);
 
     /* deserialize column skip lists */
-    blockSkipNodeArray = palloc0(columnCount * sizeof(ColumnBlockSkipNode *));
+    blockSkipNodeArray = palloc0(columnCount * sizeof(ColumnBlockSkipNode * ));
     currentColumnSkipListFileOffset = stripeMetadata->fileOffset;
 
     for (columnIndex = 0; columnIndex < stripeColumnCount; columnIndex++) {
@@ -736,7 +738,8 @@ SelectedBlockMask(StripeSkipList *stripeSkipList, List *projectedColumnList,
     selectedBlockMask = palloc0(stripeSkipList->blockCount * sizeof(bool));
     memset(selectedBlockMask, true, stripeSkipList->blockCount * sizeof(bool));
 
-    foreach(columnCell, projectedColumnList) {
+    foreach(columnCell, projectedColumnList)
+    {
         Var *column = lfirst(columnCell);
         uint32 columnIndex = column->varattno - 1;
         FmgrInfo *comparisonFunction = NULL;
@@ -830,7 +833,8 @@ BuildRestrictInfoList(List *whereClauseList) {
     List *restrictInfoList = NIL;
 
     ListCell *qualCell = NULL;
-    foreach(qualCell, whereClauseList) {
+    foreach(qualCell, whereClauseList)
+    {
         RestrictInfo *restrictInfo = NULL;
         Node *qualNode = (Node *) lfirst(qualCell);
 
@@ -973,7 +977,7 @@ SelectedBlockSkipList(StripeSkipList *stripeSkipList, bool *projectedColumnMask,
         }
     }
 
-    selectedBlockSkipNodeArray = palloc0(columnCount * sizeof(ColumnBlockSkipNode *));
+    selectedBlockSkipNodeArray = palloc0(columnCount * sizeof(ColumnBlockSkipNode * ));
     for (columnIndex = 0; columnIndex < columnCount; columnIndex++) {
         uint32 selectedBlockIndex = 0;
         bool firstColumn = columnIndex == 0;
@@ -1037,7 +1041,8 @@ ProjectedColumnMask(uint32 columnCount, List *projectedColumnList) {
     bool *projectedColumnMask = palloc0(columnCount * sizeof(bool));
     ListCell *columnCell = NULL;
 
-    foreach(columnCell, projectedColumnList) {
+    foreach(columnCell, projectedColumnList)
+    {
         Var *column = (Var *) lfirst(columnCell);
         uint32 columnIndex = column->varattno - 1;
         projectedColumnMask[columnIndex] = true;

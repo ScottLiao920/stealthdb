@@ -378,7 +378,7 @@ CStoreProcessUtility(Node *parseTree, const char *queryString,
             if (completionTag != NULL) {
                 snprintf(completionTag, COMPLETION_TAG_BUFSIZE,
                          "COPY "
-                         UINT64_FORMAT, processed);
+                UINT64_FORMAT, processed);
             }
 #endif
         } else {
@@ -391,7 +391,8 @@ CStoreProcessUtility(Node *parseTree, const char *queryString,
             bool removeCStoreDirectory = false;
             ListCell *objectCell = NULL;
 
-            foreach(objectCell, dropStmt->objects) {
+            foreach(objectCell, dropStmt->objects)
+            {
                 Node *object = (Node *) lfirst(objectCell);
                 char *objectName = NULL;
 
@@ -419,7 +420,8 @@ CStoreProcessUtility(Node *parseTree, const char *queryString,
 
             CALL_PREVIOUS_UTILITY();
 
-            foreach(fileListCell, droppedTables) {
+            foreach(fileListCell, droppedTables)
+            {
                 char *fileName = lfirst(fileListCell);
 
                 DeleteCStoreTableFiles(fileName);
@@ -446,7 +448,8 @@ CStoreProcessUtility(Node *parseTree, const char *queryString,
 
         TruncateCStoreTables(cstoreRelationList);
 
-        foreach(cstoreRelationCell, cstoreRelationList) {
+        foreach(cstoreRelationCell, cstoreRelationList)
+        {
             Relation relation = (Relation) lfirst(cstoreRelationCell);
             relation_close(relation, AccessExclusiveLock);
         }
@@ -747,7 +750,8 @@ CStoreProcessAlterTableCommand(AlterTableStmt *alterStatement) {
         return;
     }
 
-    foreach(commandCell, commandList) {
+    foreach(commandCell, commandList)
+    {
         AlterTableCmd *alterCommand = (AlterTableCmd *) lfirst(commandCell);
         if (alterCommand->subtype == AT_AlterColumnType) {
             char *columnName = alterCommand->name;
@@ -787,7 +791,8 @@ DroppedCStoreFilenameList(DropStmt *dropStatement) {
 
     if (dropStatement->removeType == OBJECT_FOREIGN_TABLE) {
         ListCell *dropObjectCell = NULL;
-        foreach(dropObjectCell, dropStatement->objects) {
+        foreach(dropObjectCell, dropStatement->objects)
+        {
             List *tableNameList = (List *) lfirst(dropObjectCell);
             RangeVar *rangeVar = makeRangeVarFromNameList(tableNameList);
 
@@ -820,7 +825,8 @@ static List *
 FindCStoreTables(List *tableList) {
     List *cstoreTableList = NIL;
     ListCell *relationCell = NULL;
-    foreach(relationCell, tableList) {
+    foreach(relationCell, tableList)
+    {
         RangeVar *rangeVar = (RangeVar *) lfirst(relationCell);
         Oid relationId = RangeVarGetRelid(rangeVar, AccessShareLock, true);
         if (CStoreTable(relationId) && !DistributedTable(relationId)) {
@@ -843,7 +849,8 @@ OpenRelationsForTruncate(List *cstoreTableList) {
     ListCell *relationCell = NULL;
     List *relationIdList = NIL;
     List *relationList = NIL;
-    foreach(relationCell, cstoreTableList) {
+    foreach(relationCell, cstoreTableList)
+    {
         RangeVar *rangeVar = (RangeVar *) lfirst(relationCell);
         Relation relation = relation_openrv(rangeVar, AccessExclusiveLock);
         Oid relationId = relation->rd_id;
@@ -870,7 +877,8 @@ OpenRelationsForTruncate(List *cstoreTableList) {
 static void
 TruncateCStoreTables(List *cstoreRelationList) {
     ListCell *relationCell = NULL;
-    foreach(relationCell, cstoreRelationList) {
+    foreach(relationCell, cstoreRelationList)
+    {
         Relation relation = (Relation) lfirst(relationCell);
         Oid relationId = relation->rd_id;
         CStoreFdwOptions *cstoreFdwOptions = NULL;
@@ -1033,7 +1041,8 @@ DistributedTable(Oid relationId) {
 static bool
 DistributedWorkerCopy(CopyStmt *copyStatement) {
     ListCell *optionCell = NULL;
-    foreach(optionCell, copyStatement->options) {
+    foreach(optionCell, copyStatement->options)
+    {
         DefElem *defel = (DefElem *) lfirst(optionCell);
         if (strncmp(defel->defname, "master_host", NAMEDATALEN) == 0) {
             return true;
@@ -1236,7 +1245,8 @@ cstore_fdw_validator(PG_FUNCTION_ARGS) {
     char *stripeRowCountString = NULL;
     char *blockRowCountString = NULL;
 
-    foreach(optionCell, optionList) {
+    foreach(optionCell, optionList)
+    {
         DefElem *optionDef = (DefElem *) lfirst(optionCell);
         char *optionName = optionDef->defname;
         bool optionValid = false;
@@ -1428,7 +1438,8 @@ CStoreGetOptionValue(Oid foreignTableId, const char *optionName) {
     optionList = list_concat(optionList, foreignTable->options);
     optionList = list_concat(optionList, foreignServer->options);
 
-    foreach(optionCell, optionList) {
+    foreach(optionCell, optionList)
+    {
         DefElem *optionDef = (DefElem *) lfirst(optionCell);
         char *optionDefName = optionDef->defname;
 
@@ -1766,7 +1777,8 @@ ColumnList(RelOptInfo *baserel, Oid foreignTableId) {
     TupleDesc tupleDescriptor = RelationGetDescr(relation);
 
     /* first add the columns used in joins and projections */
-    foreach(targetColumnCell, targetColumnList) {
+    foreach(targetColumnCell, targetColumnList)
+    {
         List *targetVarList = NIL;
         Node *targetExpr = (Node *) lfirst(targetColumnCell);
 
@@ -1784,7 +1796,8 @@ ColumnList(RelOptInfo *baserel, Oid foreignTableId) {
     }
 
     /* then walk over all restriction clauses, and pull up any used columns */
-    foreach(restrictInfoCell, restrictInfoList) {
+    foreach(restrictInfoCell, restrictInfoList)
+    {
         RestrictInfo *restrictInfo = (RestrictInfo *) lfirst(restrictInfoCell);
         Node *restrictClause = (Node *) restrictInfo->clause;
         List *clauseColumnList = NIL;
@@ -1814,7 +1827,8 @@ ColumnList(RelOptInfo *baserel, Oid foreignTableId) {
         }
 
         /* look for this column in the needed column list */
-        foreach(neededColumnCell, neededColumnList) {
+        foreach(neededColumnCell, neededColumnList)
+        {
             Var *neededColumn = (Var *) lfirst(neededColumnCell);
             if (neededColumn->varattno == columnIndex) {
                 column = neededColumn;
@@ -2157,7 +2171,8 @@ CStorePlanForeignModify(PlannerInfo *plannerInfo, ModifyTable *plan,
          * of insert, update, and delete operations are not supported.
          */
         query = plannerInfo->parse;
-        foreach(tableCell, query->rtable) {
+        foreach(tableCell, query->rtable)
+        {
             RangeTblEntry *tableEntry = lfirst(tableCell);
 
             if (tableEntry->rtekind == RTE_SUBQUERY &&
