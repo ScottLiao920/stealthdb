@@ -33,3 +33,7 @@ select * from c_table_test_pglz;
 truncate c_table_test_pglz;
 copy c_table_test_pglz from '/home/scott/Projects/stealthdb/plain_data.csv' delimiter ',' csv;
 select * from c_table_test_pglz;
+
+create foreign table c_table_enc(id_enc_fdw enc_int4, comment text) server cstore_server options (compression 'enc_lz4');
+copy c_table_enc from '/home/scott/Projects/stealthdb/plain_data.csv' delimiter ',' csv;
+select * from c_table_enc;

@@ -7,728 +7,726 @@
 #endif
 
 #include "untrusted/cstore/cstore.pb-c.h"
-
-void protobuf__column_block_skip_node__init
-        (Protobuf__ColumnBlockSkipNode *message) {
-    static Protobuf__ColumnBlockSkipNode init_value = PROTOBUF__COLUMN_BLOCK_SKIP_NODE__INIT;
-    *message = init_value;
+void   protobuf__column_block_skip_node__init
+                     (Protobuf__ColumnBlockSkipNode         *message)
+{
+  static Protobuf__ColumnBlockSkipNode init_value = PROTOBUF__COLUMN_BLOCK_SKIP_NODE__INIT;
+  *message = init_value;
 }
-
 size_t protobuf__column_block_skip_node__get_packed_size
-        (const Protobuf__ColumnBlockSkipNode *message) {
-    assert(message->base.descriptor == &protobuf__column_block_skip_node__descriptor);
-    return protobuf_c_message_get_packed_size((const ProtobufCMessage *) (message));
+                     (const Protobuf__ColumnBlockSkipNode *message)
+{
+  assert(message->base.descriptor == &protobuf__column_block_skip_node__descriptor);
+  return protobuf_c_message_get_packed_size ((const ProtobufCMessage*)(message));
 }
-
 size_t protobuf__column_block_skip_node__pack
-        (const Protobuf__ColumnBlockSkipNode *message,
-         uint8_t *out) {
-    assert(message->base.descriptor == &protobuf__column_block_skip_node__descriptor);
-    return protobuf_c_message_pack((const ProtobufCMessage *) message, out);
+                     (const Protobuf__ColumnBlockSkipNode *message,
+                      uint8_t       *out)
+{
+  assert(message->base.descriptor == &protobuf__column_block_skip_node__descriptor);
+  return protobuf_c_message_pack ((const ProtobufCMessage*)message, out);
 }
-
 size_t protobuf__column_block_skip_node__pack_to_buffer
-        (const Protobuf__ColumnBlockSkipNode *message,
-         ProtobufCBuffer *buffer) {
-    assert(message->base.descriptor == &protobuf__column_block_skip_node__descriptor);
-    return protobuf_c_message_pack_to_buffer((const ProtobufCMessage *) message, buffer);
+                     (const Protobuf__ColumnBlockSkipNode *message,
+                      ProtobufCBuffer *buffer)
+{
+  assert(message->base.descriptor == &protobuf__column_block_skip_node__descriptor);
+  return protobuf_c_message_pack_to_buffer ((const ProtobufCMessage*)message, buffer);
 }
-
 Protobuf__ColumnBlockSkipNode *
-protobuf__column_block_skip_node__unpack
-        (ProtobufCAllocator *allocator,
-         size_t len,
-         const uint8_t *data) {
-    return (Protobuf__ColumnBlockSkipNode *)
-            protobuf_c_message_unpack(&protobuf__column_block_skip_node__descriptor,
-                                      allocator, len, data);
+       protobuf__column_block_skip_node__unpack
+                     (ProtobufCAllocator  *allocator,
+                      size_t               len,
+                      const uint8_t       *data)
+{
+  return (Protobuf__ColumnBlockSkipNode *)
+     protobuf_c_message_unpack (&protobuf__column_block_skip_node__descriptor,
+                                allocator, len, data);
 }
-
-void protobuf__column_block_skip_node__free_unpacked
-        (Protobuf__ColumnBlockSkipNode *message,
-         ProtobufCAllocator *allocator) {
-    assert(message->base.descriptor == &protobuf__column_block_skip_node__descriptor);
-    protobuf_c_message_free_unpacked((ProtobufCMessage *) message, allocator);
+void   protobuf__column_block_skip_node__free_unpacked
+                     (Protobuf__ColumnBlockSkipNode *message,
+                      ProtobufCAllocator *allocator)
+{
+  assert(message->base.descriptor == &protobuf__column_block_skip_node__descriptor);
+  protobuf_c_message_free_unpacked ((ProtobufCMessage*)message, allocator);
 }
-
-void protobuf__column_block_skip_list__init
-        (Protobuf__ColumnBlockSkipList *message) {
-    static Protobuf__ColumnBlockSkipList init_value = PROTOBUF__COLUMN_BLOCK_SKIP_LIST__INIT;
-    *message = init_value;
+void   protobuf__column_block_skip_list__init
+                     (Protobuf__ColumnBlockSkipList         *message)
+{
+  static Protobuf__ColumnBlockSkipList init_value = PROTOBUF__COLUMN_BLOCK_SKIP_LIST__INIT;
+  *message = init_value;
 }
-
 size_t protobuf__column_block_skip_list__get_packed_size
-        (const Protobuf__ColumnBlockSkipList *message) {
-    assert(message->base.descriptor == &protobuf__column_block_skip_list__descriptor);
-    return protobuf_c_message_get_packed_size((const ProtobufCMessage *) (message));
+                     (const Protobuf__ColumnBlockSkipList *message)
+{
+  assert(message->base.descriptor == &protobuf__column_block_skip_list__descriptor);
+  return protobuf_c_message_get_packed_size ((const ProtobufCMessage*)(message));
 }
-
 size_t protobuf__column_block_skip_list__pack
-        (const Protobuf__ColumnBlockSkipList *message,
-         uint8_t *out) {
-    assert(message->base.descriptor == &protobuf__column_block_skip_list__descriptor);
-    return protobuf_c_message_pack((const ProtobufCMessage *) message, out);
+                     (const Protobuf__ColumnBlockSkipList *message,
+                      uint8_t       *out)
+{
+  assert(message->base.descriptor == &protobuf__column_block_skip_list__descriptor);
+  return protobuf_c_message_pack ((const ProtobufCMessage*)message, out);
 }
-
 size_t protobuf__column_block_skip_list__pack_to_buffer
-        (const Protobuf__ColumnBlockSkipList *message,
-         ProtobufCBuffer *buffer) {
-    assert(message->base.descriptor == &protobuf__column_block_skip_list__descriptor);
-    return protobuf_c_message_pack_to_buffer((const ProtobufCMessage *) message, buffer);
+                     (const Protobuf__ColumnBlockSkipList *message,
+                      ProtobufCBuffer *buffer)
+{
+  assert(message->base.descriptor == &protobuf__column_block_skip_list__descriptor);
+  return protobuf_c_message_pack_to_buffer ((const ProtobufCMessage*)message, buffer);
 }
-
 Protobuf__ColumnBlockSkipList *
-protobuf__column_block_skip_list__unpack
-        (ProtobufCAllocator *allocator,
-         size_t len,
-         const uint8_t *data) {
-    return (Protobuf__ColumnBlockSkipList *)
-            protobuf_c_message_unpack(&protobuf__column_block_skip_list__descriptor,
-                                      allocator, len, data);
+       protobuf__column_block_skip_list__unpack
+                     (ProtobufCAllocator  *allocator,
+                      size_t               len,
+                      const uint8_t       *data)
+{
+  return (Protobuf__ColumnBlockSkipList *)
+     protobuf_c_message_unpack (&protobuf__column_block_skip_list__descriptor,
+                                allocator, len, data);
 }
-
-void protobuf__column_block_skip_list__free_unpacked
-        (Protobuf__ColumnBlockSkipList *message,
-         ProtobufCAllocator *allocator) {
-    assert(message->base.descriptor == &protobuf__column_block_skip_list__descriptor);
-    protobuf_c_message_free_unpacked((ProtobufCMessage *) message, allocator);
+void   protobuf__column_block_skip_list__free_unpacked
+                     (Protobuf__ColumnBlockSkipList *message,
+                      ProtobufCAllocator *allocator)
+{
+  assert(message->base.descriptor == &protobuf__column_block_skip_list__descriptor);
+  protobuf_c_message_free_unpacked ((ProtobufCMessage*)message, allocator);
 }
-
-void protobuf__stripe_footer__init
-        (Protobuf__StripeFooter *message) {
-    static Protobuf__StripeFooter init_value = PROTOBUF__STRIPE_FOOTER__INIT;
-    *message = init_value;
+void   protobuf__stripe_footer__init
+                     (Protobuf__StripeFooter         *message)
+{
+  static Protobuf__StripeFooter init_value = PROTOBUF__STRIPE_FOOTER__INIT;
+  *message = init_value;
 }
-
 size_t protobuf__stripe_footer__get_packed_size
-        (const Protobuf__StripeFooter *message) {
-    assert(message->base.descriptor == &protobuf__stripe_footer__descriptor);
-    return protobuf_c_message_get_packed_size((const ProtobufCMessage *) (message));
+                     (const Protobuf__StripeFooter *message)
+{
+  assert(message->base.descriptor == &protobuf__stripe_footer__descriptor);
+  return protobuf_c_message_get_packed_size ((const ProtobufCMessage*)(message));
 }
-
 size_t protobuf__stripe_footer__pack
-        (const Protobuf__StripeFooter *message,
-         uint8_t *out) {
-    assert(message->base.descriptor == &protobuf__stripe_footer__descriptor);
-    return protobuf_c_message_pack((const ProtobufCMessage *) message, out);
+                     (const Protobuf__StripeFooter *message,
+                      uint8_t       *out)
+{
+  assert(message->base.descriptor == &protobuf__stripe_footer__descriptor);
+  return protobuf_c_message_pack ((const ProtobufCMessage*)message, out);
 }
-
 size_t protobuf__stripe_footer__pack_to_buffer
-        (const Protobuf__StripeFooter *message,
-         ProtobufCBuffer *buffer) {
-    assert(message->base.descriptor == &protobuf__stripe_footer__descriptor);
-    return protobuf_c_message_pack_to_buffer((const ProtobufCMessage *) message, buffer);
+                     (const Protobuf__StripeFooter *message,
+                      ProtobufCBuffer *buffer)
+{
+  assert(message->base.descriptor == &protobuf__stripe_footer__descriptor);
+  return protobuf_c_message_pack_to_buffer ((const ProtobufCMessage*)message, buffer);
 }
-
 Protobuf__StripeFooter *
-protobuf__stripe_footer__unpack
-        (ProtobufCAllocator *allocator,
-         size_t len,
-         const uint8_t *data) {
-    return (Protobuf__StripeFooter *)
-            protobuf_c_message_unpack(&protobuf__stripe_footer__descriptor,
-                                      allocator, len, data);
+       protobuf__stripe_footer__unpack
+                     (ProtobufCAllocator  *allocator,
+                      size_t               len,
+                      const uint8_t       *data)
+{
+  return (Protobuf__StripeFooter *)
+     protobuf_c_message_unpack (&protobuf__stripe_footer__descriptor,
+                                allocator, len, data);
 }
-
-void protobuf__stripe_footer__free_unpacked
-        (Protobuf__StripeFooter *message,
-         ProtobufCAllocator *allocator) {
-    assert(message->base.descriptor == &protobuf__stripe_footer__descriptor);
-    protobuf_c_message_free_unpacked((ProtobufCMessage *) message, allocator);
+void   protobuf__stripe_footer__free_unpacked
+                     (Protobuf__StripeFooter *message,
+                      ProtobufCAllocator *allocator)
+{
+  assert(message->base.descriptor == &protobuf__stripe_footer__descriptor);
+  protobuf_c_message_free_unpacked ((ProtobufCMessage*)message, allocator);
 }
-
-void protobuf__stripe_metadata__init
-        (Protobuf__StripeMetadata *message) {
-    static Protobuf__StripeMetadata init_value = PROTOBUF__STRIPE_METADATA__INIT;
-    *message = init_value;
+void   protobuf__stripe_metadata__init
+                     (Protobuf__StripeMetadata         *message)
+{
+  static Protobuf__StripeMetadata init_value = PROTOBUF__STRIPE_METADATA__INIT;
+  *message = init_value;
 }
-
 size_t protobuf__stripe_metadata__get_packed_size
-        (const Protobuf__StripeMetadata *message) {
-    assert(message->base.descriptor == &protobuf__stripe_metadata__descriptor);
-    return protobuf_c_message_get_packed_size((const ProtobufCMessage *) (message));
+                     (const Protobuf__StripeMetadata *message)
+{
+  assert(message->base.descriptor == &protobuf__stripe_metadata__descriptor);
+  return protobuf_c_message_get_packed_size ((const ProtobufCMessage*)(message));
 }
-
 size_t protobuf__stripe_metadata__pack
-        (const Protobuf__StripeMetadata *message,
-         uint8_t *out) {
-    assert(message->base.descriptor == &protobuf__stripe_metadata__descriptor);
-    return protobuf_c_message_pack((const ProtobufCMessage *) message, out);
+                     (const Protobuf__StripeMetadata *message,
+                      uint8_t       *out)
+{
+  assert(message->base.descriptor == &protobuf__stripe_metadata__descriptor);
+  return protobuf_c_message_pack ((const ProtobufCMessage*)message, out);
 }
-
 size_t protobuf__stripe_metadata__pack_to_buffer
-        (const Protobuf__StripeMetadata *message,
-         ProtobufCBuffer *buffer) {
-    assert(message->base.descriptor == &protobuf__stripe_metadata__descriptor);
-    return protobuf_c_message_pack_to_buffer((const ProtobufCMessage *) message, buffer);
+                     (const Protobuf__StripeMetadata *message,
+                      ProtobufCBuffer *buffer)
+{
+  assert(message->base.descriptor == &protobuf__stripe_metadata__descriptor);
+  return protobuf_c_message_pack_to_buffer ((const ProtobufCMessage*)message, buffer);
 }
-
 Protobuf__StripeMetadata *
-protobuf__stripe_metadata__unpack
-        (ProtobufCAllocator *allocator,
-         size_t len,
-         const uint8_t *data) {
-    return (Protobuf__StripeMetadata *)
-            protobuf_c_message_unpack(&protobuf__stripe_metadata__descriptor,
-                                      allocator, len, data);
+       protobuf__stripe_metadata__unpack
+                     (ProtobufCAllocator  *allocator,
+                      size_t               len,
+                      const uint8_t       *data)
+{
+  return (Protobuf__StripeMetadata *)
+     protobuf_c_message_unpack (&protobuf__stripe_metadata__descriptor,
+                                allocator, len, data);
 }
-
-void protobuf__stripe_metadata__free_unpacked
-        (Protobuf__StripeMetadata *message,
-         ProtobufCAllocator *allocator) {
-    assert(message->base.descriptor == &protobuf__stripe_metadata__descriptor);
-    protobuf_c_message_free_unpacked((ProtobufCMessage *) message, allocator);
+void   protobuf__stripe_metadata__free_unpacked
+                     (Protobuf__StripeMetadata *message,
+                      ProtobufCAllocator *allocator)
+{
+  assert(message->base.descriptor == &protobuf__stripe_metadata__descriptor);
+  protobuf_c_message_free_unpacked ((ProtobufCMessage*)message, allocator);
 }
-
-void protobuf__table_footer__init
-        (Protobuf__TableFooter *message) {
-    static Protobuf__TableFooter init_value = PROTOBUF__TABLE_FOOTER__INIT;
-    *message = init_value;
+void   protobuf__table_footer__init
+                     (Protobuf__TableFooter         *message)
+{
+  static Protobuf__TableFooter init_value = PROTOBUF__TABLE_FOOTER__INIT;
+  *message = init_value;
 }
-
 size_t protobuf__table_footer__get_packed_size
-        (const Protobuf__TableFooter *message) {
-    assert(message->base.descriptor == &protobuf__table_footer__descriptor);
-    return protobuf_c_message_get_packed_size((const ProtobufCMessage *) (message));
+                     (const Protobuf__TableFooter *message)
+{
+  assert(message->base.descriptor == &protobuf__table_footer__descriptor);
+  return protobuf_c_message_get_packed_size ((const ProtobufCMessage*)(message));
 }
-
 size_t protobuf__table_footer__pack
-        (const Protobuf__TableFooter *message,
-         uint8_t *out) {
-    assert(message->base.descriptor == &protobuf__table_footer__descriptor);
-    return protobuf_c_message_pack((const ProtobufCMessage *) message, out);
+                     (const Protobuf__TableFooter *message,
+                      uint8_t       *out)
+{
+  assert(message->base.descriptor == &protobuf__table_footer__descriptor);
+  return protobuf_c_message_pack ((const ProtobufCMessage*)message, out);
 }
-
 size_t protobuf__table_footer__pack_to_buffer
-        (const Protobuf__TableFooter *message,
-         ProtobufCBuffer *buffer) {
-    assert(message->base.descriptor == &protobuf__table_footer__descriptor);
-    return protobuf_c_message_pack_to_buffer((const ProtobufCMessage *) message, buffer);
+                     (const Protobuf__TableFooter *message,
+                      ProtobufCBuffer *buffer)
+{
+  assert(message->base.descriptor == &protobuf__table_footer__descriptor);
+  return protobuf_c_message_pack_to_buffer ((const ProtobufCMessage*)message, buffer);
 }
-
 Protobuf__TableFooter *
-protobuf__table_footer__unpack
-        (ProtobufCAllocator *allocator,
-         size_t len,
-         const uint8_t *data) {
-    return (Protobuf__TableFooter *)
-            protobuf_c_message_unpack(&protobuf__table_footer__descriptor,
-                                      allocator, len, data);
+       protobuf__table_footer__unpack
+                     (ProtobufCAllocator  *allocator,
+                      size_t               len,
+                      const uint8_t       *data)
+{
+  return (Protobuf__TableFooter *)
+     protobuf_c_message_unpack (&protobuf__table_footer__descriptor,
+                                allocator, len, data);
 }
-
-void protobuf__table_footer__free_unpacked
-        (Protobuf__TableFooter *message,
-         ProtobufCAllocator *allocator) {
-    assert(message->base.descriptor == &protobuf__table_footer__descriptor);
-    protobuf_c_message_free_unpacked((ProtobufCMessage *) message, allocator);
+void   protobuf__table_footer__free_unpacked
+                     (Protobuf__TableFooter *message,
+                      ProtobufCAllocator *allocator)
+{
+  assert(message->base.descriptor == &protobuf__table_footer__descriptor);
+  protobuf_c_message_free_unpacked ((ProtobufCMessage*)message, allocator);
 }
-
-void protobuf__post_script__init
-        (Protobuf__PostScript *message) {
-    static Protobuf__PostScript init_value = PROTOBUF__POST_SCRIPT__INIT;
-    *message = init_value;
+void   protobuf__post_script__init
+                     (Protobuf__PostScript         *message)
+{
+  static Protobuf__PostScript init_value = PROTOBUF__POST_SCRIPT__INIT;
+  *message = init_value;
 }
-
 size_t protobuf__post_script__get_packed_size
-        (const Protobuf__PostScript *message) {
-    assert(message->base.descriptor == &protobuf__post_script__descriptor);
-    return protobuf_c_message_get_packed_size((const ProtobufCMessage *) (message));
+                     (const Protobuf__PostScript *message)
+{
+  assert(message->base.descriptor == &protobuf__post_script__descriptor);
+  return protobuf_c_message_get_packed_size ((const ProtobufCMessage*)(message));
 }
-
 size_t protobuf__post_script__pack
-        (const Protobuf__PostScript *message,
-         uint8_t *out) {
-    assert(message->base.descriptor == &protobuf__post_script__descriptor);
-    return protobuf_c_message_pack((const ProtobufCMessage *) message, out);
+                     (const Protobuf__PostScript *message,
+                      uint8_t       *out)
+{
+  assert(message->base.descriptor == &protobuf__post_script__descriptor);
+  return protobuf_c_message_pack ((const ProtobufCMessage*)message, out);
 }
-
 size_t protobuf__post_script__pack_to_buffer
-        (const Protobuf__PostScript *message,
-         ProtobufCBuffer *buffer) {
-    assert(message->base.descriptor == &protobuf__post_script__descriptor);
-    return protobuf_c_message_pack_to_buffer((const ProtobufCMessage *) message, buffer);
+                     (const Protobuf__PostScript *message,
+                      ProtobufCBuffer *buffer)
+{
+  assert(message->base.descriptor == &protobuf__post_script__descriptor);
+  return protobuf_c_message_pack_to_buffer ((const ProtobufCMessage*)message, buffer);
 }
-
 Protobuf__PostScript *
-protobuf__post_script__unpack
-        (ProtobufCAllocator *allocator,
-         size_t len,
-         const uint8_t *data) {
-    return (Protobuf__PostScript *)
-            protobuf_c_message_unpack(&protobuf__post_script__descriptor,
-                                      allocator, len, data);
+       protobuf__post_script__unpack
+                     (ProtobufCAllocator  *allocator,
+                      size_t               len,
+                      const uint8_t       *data)
+{
+  return (Protobuf__PostScript *)
+     protobuf_c_message_unpack (&protobuf__post_script__descriptor,
+                                allocator, len, data);
 }
-
-void protobuf__post_script__free_unpacked
-        (Protobuf__PostScript *message,
-         ProtobufCAllocator *allocator) {
-    assert(message->base.descriptor == &protobuf__post_script__descriptor);
-    protobuf_c_message_free_unpacked((ProtobufCMessage *) message, allocator);
+void   protobuf__post_script__free_unpacked
+                     (Protobuf__PostScript *message,
+                      ProtobufCAllocator *allocator)
+{
+  assert(message->base.descriptor == &protobuf__post_script__descriptor);
+  protobuf_c_message_free_unpacked ((ProtobufCMessage*)message, allocator);
 }
-
 static const ProtobufCFieldDescriptor protobuf__column_block_skip_node__field_descriptors[8] =
-        {
-                {
-                        "rowCount",
-                        1,
-                        PROTOBUF_C_LABEL_OPTIONAL,
-                        PROTOBUF_C_TYPE_UINT64,
-                        offsetof(Protobuf__ColumnBlockSkipNode, has_rowcount),
-                        offsetof(Protobuf__ColumnBlockSkipNode, rowcount),
-                        NULL,
-                        NULL,
-                        0,             /* flags */
-                        0, NULL, NULL    /* reserved1,reserved2, etc */
-                },
-                {
-                        "minimumValue",
-                        2,
-                        PROTOBUF_C_LABEL_OPTIONAL,
-                        PROTOBUF_C_TYPE_BYTES,
-                        offsetof(Protobuf__ColumnBlockSkipNode, has_minimumvalue),
-                        offsetof(Protobuf__ColumnBlockSkipNode, minimumvalue),
-                        NULL,
-                        NULL,
-                        0,             /* flags */
-                        0, NULL, NULL    /* reserved1,reserved2, etc */
-                },
-                {
-                        "maximumValue",
-                        3,
-                        PROTOBUF_C_LABEL_OPTIONAL,
-                        PROTOBUF_C_TYPE_BYTES,
-                        offsetof(Protobuf__ColumnBlockSkipNode, has_maximumvalue),
-                        offsetof(Protobuf__ColumnBlockSkipNode, maximumvalue),
-                        NULL,
-                        NULL,
-                        0,             /* flags */
-                        0, NULL, NULL    /* reserved1,reserved2, etc */
-                },
-                {
-                        "valueBlockOffset",
-                        4,
-                        PROTOBUF_C_LABEL_OPTIONAL,
-                        PROTOBUF_C_TYPE_UINT64,
-                        offsetof(Protobuf__ColumnBlockSkipNode, has_valueblockoffset),
-                        offsetof(Protobuf__ColumnBlockSkipNode, valueblockoffset),
-                        NULL,
-                        NULL,
-                        0,             /* flags */
-                        0, NULL, NULL    /* reserved1,reserved2, etc */
-                },
-                {
-                        "valueLength",
-                        5,
-                        PROTOBUF_C_LABEL_OPTIONAL,
-                        PROTOBUF_C_TYPE_UINT64,
-                        offsetof(Protobuf__ColumnBlockSkipNode, has_valuelength),
-                        offsetof(Protobuf__ColumnBlockSkipNode, valuelength),
-                        NULL,
-                        NULL,
-                        0,             /* flags */
-                        0, NULL, NULL    /* reserved1,reserved2, etc */
-                },
-                {
-                        "valueCompressionType",
-                        6,
-                        PROTOBUF_C_LABEL_OPTIONAL,
-                        PROTOBUF_C_TYPE_ENUM,
-                        offsetof(Protobuf__ColumnBlockSkipNode, has_valuecompressiontype),
-                        offsetof(Protobuf__ColumnBlockSkipNode, valuecompressiontype),
-                        &protobuf__compression_type__descriptor,
-                        NULL,
-                        0,             /* flags */
-                        0, NULL, NULL    /* reserved1,reserved2, etc */
-                },
-                {
-                        "existsBlockOffset",
-                        7,
-                        PROTOBUF_C_LABEL_OPTIONAL,
-                        PROTOBUF_C_TYPE_UINT64,
-                        offsetof(Protobuf__ColumnBlockSkipNode, has_existsblockoffset),
-                        offsetof(Protobuf__ColumnBlockSkipNode, existsblockoffset),
-                        NULL,
-                        NULL,
-                        0,             /* flags */
-                        0, NULL, NULL    /* reserved1,reserved2, etc */
-                },
-                {
-                        "existsLength",
-                        8,
-                        PROTOBUF_C_LABEL_OPTIONAL,
-                        PROTOBUF_C_TYPE_UINT64,
-                        offsetof(Protobuf__ColumnBlockSkipNode, has_existslength),
-                        offsetof(Protobuf__ColumnBlockSkipNode, existslength),
-                        NULL,
-                        NULL,
-                        0,             /* flags */
-                        0, NULL, NULL    /* reserved1,reserved2, etc */
-                },
-        };
+{
+  {
+    "rowCount",
+    1,
+    PROTOBUF_C_LABEL_OPTIONAL,
+    PROTOBUF_C_TYPE_UINT64,
+    offsetof(Protobuf__ColumnBlockSkipNode, has_rowcount),
+    offsetof(Protobuf__ColumnBlockSkipNode, rowcount),
+    NULL,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "minimumValue",
+    2,
+    PROTOBUF_C_LABEL_OPTIONAL,
+    PROTOBUF_C_TYPE_BYTES,
+    offsetof(Protobuf__ColumnBlockSkipNode, has_minimumvalue),
+    offsetof(Protobuf__ColumnBlockSkipNode, minimumvalue),
+    NULL,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "maximumValue",
+    3,
+    PROTOBUF_C_LABEL_OPTIONAL,
+    PROTOBUF_C_TYPE_BYTES,
+    offsetof(Protobuf__ColumnBlockSkipNode, has_maximumvalue),
+    offsetof(Protobuf__ColumnBlockSkipNode, maximumvalue),
+    NULL,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "valueBlockOffset",
+    4,
+    PROTOBUF_C_LABEL_OPTIONAL,
+    PROTOBUF_C_TYPE_UINT64,
+    offsetof(Protobuf__ColumnBlockSkipNode, has_valueblockoffset),
+    offsetof(Protobuf__ColumnBlockSkipNode, valueblockoffset),
+    NULL,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "valueLength",
+    5,
+    PROTOBUF_C_LABEL_OPTIONAL,
+    PROTOBUF_C_TYPE_UINT64,
+    offsetof(Protobuf__ColumnBlockSkipNode, has_valuelength),
+    offsetof(Protobuf__ColumnBlockSkipNode, valuelength),
+    NULL,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "valueCompressionType",
+    6,
+    PROTOBUF_C_LABEL_OPTIONAL,
+    PROTOBUF_C_TYPE_ENUM,
+    offsetof(Protobuf__ColumnBlockSkipNode, has_valuecompressiontype),
+    offsetof(Protobuf__ColumnBlockSkipNode, valuecompressiontype),
+    &protobuf__compression_type__descriptor,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "existsBlockOffset",
+    7,
+    PROTOBUF_C_LABEL_OPTIONAL,
+    PROTOBUF_C_TYPE_UINT64,
+    offsetof(Protobuf__ColumnBlockSkipNode, has_existsblockoffset),
+    offsetof(Protobuf__ColumnBlockSkipNode, existsblockoffset),
+    NULL,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "existsLength",
+    8,
+    PROTOBUF_C_LABEL_OPTIONAL,
+    PROTOBUF_C_TYPE_UINT64,
+    offsetof(Protobuf__ColumnBlockSkipNode, has_existslength),
+    offsetof(Protobuf__ColumnBlockSkipNode, existslength),
+    NULL,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+};
 static const unsigned protobuf__column_block_skip_node__field_indices_by_name[] = {
-        6,   /* field[6] = existsBlockOffset */
-        7,   /* field[7] = existsLength */
-        2,   /* field[2] = maximumValue */
-        1,   /* field[1] = minimumValue */
-        0,   /* field[0] = rowCount */
-        3,   /* field[3] = valueBlockOffset */
-        5,   /* field[5] = valueCompressionType */
-        4,   /* field[4] = valueLength */
+  6,   /* field[6] = existsBlockOffset */
+  7,   /* field[7] = existsLength */
+  2,   /* field[2] = maximumValue */
+  1,   /* field[1] = minimumValue */
+  0,   /* field[0] = rowCount */
+  3,   /* field[3] = valueBlockOffset */
+  5,   /* field[5] = valueCompressionType */
+  4,   /* field[4] = valueLength */
 };
 static const ProtobufCIntRange protobuf__column_block_skip_node__number_ranges[1 + 1] =
-        {
-                {1, 0},
-                {0, 8}
-        };
+{
+  { 1, 0 },
+  { 0, 8 }
+};
 const ProtobufCMessageDescriptor protobuf__column_block_skip_node__descriptor =
-        {
-                PROTOBUF_C__MESSAGE_DESCRIPTOR_MAGIC,
-                "protobuf.ColumnBlockSkipNode",
-                "ColumnBlockSkipNode",
-                "Protobuf__ColumnBlockSkipNode",
-                "protobuf",
-                sizeof(Protobuf__ColumnBlockSkipNode),
-                8,
-                protobuf__column_block_skip_node__field_descriptors,
-                protobuf__column_block_skip_node__field_indices_by_name,
-                1, protobuf__column_block_skip_node__number_ranges,
-                (ProtobufCMessageInit) protobuf__column_block_skip_node__init,
-                NULL, NULL, NULL    /* reserved[123] */
-        };
+{
+  PROTOBUF_C__MESSAGE_DESCRIPTOR_MAGIC,
+  "protobuf.ColumnBlockSkipNode",
+  "ColumnBlockSkipNode",
+  "Protobuf__ColumnBlockSkipNode",
+  "protobuf",
+  sizeof(Protobuf__ColumnBlockSkipNode),
+  8,
+  protobuf__column_block_skip_node__field_descriptors,
+  protobuf__column_block_skip_node__field_indices_by_name,
+  1,  protobuf__column_block_skip_node__number_ranges,
+  (ProtobufCMessageInit) protobuf__column_block_skip_node__init,
+  NULL,NULL,NULL    /* reserved[123] */
+};
 static const ProtobufCFieldDescriptor protobuf__column_block_skip_list__field_descriptors[1] =
-        {
-                {
-                        "blockSkipNodeArray",
-                        1,
-                        PROTOBUF_C_LABEL_REPEATED,
-                        PROTOBUF_C_TYPE_MESSAGE,
-                        offsetof(Protobuf__ColumnBlockSkipList, n_blockskipnodearray),
-                        offsetof(Protobuf__ColumnBlockSkipList, blockskipnodearray),
-                        &protobuf__column_block_skip_node__descriptor,
-                        NULL,
-                        0,             /* flags */
-                        0, NULL, NULL    /* reserved1,reserved2, etc */
-                },
-        };
+{
+  {
+    "blockSkipNodeArray",
+    1,
+    PROTOBUF_C_LABEL_REPEATED,
+    PROTOBUF_C_TYPE_MESSAGE,
+    offsetof(Protobuf__ColumnBlockSkipList, n_blockskipnodearray),
+    offsetof(Protobuf__ColumnBlockSkipList, blockskipnodearray),
+    &protobuf__column_block_skip_node__descriptor,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+};
 static const unsigned protobuf__column_block_skip_list__field_indices_by_name[] = {
-        0,   /* field[0] = blockSkipNodeArray */
+  0,   /* field[0] = blockSkipNodeArray */
 };
 static const ProtobufCIntRange protobuf__column_block_skip_list__number_ranges[1 + 1] =
-        {
-                {1, 0},
-                {0, 1}
-        };
+{
+  { 1, 0 },
+  { 0, 1 }
+};
 const ProtobufCMessageDescriptor protobuf__column_block_skip_list__descriptor =
-        {
-                PROTOBUF_C__MESSAGE_DESCRIPTOR_MAGIC,
-                "protobuf.ColumnBlockSkipList",
-                "ColumnBlockSkipList",
-                "Protobuf__ColumnBlockSkipList",
-                "protobuf",
-                sizeof(Protobuf__ColumnBlockSkipList),
-                1,
-                protobuf__column_block_skip_list__field_descriptors,
-                protobuf__column_block_skip_list__field_indices_by_name,
-                1, protobuf__column_block_skip_list__number_ranges,
-                (ProtobufCMessageInit) protobuf__column_block_skip_list__init,
-                NULL, NULL, NULL    /* reserved[123] */
-        };
+{
+  PROTOBUF_C__MESSAGE_DESCRIPTOR_MAGIC,
+  "protobuf.ColumnBlockSkipList",
+  "ColumnBlockSkipList",
+  "Protobuf__ColumnBlockSkipList",
+  "protobuf",
+  sizeof(Protobuf__ColumnBlockSkipList),
+  1,
+  protobuf__column_block_skip_list__field_descriptors,
+  protobuf__column_block_skip_list__field_indices_by_name,
+  1,  protobuf__column_block_skip_list__number_ranges,
+  (ProtobufCMessageInit) protobuf__column_block_skip_list__init,
+  NULL,NULL,NULL    /* reserved[123] */
+};
 static const ProtobufCFieldDescriptor protobuf__stripe_footer__field_descriptors[3] =
-        {
-                {
-                        "skipListSizeArray",
-                        1,
-                        PROTOBUF_C_LABEL_REPEATED,
-                        PROTOBUF_C_TYPE_UINT64,
-                        offsetof(Protobuf__StripeFooter, n_skiplistsizearray),
-                        offsetof(Protobuf__StripeFooter, skiplistsizearray),
-                        NULL,
-                        NULL,
-                        0,             /* flags */
-                        0, NULL, NULL    /* reserved1,reserved2, etc */
-                },
-                {
-                        "existsSizeArray",
-                        2,
-                        PROTOBUF_C_LABEL_REPEATED,
-                        PROTOBUF_C_TYPE_UINT64,
-                        offsetof(Protobuf__StripeFooter, n_existssizearray),
-                        offsetof(Protobuf__StripeFooter, existssizearray),
-                        NULL,
-                        NULL,
-                        0,             /* flags */
-                        0, NULL, NULL    /* reserved1,reserved2, etc */
-                },
-                {
-                        "valueSizeArray",
-                        3,
-                        PROTOBUF_C_LABEL_REPEATED,
-                        PROTOBUF_C_TYPE_UINT64,
-                        offsetof(Protobuf__StripeFooter, n_valuesizearray),
-                        offsetof(Protobuf__StripeFooter, valuesizearray),
-                        NULL,
-                        NULL,
-                        0,             /* flags */
-                        0, NULL, NULL    /* reserved1,reserved2, etc */
-                },
-        };
+{
+  {
+    "skipListSizeArray",
+    1,
+    PROTOBUF_C_LABEL_REPEATED,
+    PROTOBUF_C_TYPE_UINT64,
+    offsetof(Protobuf__StripeFooter, n_skiplistsizearray),
+    offsetof(Protobuf__StripeFooter, skiplistsizearray),
+    NULL,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "existsSizeArray",
+    2,
+    PROTOBUF_C_LABEL_REPEATED,
+    PROTOBUF_C_TYPE_UINT64,
+    offsetof(Protobuf__StripeFooter, n_existssizearray),
+    offsetof(Protobuf__StripeFooter, existssizearray),
+    NULL,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "valueSizeArray",
+    3,
+    PROTOBUF_C_LABEL_REPEATED,
+    PROTOBUF_C_TYPE_UINT64,
+    offsetof(Protobuf__StripeFooter, n_valuesizearray),
+    offsetof(Protobuf__StripeFooter, valuesizearray),
+    NULL,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+};
 static const unsigned protobuf__stripe_footer__field_indices_by_name[] = {
-        1,   /* field[1] = existsSizeArray */
-        0,   /* field[0] = skipListSizeArray */
-        2,   /* field[2] = valueSizeArray */
+  1,   /* field[1] = existsSizeArray */
+  0,   /* field[0] = skipListSizeArray */
+  2,   /* field[2] = valueSizeArray */
 };
 static const ProtobufCIntRange protobuf__stripe_footer__number_ranges[1 + 1] =
-        {
-                {1, 0},
-                {0, 3}
-        };
+{
+  { 1, 0 },
+  { 0, 3 }
+};
 const ProtobufCMessageDescriptor protobuf__stripe_footer__descriptor =
-        {
-                PROTOBUF_C__MESSAGE_DESCRIPTOR_MAGIC,
-                "protobuf.StripeFooter",
-                "StripeFooter",
-                "Protobuf__StripeFooter",
-                "protobuf",
-                sizeof(Protobuf__StripeFooter),
-                3,
-                protobuf__stripe_footer__field_descriptors,
-                protobuf__stripe_footer__field_indices_by_name,
-                1, protobuf__stripe_footer__number_ranges,
-                (ProtobufCMessageInit) protobuf__stripe_footer__init,
-                NULL, NULL, NULL    /* reserved[123] */
-        };
+{
+  PROTOBUF_C__MESSAGE_DESCRIPTOR_MAGIC,
+  "protobuf.StripeFooter",
+  "StripeFooter",
+  "Protobuf__StripeFooter",
+  "protobuf",
+  sizeof(Protobuf__StripeFooter),
+  3,
+  protobuf__stripe_footer__field_descriptors,
+  protobuf__stripe_footer__field_indices_by_name,
+  1,  protobuf__stripe_footer__number_ranges,
+  (ProtobufCMessageInit) protobuf__stripe_footer__init,
+  NULL,NULL,NULL    /* reserved[123] */
+};
 static const ProtobufCFieldDescriptor protobuf__stripe_metadata__field_descriptors[4] =
-        {
-                {
-                        "fileOffset",
-                        1,
-                        PROTOBUF_C_LABEL_OPTIONAL,
-                        PROTOBUF_C_TYPE_UINT64,
-                        offsetof(Protobuf__StripeMetadata, has_fileoffset),
-                        offsetof(Protobuf__StripeMetadata, fileoffset),
-                        NULL,
-                        NULL,
-                        0,             /* flags */
-                        0, NULL, NULL    /* reserved1,reserved2, etc */
-                },
-                {
-                        "skipListLength",
-                        2,
-                        PROTOBUF_C_LABEL_OPTIONAL,
-                        PROTOBUF_C_TYPE_UINT64,
-                        offsetof(Protobuf__StripeMetadata, has_skiplistlength),
-                        offsetof(Protobuf__StripeMetadata, skiplistlength),
-                        NULL,
-                        NULL,
-                        0,             /* flags */
-                        0, NULL, NULL    /* reserved1,reserved2, etc */
-                },
-                {
-                        "dataLength",
-                        3,
-                        PROTOBUF_C_LABEL_OPTIONAL,
-                        PROTOBUF_C_TYPE_UINT64,
-                        offsetof(Protobuf__StripeMetadata, has_datalength),
-                        offsetof(Protobuf__StripeMetadata, datalength),
-                        NULL,
-                        NULL,
-                        0,             /* flags */
-                        0, NULL, NULL    /* reserved1,reserved2, etc */
-                },
-                {
-                        "footerLength",
-                        4,
-                        PROTOBUF_C_LABEL_OPTIONAL,
-                        PROTOBUF_C_TYPE_UINT64,
-                        offsetof(Protobuf__StripeMetadata, has_footerlength),
-                        offsetof(Protobuf__StripeMetadata, footerlength),
-                        NULL,
-                        NULL,
-                        0,             /* flags */
-                        0, NULL, NULL    /* reserved1,reserved2, etc */
-                },
-        };
+{
+  {
+    "fileOffset",
+    1,
+    PROTOBUF_C_LABEL_OPTIONAL,
+    PROTOBUF_C_TYPE_UINT64,
+    offsetof(Protobuf__StripeMetadata, has_fileoffset),
+    offsetof(Protobuf__StripeMetadata, fileoffset),
+    NULL,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "skipListLength",
+    2,
+    PROTOBUF_C_LABEL_OPTIONAL,
+    PROTOBUF_C_TYPE_UINT64,
+    offsetof(Protobuf__StripeMetadata, has_skiplistlength),
+    offsetof(Protobuf__StripeMetadata, skiplistlength),
+    NULL,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "dataLength",
+    3,
+    PROTOBUF_C_LABEL_OPTIONAL,
+    PROTOBUF_C_TYPE_UINT64,
+    offsetof(Protobuf__StripeMetadata, has_datalength),
+    offsetof(Protobuf__StripeMetadata, datalength),
+    NULL,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "footerLength",
+    4,
+    PROTOBUF_C_LABEL_OPTIONAL,
+    PROTOBUF_C_TYPE_UINT64,
+    offsetof(Protobuf__StripeMetadata, has_footerlength),
+    offsetof(Protobuf__StripeMetadata, footerlength),
+    NULL,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+};
 static const unsigned protobuf__stripe_metadata__field_indices_by_name[] = {
-        2,   /* field[2] = dataLength */
-        0,   /* field[0] = fileOffset */
-        3,   /* field[3] = footerLength */
-        1,   /* field[1] = skipListLength */
+  2,   /* field[2] = dataLength */
+  0,   /* field[0] = fileOffset */
+  3,   /* field[3] = footerLength */
+  1,   /* field[1] = skipListLength */
 };
 static const ProtobufCIntRange protobuf__stripe_metadata__number_ranges[1 + 1] =
-        {
-                {1, 0},
-                {0, 4}
-        };
+{
+  { 1, 0 },
+  { 0, 4 }
+};
 const ProtobufCMessageDescriptor protobuf__stripe_metadata__descriptor =
-        {
-                PROTOBUF_C__MESSAGE_DESCRIPTOR_MAGIC,
-                "protobuf.StripeMetadata",
-                "StripeMetadata",
-                "Protobuf__StripeMetadata",
-                "protobuf",
-                sizeof(Protobuf__StripeMetadata),
-                4,
-                protobuf__stripe_metadata__field_descriptors,
-                protobuf__stripe_metadata__field_indices_by_name,
-                1, protobuf__stripe_metadata__number_ranges,
-                (ProtobufCMessageInit) protobuf__stripe_metadata__init,
-                NULL, NULL, NULL    /* reserved[123] */
-        };
+{
+  PROTOBUF_C__MESSAGE_DESCRIPTOR_MAGIC,
+  "protobuf.StripeMetadata",
+  "StripeMetadata",
+  "Protobuf__StripeMetadata",
+  "protobuf",
+  sizeof(Protobuf__StripeMetadata),
+  4,
+  protobuf__stripe_metadata__field_descriptors,
+  protobuf__stripe_metadata__field_indices_by_name,
+  1,  protobuf__stripe_metadata__number_ranges,
+  (ProtobufCMessageInit) protobuf__stripe_metadata__init,
+  NULL,NULL,NULL    /* reserved[123] */
+};
 static const ProtobufCFieldDescriptor protobuf__table_footer__field_descriptors[2] =
-        {
-                {
-                        "stripeMetadataArray",
-                        1,
-                        PROTOBUF_C_LABEL_REPEATED,
-                        PROTOBUF_C_TYPE_MESSAGE,
-                        offsetof(Protobuf__TableFooter, n_stripemetadataarray),
-                        offsetof(Protobuf__TableFooter, stripemetadataarray),
-                        &protobuf__stripe_metadata__descriptor,
-                        NULL,
-                        0,             /* flags */
-                        0, NULL, NULL    /* reserved1,reserved2, etc */
-                },
-                {
-                        "blockRowCount",
-                        2,
-                        PROTOBUF_C_LABEL_OPTIONAL,
-                        PROTOBUF_C_TYPE_UINT32,
-                        offsetof(Protobuf__TableFooter, has_blockrowcount),
-                        offsetof(Protobuf__TableFooter, blockrowcount),
-                        NULL,
-                        NULL,
-                        0,             /* flags */
-                        0, NULL, NULL    /* reserved1,reserved2, etc */
-                },
-        };
+{
+  {
+    "stripeMetadataArray",
+    1,
+    PROTOBUF_C_LABEL_REPEATED,
+    PROTOBUF_C_TYPE_MESSAGE,
+    offsetof(Protobuf__TableFooter, n_stripemetadataarray),
+    offsetof(Protobuf__TableFooter, stripemetadataarray),
+    &protobuf__stripe_metadata__descriptor,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "blockRowCount",
+    2,
+    PROTOBUF_C_LABEL_OPTIONAL,
+    PROTOBUF_C_TYPE_UINT32,
+    offsetof(Protobuf__TableFooter, has_blockrowcount),
+    offsetof(Protobuf__TableFooter, blockrowcount),
+    NULL,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+};
 static const unsigned protobuf__table_footer__field_indices_by_name[] = {
-        1,   /* field[1] = blockRowCount */
-        0,   /* field[0] = stripeMetadataArray */
+  1,   /* field[1] = blockRowCount */
+  0,   /* field[0] = stripeMetadataArray */
 };
 static const ProtobufCIntRange protobuf__table_footer__number_ranges[1 + 1] =
-        {
-                {1, 0},
-                {0, 2}
-        };
+{
+  { 1, 0 },
+  { 0, 2 }
+};
 const ProtobufCMessageDescriptor protobuf__table_footer__descriptor =
-        {
-                PROTOBUF_C__MESSAGE_DESCRIPTOR_MAGIC,
-                "protobuf.TableFooter",
-                "TableFooter",
-                "Protobuf__TableFooter",
-                "protobuf",
-                sizeof(Protobuf__TableFooter),
-                2,
-                protobuf__table_footer__field_descriptors,
-                protobuf__table_footer__field_indices_by_name,
-                1, protobuf__table_footer__number_ranges,
-                (ProtobufCMessageInit) protobuf__table_footer__init,
-                NULL, NULL, NULL    /* reserved[123] */
-        };
+{
+  PROTOBUF_C__MESSAGE_DESCRIPTOR_MAGIC,
+  "protobuf.TableFooter",
+  "TableFooter",
+  "Protobuf__TableFooter",
+  "protobuf",
+  sizeof(Protobuf__TableFooter),
+  2,
+  protobuf__table_footer__field_descriptors,
+  protobuf__table_footer__field_indices_by_name,
+  1,  protobuf__table_footer__number_ranges,
+  (ProtobufCMessageInit) protobuf__table_footer__init,
+  NULL,NULL,NULL    /* reserved[123] */
+};
 static const ProtobufCFieldDescriptor protobuf__post_script__field_descriptors[4] =
-        {
-                {
-                        "tableFooterLength",
-                        1,
-                        PROTOBUF_C_LABEL_OPTIONAL,
-                        PROTOBUF_C_TYPE_UINT64,
-                        offsetof(Protobuf__PostScript, has_tablefooterlength),
-                        offsetof(Protobuf__PostScript, tablefooterlength),
-                        NULL,
-                        NULL,
-                        0,             /* flags */
-                        0, NULL, NULL    /* reserved1,reserved2, etc */
-                },
-                {
-                        "versionMajor",
-                        2,
-                        PROTOBUF_C_LABEL_OPTIONAL,
-                        PROTOBUF_C_TYPE_UINT64,
-                        offsetof(Protobuf__PostScript, has_versionmajor),
-                        offsetof(Protobuf__PostScript, versionmajor),
-                        NULL,
-                        NULL,
-                        0,             /* flags */
-                        0, NULL, NULL    /* reserved1,reserved2, etc */
-                },
-                {
-                        "versionMinor",
-                        3,
-                        PROTOBUF_C_LABEL_OPTIONAL,
-                        PROTOBUF_C_TYPE_UINT64,
-                        offsetof(Protobuf__PostScript, has_versionminor),
-                        offsetof(Protobuf__PostScript, versionminor),
-                        NULL,
-                        NULL,
-                        0,             /* flags */
-                        0, NULL, NULL    /* reserved1,reserved2, etc */
-                },
-                {
-                        "magicNumber",
-                        8000,
-                        PROTOBUF_C_LABEL_OPTIONAL,
-                        PROTOBUF_C_TYPE_STRING,
-                        0,   /* quantifier_offset */
-                        offsetof(Protobuf__PostScript, magicnumber),
-                        NULL,
-                        NULL,
-                        0,             /* flags */
-                        0, NULL, NULL    /* reserved1,reserved2, etc */
-                },
-        };
+{
+  {
+    "tableFooterLength",
+    1,
+    PROTOBUF_C_LABEL_OPTIONAL,
+    PROTOBUF_C_TYPE_UINT64,
+    offsetof(Protobuf__PostScript, has_tablefooterlength),
+    offsetof(Protobuf__PostScript, tablefooterlength),
+    NULL,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "versionMajor",
+    2,
+    PROTOBUF_C_LABEL_OPTIONAL,
+    PROTOBUF_C_TYPE_UINT64,
+    offsetof(Protobuf__PostScript, has_versionmajor),
+    offsetof(Protobuf__PostScript, versionmajor),
+    NULL,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "versionMinor",
+    3,
+    PROTOBUF_C_LABEL_OPTIONAL,
+    PROTOBUF_C_TYPE_UINT64,
+    offsetof(Protobuf__PostScript, has_versionminor),
+    offsetof(Protobuf__PostScript, versionminor),
+    NULL,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "magicNumber",
+    8000,
+    PROTOBUF_C_LABEL_OPTIONAL,
+    PROTOBUF_C_TYPE_STRING,
+    0,   /* quantifier_offset */
+    offsetof(Protobuf__PostScript, magicnumber),
+    NULL,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+};
 static const unsigned protobuf__post_script__field_indices_by_name[] = {
-        3,   /* field[3] = magicNumber */
-        0,   /* field[0] = tableFooterLength */
-        1,   /* field[1] = versionMajor */
-        2,   /* field[2] = versionMinor */
+  3,   /* field[3] = magicNumber */
+  0,   /* field[0] = tableFooterLength */
+  1,   /* field[1] = versionMajor */
+  2,   /* field[2] = versionMinor */
 };
 static const ProtobufCIntRange protobuf__post_script__number_ranges[2 + 1] =
-        {
-                {1,    0},
-                {8000, 3},
-                {0,    4}
-        };
+{
+  { 1, 0 },
+  { 8000, 3 },
+  { 0, 4 }
+};
 const ProtobufCMessageDescriptor protobuf__post_script__descriptor =
-        {
-                PROTOBUF_C__MESSAGE_DESCRIPTOR_MAGIC,
-                "protobuf.PostScript",
-                "PostScript",
-                "Protobuf__PostScript",
-                "protobuf",
-                sizeof(Protobuf__PostScript),
-                4,
-                protobuf__post_script__field_descriptors,
-                protobuf__post_script__field_indices_by_name,
-                2, protobuf__post_script__number_ranges,
-                (ProtobufCMessageInit) protobuf__post_script__init,
-                NULL, NULL, NULL    /* reserved[123] */
-        };
+{
+  PROTOBUF_C__MESSAGE_DESCRIPTOR_MAGIC,
+  "protobuf.PostScript",
+  "PostScript",
+  "Protobuf__PostScript",
+  "protobuf",
+  sizeof(Protobuf__PostScript),
+  4,
+  protobuf__post_script__field_descriptors,
+  protobuf__post_script__field_indices_by_name,
+  2,  protobuf__post_script__number_ranges,
+  (ProtobufCMessageInit) protobuf__post_script__init,
+  NULL,NULL,NULL    /* reserved[123] */
+};
 static const ProtobufCEnumValue protobuf__compression_type__enum_values_by_number[2] =
-        {
-                {"NONE",  "PROTOBUF__COMPRESSION_TYPE__NONE",  0},
-                {"PG_LZ", "PROTOBUF__COMPRESSION_TYPE__PG_LZ", 1},
-        };
+{
+  { "NONE", "PROTOBUF__COMPRESSION_TYPE__NONE", 0 },
+  { "PG_LZ", "PROTOBUF__COMPRESSION_TYPE__PG_LZ", 1 },
+};
 static const ProtobufCIntRange protobuf__compression_type__value_ranges[] = {
-        {0, 0},
-        {0, 2}
+{0, 0},{0, 2}
 };
 static const ProtobufCEnumValueIndex protobuf__compression_type__enum_values_by_name[2] =
-        {
-                {"NONE",  0},
-                {"PG_LZ", 1},
-        };
+{
+  { "NONE", 0 },
+  { "PG_LZ", 1 },
+};
 const ProtobufCEnumDescriptor protobuf__compression_type__descriptor =
-        {
-                PROTOBUF_C__ENUM_DESCRIPTOR_MAGIC,
-                "protobuf.CompressionType",
-                "CompressionType",
-                "Protobuf__CompressionType",
-                "protobuf",
-                2,
-                protobuf__compression_type__enum_values_by_number,
-                2,
-                protobuf__compression_type__enum_values_by_name,
-                1,
-                protobuf__compression_type__value_ranges,
-                NULL, NULL, NULL, NULL   /* reserved[1234] */
-        };
+{
+  PROTOBUF_C__ENUM_DESCRIPTOR_MAGIC,
+  "protobuf.CompressionType",
+  "CompressionType",
+  "Protobuf__CompressionType",
+  "protobuf",
+  2,
+  protobuf__compression_type__enum_values_by_number,
+  2,
+  protobuf__compression_type__enum_values_by_name,
+  1,
+  protobuf__compression_type__value_ranges,
+  NULL,NULL,NULL,NULL   /* reserved[1234] */
+};

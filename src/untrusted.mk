@@ -17,9 +17,9 @@ VECTORIZED=yes
 ifeq ($(VECTORIZED), yes)
 	CSTORE_DIR=untrusted/postgres_vectorization_test
 else
-	CSTORE_DIR=untrusted/cstore_fdw
-	C_SRCS += $(wildcard $(CSTORE_DIR)/*.c)
+	CSTORE_DIR=untrusted/cstore
 endif
+C_SRCS += $(wildcard $(CSTORE_DIR)/*.c)
 C_OBJS := $(C_SRCS:.c=.o)
 
 CXX_SRCS := $(wildcard tools/*.cpp) $(wildcard $(INTERFACE_DIR)/*.cpp)
@@ -61,28 +61,26 @@ $(INTERFACE_DIR)/%.o: $(INTERFACE_DIR)/%.cpp
 	@$(CXX) $(CXXFLAGS) -o $@ -c $^ # $^: names of all the prerequisites
 	@echo "CXX interface <=  $<"
 
+
 cstore.pb-c.c: $(CSTORE_DIR)/cstore.proto
-ifeq ($(VECTORIZED), yes)
-	@echo "cstore.pb generated in its own makefile"
-else
 	protoc-c --c_out=. $(CSTORE_DIR)/cstore.proto
-endif
+
+C_SRCS += $(CSTORE_DIR)/cstore.pb-c.c
+C_OBJS += $(CSTORE_DIR)/cstore.pb-c.o
+$(info $(C_OBJS) $(wildcard $(CSTORE_DIR)/*.c))
 
 $(EXTENSION_DIR)/%.o: $(EXTENSION_DIR)/%.c
 	@echo "$^ $@"
 	@$(CC) $(CFLAGS) $(PSQL_CPPFLAGS) -o $@ -c $^
 	@echo "CC extension <=  $<"
 
-cstore:
-ifeq ($(VECTORIZED), yes)
-		cd $(CSTORE_DIR) && $(MAKE)
-		cd $(CSTORE_DIR) && $(MAKE) install
-else
-	$(CSTORE_DIR)/%.o: $(CSTORE_DIR)/%.c
-		@echo "$^ $@"
-		@$(CC) $(CFLAGS) $(PSQL_CPPFLAGS) -o $@ -c $^
-		@echo "CC extension <=  $<"
-endif
+cstore: $(CSTORE_DIR)/cstore.pb-c.c
+$(CSTORE_DIR)/%.o: $(CSTORE_DIR)/%.c
+	@echo "$^ $@"
+	@$(CC) $(CFLAGS) $(PSQL_CPPFLAGS) -o $@ -c $^
+	@echo "CC cstore <=  $<"
+#		cd $(CSTORE_DIR) && $(MAKE)
+#		cd $(CSTORE_DIR) && $(MAKE) install
 
 $(UNTRUSTED_DIR)/encdb.so: $(UNTRUSTED_DIR)/enclave_u.o $(CXX_OBJS) $(C_OBJS)
 	@$(CC) -shared -L$(PSQL_LIBDIR) $^ -o $@ $(LDFLAGS)
@@ -114,5 +112,9 @@ uninstall:
 .PHONY: clean
 clean:
 	@$(RM) $(CXX_OBJS) $(C_OBJS) $(UNTRUSTED_DIR)/enclave_u.*
+ifeq ($(VECTORIZED), yes)
 	cd $(CSTORE_DIR) && $(MAKE) clean
 	cd $(LZ4_DIR) && $(MAKE) clean
+else
+	cd $(LZ4_DIR) && $(MAKE) clean
+endif

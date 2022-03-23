@@ -1151,13 +1151,13 @@ CREATE CAST (timestamp AS enc_timestamp) WITH FUNCTION enc_timestamp(timestamp) 
 CREATE FUNCTION cstore_fdw_handler()
     RETURNS fdw_handler
 AS
-'$libdir/cstore_fdw'
+'$libdir/encdb'
     LANGUAGE C STRICT;
 
 CREATE FUNCTION cstore_fdw_validator(text[], oid)
     RETURNS void
 AS
-'$libdir/cstore_fdw'
+'$libdir/encdb'
     LANGUAGE C STRICT;
 
 CREATE FOREIGN DATA WRAPPER cstore_fdw
@@ -1167,7 +1167,7 @@ CREATE FOREIGN DATA WRAPPER cstore_fdw
 CREATE FUNCTION cstore_ddl_event_end_trigger()
     RETURNS event_trigger
 AS
-'$libdir/cstore_fdw'
+'$libdir/encdb'
     LANGUAGE C STRICT;
 
 CREATE EVENT TRIGGER cstore_ddl_event_end
@@ -1177,7 +1177,7 @@ EXECUTE PROCEDURE cstore_ddl_event_end_trigger();
 CREATE FUNCTION cstore_table_size(relation regclass)
     RETURNS bigint
 AS
-'$libdir/cstore_fdw'
+'$libdir/encdb'
     LANGUAGE C STRICT;
 
 -- We declare transition functions here. Note that these functions' declarations
@@ -1187,59 +1187,59 @@ AS
 CREATE FUNCTION int4_sum_vec(bigint, int)
     RETURNS bigint
 AS
-'$libdir/cstore_fdw'
+'$libdir/encdb'
     LANGUAGE C STRICT;
 
 CREATE FUNCTION int8_sum_vec(numeric, bigint)
     RETURNS numeric
 AS
-'$libdir/cstore_fdw'
+'$libdir/encdb'
     LANGUAGE C STRICT;
 
 CREATE FUNCTION int4_avg_accum_vec(bigint[], int)
     RETURNS bigint[]
 AS
-'$libdir/cstore_fdw'
+'$libdir/encdb'
     LANGUAGE C STRICT;
 
 CREATE FUNCTION int8_avg_accum_vec(numeric[], bigint)
     RETURNS numeric[]
 AS
-'$libdir/cstore_fdw'
+'$libdir/encdb'
     LANGUAGE C STRICT;
 
 CREATE FUNCTION int8inc_vec(bigint)
     RETURNS bigint
 AS
-'$libdir/cstore_fdw'
+'$libdir/encdb'
     LANGUAGE C STRICT;
 
 CREATE FUNCTION int8inc_any_vec(bigint, "any")
     RETURNS bigint
 AS
-'$libdir/cstore_fdw'
+'$libdir/encdb'
     LANGUAGE C STRICT;
 
 CREATE FUNCTION float4pl_vec(real, real)
     RETURNS real
 AS
-'$libdir/cstore_fdw'
+'$libdir/encdb'
     LANGUAGE C STRICT;
 
 CREATE FUNCTION float8pl_vec(double precision, double precision)
     RETURNS double precision
 AS
-'$libdir/cstore_fdw'
+'$libdir/encdb'
     LANGUAGE C STRICT;
 
 CREATE FUNCTION float8_accum_vec(double precision[], double precision)
     RETURNS double precision[]
 AS
-'$libdir/cstore_fdw'
+'$libdir/encdb'
     LANGUAGE C STRICT;
 
 CREATE FUNCTION float4_accum_vec(double precision[], real)
     RETURNS double precision[]
 AS
-'$libdir/cstore_fdw'
+'$libdir/encdb'
     LANGUAGE C STRICT;

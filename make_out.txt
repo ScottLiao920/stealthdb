@@ -1,39 +1,147 @@
 make -C src -f untrusted.mk all
 make[1]: Entering directory '/home/scott/Projects/stealthdb/src'
-GEN  =>  untrusted/enclave_u.c
-CC   <=  untrusted/enclave_u.c
-CXX  <=  tools/base64.cpp
-CXX  <=  tools/bytes.cpp
-CXX  <=  tools/sync_utils.cpp
-CXX  <=  tools/Queue.cpp
-CXX interface <=  untrusted/interface/enc_int32.cpp
-CXX interface <=  untrusted/interface/enc_timestamp.cpp
-CXX interface <=  untrusted/interface/interface.cpp
-CXX interface <=  untrusted/interface/enc_compression.cpp
-CXX interface <=  untrusted/interface/enc_float32.cpp
-CXX interface <=  untrusted/interface/enc_text.cpp
-untrusted/extensions/enc_int4.c untrusted/extensions/enc_int4.o
-CC extension <=  untrusted/extensions/enc_int4.c
-untrusted/extensions/enc_text.c untrusted/extensions/enc_text.o
-CC extension <=  untrusted/extensions/enc_text.c
-untrusted/extensions/enc_float4.c untrusted/extensions/enc_float4.o
-CC extension <=  untrusted/extensions/enc_float4.c
-untrusted/extensions/encdb.c untrusted/extensions/encdb.o
-CC extension <=  untrusted/extensions/encdb.c
-untrusted/extensions/enc_timestamp.c untrusted/extensions/enc_timestamp.o
-CC extension <=  untrusted/extensions/enc_timestamp.c
-untrusted/cstore/cstore.pb-c.c untrusted/cstore/cstore.pb-c.o
-CC extension <=  untrusted/cstore/cstore.pb-c.c
-untrusted/cstore/cstore_reader.c untrusted/cstore/cstore_reader.o
-CC extension <=  untrusted/cstore/cstore_reader.c
-untrusted/cstore/cstore_compression.c untrusted/cstore/cstore_compression.o
-CC extension <=  untrusted/cstore/cstore_compression.c
-untrusted/cstore/cstore_fdw.c untrusted/cstore/cstore_fdw.o
-CC extension <=  untrusted/cstore/cstore_fdw.c
-untrusted/cstore/cstore_writer.c untrusted/cstore/cstore_writer.o
-CC extension <=  untrusted/cstore/cstore_writer.c
-untrusted/cstore/cstore_metadata_serialization.c untrusted/cstore/cstore_metadata_serialization.o
-CC extension <=  untrusted/cstore/cstore_metadata_serialization.c
-untrusted.mk:73: recipe for target 'untrusted/encdb.so' failed
+protoc-c --c_out=. untrusted/postgres_vectorization_test/cstore.proto
+cd untrusted/lz4 && make
+make[2]: Entering directory '/home/scott/Projects/stealthdb/src/untrusted/lz4'
+make -C lib lib-release
+make[3]: Entering directory '/home/scott/Projects/stealthdb/src/untrusted/lz4/lib'
+echo compiling static library
+cc -O0  -DXXH_NAMESPACE=LZ4_   -c lz4.c lz4frame.c lz4hc.c xxhash.c
+ar rcs liblz4.a *.o
+echo compiling dynamic library 1.9.3
+cc -O0  -DXXH_NAMESPACE=LZ4_   -shared lz4.c lz4frame.c lz4hc.c xxhash.c -fPIC -fvisibility=hidden -Wl,-soname=liblz4.so.1 -o liblz4.so.1.9.3
+echo creating versioned links
+ln -sf liblz4.so.1.9.3 liblz4.so.1
+ln -sf liblz4.so.1.9.3 liblz4.so
+make[3]: Leaving directory '/home/scott/Projects/stealthdb/src/untrusted/lz4/lib'
+make -C programs lz4-release
+make[3]: Entering directory '/home/scott/Projects/stealthdb/src/untrusted/lz4/programs'
+cc -O3   -I../lib -DXXH_NAMESPACE=LZ4_  -c -o ../lib/lz4.o ../lib/lz4.c
+cc -O3   -I../lib -DXXH_NAMESPACE=LZ4_  -c -o ../lib/lz4frame.o ../lib/lz4frame.c
+cc -O3   -I../lib -DXXH_NAMESPACE=LZ4_  -c -o ../lib/lz4hc.o ../lib/lz4hc.c
+cc -O3   -I../lib -DXXH_NAMESPACE=LZ4_  -c -o ../lib/xxhash.o ../lib/xxhash.c
+cc -O3   -I../lib -DXXH_NAMESPACE=LZ4_  -c -o bench.o bench.c
+cc -O3   -I../lib -DXXH_NAMESPACE=LZ4_  -c -o datagen.o datagen.c
+cc -O3   -I../lib -DXXH_NAMESPACE=LZ4_  -c -o lz4cli.o lz4cli.c
+cc -O3   -I../lib -DXXH_NAMESPACE=LZ4_  -c -o lz4io.o lz4io.c
+cc -O3   -I../lib -DXXH_NAMESPACE=LZ4_  ../lib/lz4.o ../lib/lz4frame.o ../lib/lz4hc.o ../lib/xxhash.o bench.o datagen.o lz4cli.o lz4io.o -o lz4 
+make[3]: Leaving directory '/home/scott/Projects/stealthdb/src/untrusted/lz4/programs'
+cp programs/lz4 .
+make[2]: Leaving directory '/home/scott/Projects/stealthdb/src/untrusted/lz4'
+cd untrusted/lz4 && make install
+make[2]: Entering directory '/home/scott/Projects/stealthdb/src/untrusted/lz4'
+make -C lib install
+make[3]: Entering directory '/home/scott/Projects/stealthdb/src/untrusted/lz4/lib'
+echo compiling static library
+cc -O0 -Wall -Wextra -Wcast-qual -Wcast-align -Wshadow -Wswitch-enum -Wdeclaration-after-statement -Wstrict-prototypes -Wundef -Wpointer-arith -Wstrict-aliasing=1 -DXXH_NAMESPACE=LZ4_   -c lz4.c lz4frame.c lz4hc.c xxhash.c
+ar rcs liblz4.a *.o
+echo compiling dynamic library 1.9.3
+cc -O0 -Wall -Wextra -Wcast-qual -Wcast-align -Wshadow -Wswitch-enum -Wdeclaration-after-statement -Wstrict-prototypes -Wundef -Wpointer-arith -Wstrict-aliasing=1 -DXXH_NAMESPACE=LZ4_   -shared lz4.c lz4frame.c lz4hc.c xxhash.c -fPIC -fvisibility=hidden -Wl,-soname=liblz4.so.1 -o liblz4.so.1.9.3
+echo creating versioned links
+ln -sf liblz4.so.1.9.3 liblz4.so.1
+ln -sf liblz4.so.1.9.3 liblz4.so
+echo creating pkgconfig
+sed -e 's|@PREFIX@|/usr/local|' \
+         -e 's|@LIBDIR@|/usr/local/lib|' \
+         -e 's|@INCLUDEDIR@|/usr/local/include|' \
+         -e 's|@VERSION@|1.9.3|' \
+         -e 's|=/usr/local/|=${prefix}/|' \
+          liblz4.pc.in >liblz4.pc
+install -d -m 755 /usr/local/lib/pkgconfig/ /usr/local/include/ /usr/local/lib/ /usr/local/bin/
+install -m 644 liblz4.pc /usr/local/lib/pkgconfig/
+echo Installing libraries in /usr/local/lib
+install -m 644 liblz4.a /usr/local/lib/liblz4.a
+install -m 644 lz4frame_static.h /usr/local/include/lz4frame_static.h
+install -m 755 liblz4.so.1.9.3 /usr/local/lib
+ln -sf liblz4.so.1.9.3 /usr/local/lib/liblz4.so.1
+ln -sf liblz4.so.1.9.3 /usr/local/lib/liblz4.so
+echo Installing headers in /usr/local/include
+install -m 644 lz4.h /usr/local/include/lz4.h
+install -m 644 lz4hc.h /usr/local/include/lz4hc.h
+install -m 644 lz4frame.h /usr/local/include/lz4frame.h
+echo lz4 libraries installed
+make[3]: Leaving directory '/home/scott/Projects/stealthdb/src/untrusted/lz4/lib'
+make -C programs install
+make[3]: Entering directory '/home/scott/Projects/stealthdb/src/untrusted/lz4/programs'
+cc -O3 -Wall -Wextra -Wundef -Wcast-qual -Wcast-align -Wshadow -Wswitch-enum -Wdeclaration-after-statement -Wstrict-prototypes -Wpointer-arith -Wstrict-aliasing=1  -I../lib -DXXH_NAMESPACE=LZ4_  -c -o ../lib/lz4.o ../lib/lz4.c
+cc -O3 -Wall -Wextra -Wundef -Wcast-qual -Wcast-align -Wshadow -Wswitch-enum -Wdeclaration-after-statement -Wstrict-prototypes -Wpointer-arith -Wstrict-aliasing=1  -I../lib -DXXH_NAMESPACE=LZ4_  -c -o ../lib/lz4frame.o ../lib/lz4frame.c
+cc -O3 -Wall -Wextra -Wundef -Wcast-qual -Wcast-align -Wshadow -Wswitch-enum -Wdeclaration-after-statement -Wstrict-prototypes -Wpointer-arith -Wstrict-aliasing=1  -I../lib -DXXH_NAMESPACE=LZ4_  -c -o ../lib/lz4hc.o ../lib/lz4hc.c
+cc -O3 -Wall -Wextra -Wundef -Wcast-qual -Wcast-align -Wshadow -Wswitch-enum -Wdeclaration-after-statement -Wstrict-prototypes -Wpointer-arith -Wstrict-aliasing=1  -I../lib -DXXH_NAMESPACE=LZ4_  -c -o ../lib/xxhash.o ../lib/xxhash.c
+cc -O3 -Wall -Wextra -Wundef -Wcast-qual -Wcast-align -Wshadow -Wswitch-enum -Wdeclaration-after-statement -Wstrict-prototypes -Wpointer-arith -Wstrict-aliasing=1  -I../lib -DXXH_NAMESPACE=LZ4_  -c -o bench.o bench.c
+cc -O3 -Wall -Wextra -Wundef -Wcast-qual -Wcast-align -Wshadow -Wswitch-enum -Wdeclaration-after-statement -Wstrict-prototypes -Wpointer-arith -Wstrict-aliasing=1  -I../lib -DXXH_NAMESPACE=LZ4_  -c -o datagen.o datagen.c
+cc -O3 -Wall -Wextra -Wundef -Wcast-qual -Wcast-align -Wshadow -Wswitch-enum -Wdeclaration-after-statement -Wstrict-prototypes -Wpointer-arith -Wstrict-aliasing=1  -I../lib -DXXH_NAMESPACE=LZ4_  -c -o lz4cli.o lz4cli.c
+cc -O3 -Wall -Wextra -Wundef -Wcast-qual -Wcast-align -Wshadow -Wswitch-enum -Wdeclaration-after-statement -Wstrict-prototypes -Wpointer-arith -Wstrict-aliasing=1  -I../lib -DXXH_NAMESPACE=LZ4_  -c -o lz4io.o lz4io.c
+cc -O3 -Wall -Wextra -Wundef -Wcast-qual -Wcast-align -Wshadow -Wswitch-enum -Wdeclaration-after-statement -Wstrict-prototypes -Wpointer-arith -Wstrict-aliasing=1  -I../lib -DXXH_NAMESPACE=LZ4_  ../lib/lz4.o ../lib/lz4frame.o ../lib/lz4hc.o ../lib/xxhash.o bench.o datagen.o lz4cli.o lz4io.o -o lz4 
+echo Installing binaries in /usr/local/bin
+install -d -m 755 /usr/local/bin/ /usr/local/share/man/man1/
+install -m 755 lz4 /usr/local/bin/lz4
+ln -sf lz4 /usr/local/bin/lz4c
+ln -sf lz4 /usr/local/bin/lz4cat
+ln -sf lz4 /usr/local/bin/unlz4
+echo Installing man pages in /usr/local/share/man/man1
+install -m 644 lz4.1 /usr/local/share/man/man1/lz4.1
+ln -sf lz4.1 /usr/local/share/man/man1/lz4c.1
+ln -sf lz4.1 /usr/local/share/man/man1/lz4cat.1
+ln -sf lz4.1 /usr/local/share/man/man1/unlz4.1
+echo lz4 installation completed
+make[3]: Leaving directory '/home/scott/Projects/stealthdb/src/untrusted/lz4/programs'
+make[2]: Leaving directory '/home/scott/Projects/stealthdb/src/untrusted/lz4'
+cd untrusted && /opt/intel/sgxsdk/bin/x64/sgx_edger8r --untrusted ../enclave/enclave.edl
+echo "GEN  =>  untrusted/enclave_u.c"
+cc -m64 -O0 -g -fPIC -Wall -Wextra -Wpedantic -DTOKEN_FILENAME=\"/usr/local/lib/stealthDB/enclave.token\" -DENCLAVE_FILENAME=\"/usr/local/lib/stealthDB/enclave.signed.so\" -DDATA_FILENAME=\"/usr/local/lib/stealthDB/stealthDB.data\" -I/home/scott/Projects/stealthdb/src/include -I/opt/intel/sgxsdk/include -Iuntrusted -Iuntrusted/postgres_vectorization_test -Iuntrusted/lz4/lib -c untrusted/enclave_u.c -o untrusted/enclave_u.o # untrusted/enclave_u.c: name of the first prerequisite
+echo "CC   <=  untrusted/enclave_u.c"
+g++ -m64 -O0 -g -fPIC -Wall -Wextra -Wpedantic -DTOKEN_FILENAME=\"/usr/local/lib/stealthDB/enclave.token\" -DENCLAVE_FILENAME=\"/usr/local/lib/stealthDB/enclave.signed.so\" -DDATA_FILENAME=\"/usr/local/lib/stealthDB/stealthDB.data\" -I/home/scott/Projects/stealthdb/src/include -I/opt/intel/sgxsdk/include -Iuntrusted -Iuntrusted/postgres_vectorization_test -Iuntrusted/lz4/lib -std=c++11 -c tools/base64.cpp -o tools/base64.o # tools/base64.o: name of target
+echo "CXX  <=  tools/base64.cpp"
+g++ -m64 -O0 -g -fPIC -Wall -Wextra -Wpedantic -DTOKEN_FILENAME=\"/usr/local/lib/stealthDB/enclave.token\" -DENCLAVE_FILENAME=\"/usr/local/lib/stealthDB/enclave.signed.so\" -DDATA_FILENAME=\"/usr/local/lib/stealthDB/stealthDB.data\" -I/home/scott/Projects/stealthdb/src/include -I/opt/intel/sgxsdk/include -Iuntrusted -Iuntrusted/postgres_vectorization_test -Iuntrusted/lz4/lib -std=c++11 -c tools/bytes.cpp -o tools/bytes.o # tools/bytes.o: name of target
+echo "CXX  <=  tools/bytes.cpp"
+g++ -m64 -O0 -g -fPIC -Wall -Wextra -Wpedantic -DTOKEN_FILENAME=\"/usr/local/lib/stealthDB/enclave.token\" -DENCLAVE_FILENAME=\"/usr/local/lib/stealthDB/enclave.signed.so\" -DDATA_FILENAME=\"/usr/local/lib/stealthDB/stealthDB.data\" -I/home/scott/Projects/stealthdb/src/include -I/opt/intel/sgxsdk/include -Iuntrusted -Iuntrusted/postgres_vectorization_test -Iuntrusted/lz4/lib -std=c++11 -c tools/sync_utils.cpp -o tools/sync_utils.o # tools/sync_utils.o: name of target
+echo "CXX  <=  tools/sync_utils.cpp"
+g++ -m64 -O0 -g -fPIC -Wall -Wextra -Wpedantic -DTOKEN_FILENAME=\"/usr/local/lib/stealthDB/enclave.token\" -DENCLAVE_FILENAME=\"/usr/local/lib/stealthDB/enclave.signed.so\" -DDATA_FILENAME=\"/usr/local/lib/stealthDB/stealthDB.data\" -I/home/scott/Projects/stealthdb/src/include -I/opt/intel/sgxsdk/include -Iuntrusted -Iuntrusted/postgres_vectorization_test -Iuntrusted/lz4/lib -std=c++11 -c tools/Queue.cpp -o tools/Queue.o # tools/Queue.o: name of target
+echo "CXX  <=  tools/Queue.cpp"
+g++ -m64 -O0 -g -fPIC -Wall -Wextra -Wpedantic -DTOKEN_FILENAME=\"/usr/local/lib/stealthDB/enclave.token\" -DENCLAVE_FILENAME=\"/usr/local/lib/stealthDB/enclave.signed.so\" -DDATA_FILENAME=\"/usr/local/lib/stealthDB/stealthDB.data\" -I/home/scott/Projects/stealthdb/src/include -I/opt/intel/sgxsdk/include -Iuntrusted -Iuntrusted/postgres_vectorization_test -Iuntrusted/lz4/lib -std=c++11 -o untrusted/interface/enc_int32.o -c untrusted/interface/enc_int32.cpp # untrusted/interface/enc_int32.cpp: names of all the prerequisites
+echo "CXX interface <=  untrusted/interface/enc_int32.cpp"
+g++ -m64 -O0 -g -fPIC -Wall -Wextra -Wpedantic -DTOKEN_FILENAME=\"/usr/local/lib/stealthDB/enclave.token\" -DENCLAVE_FILENAME=\"/usr/local/lib/stealthDB/enclave.signed.so\" -DDATA_FILENAME=\"/usr/local/lib/stealthDB/stealthDB.data\" -I/home/scott/Projects/stealthdb/src/include -I/opt/intel/sgxsdk/include -Iuntrusted -Iuntrusted/postgres_vectorization_test -Iuntrusted/lz4/lib -std=c++11 -o untrusted/interface/enc_timestamp.o -c untrusted/interface/enc_timestamp.cpp # untrusted/interface/enc_timestamp.cpp: names of all the prerequisites
+echo "CXX interface <=  untrusted/interface/enc_timestamp.cpp"
+g++ -m64 -O0 -g -fPIC -Wall -Wextra -Wpedantic -DTOKEN_FILENAME=\"/usr/local/lib/stealthDB/enclave.token\" -DENCLAVE_FILENAME=\"/usr/local/lib/stealthDB/enclave.signed.so\" -DDATA_FILENAME=\"/usr/local/lib/stealthDB/stealthDB.data\" -I/home/scott/Projects/stealthdb/src/include -I/opt/intel/sgxsdk/include -Iuntrusted -Iuntrusted/postgres_vectorization_test -Iuntrusted/lz4/lib -std=c++11 -o untrusted/interface/interface.o -c untrusted/interface/interface.cpp # untrusted/interface/interface.cpp: names of all the prerequisites
+echo "CXX interface <=  untrusted/interface/interface.cpp"
+g++ -m64 -O0 -g -fPIC -Wall -Wextra -Wpedantic -DTOKEN_FILENAME=\"/usr/local/lib/stealthDB/enclave.token\" -DENCLAVE_FILENAME=\"/usr/local/lib/stealthDB/enclave.signed.so\" -DDATA_FILENAME=\"/usr/local/lib/stealthDB/stealthDB.data\" -I/home/scott/Projects/stealthdb/src/include -I/opt/intel/sgxsdk/include -Iuntrusted -Iuntrusted/postgres_vectorization_test -Iuntrusted/lz4/lib -std=c++11 -o untrusted/interface/enc_compression.o -c untrusted/interface/enc_compression.cpp # untrusted/interface/enc_compression.cpp: names of all the prerequisites
+echo "CXX interface <=  untrusted/interface/enc_compression.cpp"
+g++ -m64 -O0 -g -fPIC -Wall -Wextra -Wpedantic -DTOKEN_FILENAME=\"/usr/local/lib/stealthDB/enclave.token\" -DENCLAVE_FILENAME=\"/usr/local/lib/stealthDB/enclave.signed.so\" -DDATA_FILENAME=\"/usr/local/lib/stealthDB/stealthDB.data\" -I/home/scott/Projects/stealthdb/src/include -I/opt/intel/sgxsdk/include -Iuntrusted -Iuntrusted/postgres_vectorization_test -Iuntrusted/lz4/lib -std=c++11 -o untrusted/interface/enc_float32.o -c untrusted/interface/enc_float32.cpp # untrusted/interface/enc_float32.cpp: names of all the prerequisites
+echo "CXX interface <=  untrusted/interface/enc_float32.cpp"
+g++ -m64 -O0 -g -fPIC -Wall -Wextra -Wpedantic -DTOKEN_FILENAME=\"/usr/local/lib/stealthDB/enclave.token\" -DENCLAVE_FILENAME=\"/usr/local/lib/stealthDB/enclave.signed.so\" -DDATA_FILENAME=\"/usr/local/lib/stealthDB/stealthDB.data\" -I/home/scott/Projects/stealthdb/src/include -I/opt/intel/sgxsdk/include -Iuntrusted -Iuntrusted/postgres_vectorization_test -Iuntrusted/lz4/lib -std=c++11 -o untrusted/interface/enc_text.o -c untrusted/interface/enc_text.cpp # untrusted/interface/enc_text.cpp: names of all the prerequisites
+echo "CXX interface <=  untrusted/interface/enc_text.cpp"
+echo "untrusted/extensions/enc_int4.c untrusted/extensions/enc_int4.o"
+cc -m64 -O0 -g -fPIC -Wall -Wextra -Wpedantic -DTOKEN_FILENAME=\"/usr/local/lib/stealthDB/enclave.token\" -DENCLAVE_FILENAME=\"/usr/local/lib/stealthDB/enclave.signed.so\" -DDATA_FILENAME=\"/usr/local/lib/stealthDB/stealthDB.data\" -I/home/scott/Projects/stealthdb/src/include -I/opt/intel/sgxsdk/include -Iuntrusted -Iuntrusted/postgres_vectorization_test -Iuntrusted/lz4/lib -I/home/scott/Projects/stealthdb/src -I/usr/local/pgsql/include/server -I/usr/local/pgsql/include -o untrusted/extensions/enc_int4.o -c untrusted/extensions/enc_int4.c
+echo "CC extension <=  untrusted/extensions/enc_int4.c"
+echo "untrusted/extensions/enc_text.c untrusted/extensions/enc_text.o"
+cc -m64 -O0 -g -fPIC -Wall -Wextra -Wpedantic -DTOKEN_FILENAME=\"/usr/local/lib/stealthDB/enclave.token\" -DENCLAVE_FILENAME=\"/usr/local/lib/stealthDB/enclave.signed.so\" -DDATA_FILENAME=\"/usr/local/lib/stealthDB/stealthDB.data\" -I/home/scott/Projects/stealthdb/src/include -I/opt/intel/sgxsdk/include -Iuntrusted -Iuntrusted/postgres_vectorization_test -Iuntrusted/lz4/lib -I/home/scott/Projects/stealthdb/src -I/usr/local/pgsql/include/server -I/usr/local/pgsql/include -o untrusted/extensions/enc_text.o -c untrusted/extensions/enc_text.c
+echo "CC extension <=  untrusted/extensions/enc_text.c"
+echo "untrusted/extensions/enc_float4.c untrusted/extensions/enc_float4.o"
+cc -m64 -O0 -g -fPIC -Wall -Wextra -Wpedantic -DTOKEN_FILENAME=\"/usr/local/lib/stealthDB/enclave.token\" -DENCLAVE_FILENAME=\"/usr/local/lib/stealthDB/enclave.signed.so\" -DDATA_FILENAME=\"/usr/local/lib/stealthDB/stealthDB.data\" -I/home/scott/Projects/stealthdb/src/include -I/opt/intel/sgxsdk/include -Iuntrusted -Iuntrusted/postgres_vectorization_test -Iuntrusted/lz4/lib -I/home/scott/Projects/stealthdb/src -I/usr/local/pgsql/include/server -I/usr/local/pgsql/include -o untrusted/extensions/enc_float4.o -c untrusted/extensions/enc_float4.c
+echo "CC extension <=  untrusted/extensions/enc_float4.c"
+echo "untrusted/extensions/encdb.c untrusted/extensions/encdb.o"
+cc -m64 -O0 -g -fPIC -Wall -Wextra -Wpedantic -DTOKEN_FILENAME=\"/usr/local/lib/stealthDB/enclave.token\" -DENCLAVE_FILENAME=\"/usr/local/lib/stealthDB/enclave.signed.so\" -DDATA_FILENAME=\"/usr/local/lib/stealthDB/stealthDB.data\" -I/home/scott/Projects/stealthdb/src/include -I/opt/intel/sgxsdk/include -Iuntrusted -Iuntrusted/postgres_vectorization_test -Iuntrusted/lz4/lib -I/home/scott/Projects/stealthdb/src -I/usr/local/pgsql/include/server -I/usr/local/pgsql/include -o untrusted/extensions/encdb.o -c untrusted/extensions/encdb.c
+echo "CC extension <=  untrusted/extensions/encdb.c"
+echo "untrusted/extensions/enc_timestamp.c untrusted/extensions/enc_timestamp.o"
+cc -m64 -O0 -g -fPIC -Wall -Wextra -Wpedantic -DTOKEN_FILENAME=\"/usr/local/lib/stealthDB/enclave.token\" -DENCLAVE_FILENAME=\"/usr/local/lib/stealthDB/enclave.signed.so\" -DDATA_FILENAME=\"/usr/local/lib/stealthDB/stealthDB.data\" -I/home/scott/Projects/stealthdb/src/include -I/opt/intel/sgxsdk/include -Iuntrusted -Iuntrusted/postgres_vectorization_test -Iuntrusted/lz4/lib -I/home/scott/Projects/stealthdb/src -I/usr/local/pgsql/include/server -I/usr/local/pgsql/include -o untrusted/extensions/enc_timestamp.o -c untrusted/extensions/enc_timestamp.c
+echo "CC extension <=  untrusted/extensions/enc_timestamp.c"
+echo "untrusted/postgres_vectorization_test/vectorized_aggregates.c untrusted/postgres_vectorization_test/vectorized_aggregates.o"
+cc -m64 -O0 -g -fPIC -Wall -Wextra -Wpedantic -DTOKEN_FILENAME=\"/usr/local/lib/stealthDB/enclave.token\" -DENCLAVE_FILENAME=\"/usr/local/lib/stealthDB/enclave.signed.so\" -DDATA_FILENAME=\"/usr/local/lib/stealthDB/stealthDB.data\" -I/home/scott/Projects/stealthdb/src/include -I/opt/intel/sgxsdk/include -Iuntrusted -Iuntrusted/postgres_vectorization_test -Iuntrusted/lz4/lib -I/home/scott/Projects/stealthdb/src -I/usr/local/pgsql/include/server -I/usr/local/pgsql/include -o untrusted/postgres_vectorization_test/vectorized_aggregates.o -c untrusted/postgres_vectorization_test/vectorized_aggregates.c
+echo "CC cstore <=  untrusted/postgres_vectorization_test/vectorized_aggregates.c"
+echo "untrusted/postgres_vectorization_test/vectorized_transition_functions.c untrusted/postgres_vectorization_test/vectorized_transition_functions.o"
+cc -m64 -O0 -g -fPIC -Wall -Wextra -Wpedantic -DTOKEN_FILENAME=\"/usr/local/lib/stealthDB/enclave.token\" -DENCLAVE_FILENAME=\"/usr/local/lib/stealthDB/enclave.signed.so\" -DDATA_FILENAME=\"/usr/local/lib/stealthDB/stealthDB.data\" -I/home/scott/Projects/stealthdb/src/include -I/opt/intel/sgxsdk/include -Iuntrusted -Iuntrusted/postgres_vectorization_test -Iuntrusted/lz4/lib -I/home/scott/Projects/stealthdb/src -I/usr/local/pgsql/include/server -I/usr/local/pgsql/include -o untrusted/postgres_vectorization_test/vectorized_transition_functions.o -c untrusted/postgres_vectorization_test/vectorized_transition_functions.c
+echo "CC cstore <=  untrusted/postgres_vectorization_test/vectorized_transition_functions.c"
+echo "untrusted/postgres_vectorization_test/cstore_reader.c untrusted/postgres_vectorization_test/cstore_reader.o"
+cc -m64 -O0 -g -fPIC -Wall -Wextra -Wpedantic -DTOKEN_FILENAME=\"/usr/local/lib/stealthDB/enclave.token\" -DENCLAVE_FILENAME=\"/usr/local/lib/stealthDB/enclave.signed.so\" -DDATA_FILENAME=\"/usr/local/lib/stealthDB/stealthDB.data\" -I/home/scott/Projects/stealthdb/src/include -I/opt/intel/sgxsdk/include -Iuntrusted -Iuntrusted/postgres_vectorization_test -Iuntrusted/lz4/lib -I/home/scott/Projects/stealthdb/src -I/usr/local/pgsql/include/server -I/usr/local/pgsql/include -o untrusted/postgres_vectorization_test/cstore_reader.o -c untrusted/postgres_vectorization_test/cstore_reader.c
+echo "CC cstore <=  untrusted/postgres_vectorization_test/cstore_reader.c"
+echo "untrusted/postgres_vectorization_test/cstore_fdw.c untrusted/postgres_vectorization_test/cstore_fdw.o"
+cc -m64 -O0 -g -fPIC -Wall -Wextra -Wpedantic -DTOKEN_FILENAME=\"/usr/local/lib/stealthDB/enclave.token\" -DENCLAVE_FILENAME=\"/usr/local/lib/stealthDB/enclave.signed.so\" -DDATA_FILENAME=\"/usr/local/lib/stealthDB/stealthDB.data\" -I/home/scott/Projects/stealthdb/src/include -I/opt/intel/sgxsdk/include -Iuntrusted -Iuntrusted/postgres_vectorization_test -Iuntrusted/lz4/lib -I/home/scott/Projects/stealthdb/src -I/usr/local/pgsql/include/server -I/usr/local/pgsql/include -o untrusted/postgres_vectorization_test/cstore_fdw.o -c untrusted/postgres_vectorization_test/cstore_fdw.c
+echo "CC cstore <=  untrusted/postgres_vectorization_test/cstore_fdw.c"
+echo "untrusted/postgres_vectorization_test/cstore_writer.c untrusted/postgres_vectorization_test/cstore_writer.o"
+cc -m64 -O0 -g -fPIC -Wall -Wextra -Wpedantic -DTOKEN_FILENAME=\"/usr/local/lib/stealthDB/enclave.token\" -DENCLAVE_FILENAME=\"/usr/local/lib/stealthDB/enclave.signed.so\" -DDATA_FILENAME=\"/usr/local/lib/stealthDB/stealthDB.data\" -I/home/scott/Projects/stealthdb/src/include -I/opt/intel/sgxsdk/include -Iuntrusted -Iuntrusted/postgres_vectorization_test -Iuntrusted/lz4/lib -I/home/scott/Projects/stealthdb/src -I/usr/local/pgsql/include/server -I/usr/local/pgsql/include -o untrusted/postgres_vectorization_test/cstore_writer.o -c untrusted/postgres_vectorization_test/cstore_writer.c
+echo "CC cstore <=  untrusted/postgres_vectorization_test/cstore_writer.c"
+echo "untrusted/postgres_vectorization_test/cstore_metadata_serialization.c untrusted/postgres_vectorization_test/cstore_metadata_serialization.o"
+cc -m64 -O0 -g -fPIC -Wall -Wextra -Wpedantic -DTOKEN_FILENAME=\"/usr/local/lib/stealthDB/enclave.token\" -DENCLAVE_FILENAME=\"/usr/local/lib/stealthDB/enclave.signed.so\" -DDATA_FILENAME=\"/usr/local/lib/stealthDB/stealthDB.data\" -I/home/scott/Projects/stealthdb/src/include -I/opt/intel/sgxsdk/include -Iuntrusted -Iuntrusted/postgres_vectorization_test -Iuntrusted/lz4/lib -I/home/scott/Projects/stealthdb/src -I/usr/local/pgsql/include/server -I/usr/local/pgsql/include -o untrusted/postgres_vectorization_test/cstore_metadata_serialization.o -c untrusted/postgres_vectorization_test/cstore_metadata_serialization.c
+echo "CC cstore <=  untrusted/postgres_vectorization_test/cstore_metadata_serialization.c"
 make[1]: Leaving directory '/home/scott/Projects/stealthdb/src'
 Makefile:6: recipe for target 'all' failed
