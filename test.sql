@@ -25,12 +25,14 @@ copy table_tmp to '/home/scott/Projects/stealthdb/plain_data.csv' delimiter ',' 
 select * from c_table_test;
 copy c_table_test from '/home/scott/Projects/stealthdb/plain_data.csv' delimiter ',' csv;
 select * from c_table_test;
-truncate c_table_test;
+drop foreign table c_table_test;
+create foreign table c_table_test(id_enc_fdw enc_int4, comment text) server cstore_server options (compression 'lz4');
 copy c_table_test from '/home/scott/Projects/stealthdb/cipher_data.csv' delimiter ',' csv;
 select * from c_table_test;
 copy c_table_test_pglz from '/home/scott/Projects/stealthdb/cipher_data.csv' delimiter ',' csv;
 select * from c_table_test_pglz;
-truncate c_table_test_pglz;
+drop foreign table c_table_test_pglz;
+create foreign table c_table_test_pglz(id_enc_fdw enc_int4, comment text) server cstore_server options (compression 'pglz');
 copy c_table_test_pglz from '/home/scott/Projects/stealthdb/plain_data.csv' delimiter ',' csv;
 select * from c_table_test_pglz;
 

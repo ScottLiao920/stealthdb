@@ -6,6 +6,9 @@
  *          (input size: 4 bytes; output size: 44 bytes; operators: +,-,*,/,%,>=,>,<=,<,=,!=; functions: SUM, AVG, MIN, MAX)
  */
 #include "include/untrusted/extensions/stdafx.h"
+#include "postgres_vectorization_test/cstore_fdw.h"
+#include "postgres_vectorization_test/vectorized_aggregates.h"
+
 
 //#include "untrusted/extensions/stdafx.h"
 extern bool debugMode;
@@ -23,7 +26,7 @@ pg_enc_int4_in(PG_FUNCTION_ARGS) {
     char *pSrc = PG_GETARG_CSTRING(0);
     int32 dst_int = 0;
     int ans = ENCLAVE_IS_NOT_RUNNING;
-    char *pDst = (char *) palloc(ENC_INT32_LENGTH_B64 * sizeof(char));
+    char *pDst = (char *) palloc0(ENC_INT32_LENGTH_B64 * sizeof(char));
 
     if (debugMode == true) {
         /*
@@ -42,9 +45,15 @@ pg_enc_int4_in(PG_FUNCTION_ARGS) {
             pDst[ENC_INT32_LENGTH_B64 - 1] = '\0';
         }
     } else {
-        if (false) { //(strlen(pSrc) != ENC_INT32_LENGTH_B64 - 1) {
-            ereport(ERROR,
-                    (errmsg("Incorrect length of enc_int4 element, try 'select enable_debug_mode(1)' to allow auto encryption/decryption or select pg_enc_int4_encrypt")));
+        if ((strlen(pSrc) != ENC_INT32_LENGTH_B64 - 1)) {
+//            ereport(ERROR,
+//                    (errmsg("Incorrect length of enc_int4 element, try 'select enable_debug_mode(1)' to allow auto encryption/decryption or select pg_enc_int4_encrypt")));
+            // feed a plain data to encrypted cell, just use the plain text format
+//            dst_int = pg_atoi(pSrc, INT32_LENGTH, '\0');
+//            memcpy(pDst, &dst_int, sizeof(int32));
+//            pDst[sizeof(int32) + 1] = '\0';
+            memcpy(pDst, pSrc, ENC_INT32_LENGTH_B64);
+            pDst[ENC_INT32_LENGTH_B64 - 1] = '\0';
         } else {
             memcpy(pDst, pSrc, ENC_INT32_LENGTH_B64);
             pDst[ENC_INT32_LENGTH_B64 - 1] = '\0';
