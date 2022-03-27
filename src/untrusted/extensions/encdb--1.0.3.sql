@@ -1190,6 +1190,12 @@ AS
 '$libdir/encdb'
     LANGUAGE C STRICT;
 
+CREATE FUNCTION enc_int4_sum_vec(bigint, int)
+    RETURNS bigint
+AS
+'$libdir/encdb'
+    LANGUAGE C STRICT;
+
 CREATE FUNCTION int8_sum_vec(numeric, bigint)
     RETURNS numeric
 AS
