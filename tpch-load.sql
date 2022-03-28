@@ -12,7 +12,7 @@ create foreign table customer_enc(
     c_mktsegment char(10),
     c_comment varchar(117)
     )
-    server cstore_server options (compression 'enc_lz4', block_row_count '1000', block_row_count '1000');
+    server cstore_server options (compression 'enc_lz4', block_row_count '1000');
 
 
 create foreign table lineitem_enc(
@@ -33,7 +33,7 @@ create foreign table lineitem_enc(
     l_shipmode char(10) not null,
     l_comment varchar(44) not null
     )
-    server cstore_server options (compression 'enc_lz4', block_row_count '1000', block_row_count '1000');
+    server cstore_server options (compression 'enc_lz4', block_row_count '1000');
 
 create foreign table nation_enc(
     n_nationkey_enc enc_int4,
@@ -41,7 +41,7 @@ create foreign table nation_enc(
     n_regionkey enc_int4,
     n_comment varchar(152)
     )
-    server cstore_server options (compression 'enc_lz4', block_row_count '1000', block_row_count '1000');
+    server cstore_server options (compression 'enc_lz4', block_row_count '1000');
 
 create foreign table orders_enc(
     o_orderkey enc_int4,
@@ -54,7 +54,7 @@ create foreign table orders_enc(
     o_shippriority integer,
     o_comment varchar(79)
     )
-    server cstore_server options (compression 'enc_lz4', block_row_count '1000', block_row_count '1000');
+    server cstore_server options (compression 'enc_lz4', block_row_count '1000');
 
 
 
@@ -69,7 +69,7 @@ create foreign table part_enc(
     p_retailprice numeric(15, 2),
     p_comment varchar(23)
     )
-    server cstore_server options (compression 'enc_lz4', block_row_count '1000', block_row_count '1000');
+    server cstore_server options (compression 'enc_lz4', block_row_count '1000');
 
 create foreign table partsupp_enc(
     ps_partkey enc_int4,
@@ -78,14 +78,14 @@ create foreign table partsupp_enc(
     ps_supplycost numeric(15, 2),
     ps_comment varchar(199)
     )
-    server cstore_server options (compression 'enc_lz4', block_row_count '1000', block_row_count '1000');
+    server cstore_server options (compression 'enc_lz4', block_row_count '1000');
 
 create foreign table region_enc(
     r_regionkey enc_int4,
     r_name char(25),
     r_comment varchar(152)
     )
-    server cstore_server options (compression 'enc_lz4', block_row_count '1000', block_row_count '1000');
+    server cstore_server options (compression 'enc_lz4', block_row_count '1000');
 
 create foreign table supplier_enc(
     s_suppkey enc_int4,
