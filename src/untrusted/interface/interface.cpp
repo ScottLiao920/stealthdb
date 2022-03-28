@@ -83,7 +83,8 @@ int generateKey() {
                 return resp;
             data_file.write((char *) sealed_key_b, SEALED_KEY_LENGTH);
         }
-    } else
+    }
+    else
         return NO_KEYS_STORAGE;
 
     data_file.close();
@@ -115,7 +116,8 @@ int loadKey(int item) {
                 global_eid, &resp_enclave, sealed_key_b, SEALED_KEY_LENGTH);
         if (resp != SGX_SUCCESS)
             return resp;
-    } else
+    }
+    else
         return NO_KEYS_STORAGE;
 
     data_file.close();
@@ -175,58 +177,29 @@ int loadKey(int item) {
 //    return resp + (dec_len << 4);
 //}
 
-int enc_text_compress_n_encrypt(char *pSrc, size_t src_len, char *pDst) {
-    if (!status) {
-        int resp = initMultithreading();
-        resp = loadKey(0);
-        if (resp != SGX_SUCCESS)
-            return resp;
-    }
-    int compBytes = 0;
-    int resp = 0;
-    size_t comp_len = LZ4_compressBound(src_len);
-    char *comp_buffer = nullptr;
-    auto *comp_req = new request;
-    comp_req->ocall_index = CMD_COMPRESS;
-    comp_req->is_done = -1;
-    memcpy(comp_req->buffer, &src_len, sizeof(size_t));
-    memcpy(comp_req->buffer + sizeof(size_t), &comp_len, sizeof(size_t));
-    memcpy(comp_req->buffer + 2 * sizeof(size_t), pSrc, src_len);
-    inQueue->enqueue(comp_req);
+int enc_text_compress_n_encrypt(char *pSrc, size_t src_len, char *pDst, size_t dst_len = 0) {
+    int compBytes, resp;
 
-    while (true) {
-        if (comp_req->is_done == -1) {
-            __asm__("pause");
-        } else {
-            compBytes = comp_req->resp;
-            comp_buffer = (char *) (malloc(compBytes * sizeof(char) + 2 * sizeof(size_t)));
-            memcpy(comp_buffer + 2 * sizeof(size_t), comp_req->buffer + 2 * sizeof(size_t) + src_len,
-                   compBytes * sizeof(char));
-            spin_unlock(&comp_req->is_done);
-            break;
-        }
-    }
-
-    if (compBytes <= 0) {
+    compBytes = enc_compress(pSrc, src_len, pDst, dst_len);
+    if (compBytes < 0) {
         return SGX_ERROR_UNEXPECTED;
     }
-
     // comp_buffer format: (size_t) src_len, (size_t) compressed_len, (char*) compressed data
+    char *comp_buffer = (char *) malloc(sizeof(size_t) * 2 + compBytes);
     memcpy(comp_buffer, &src_len, sizeof(size_t));
-    memcpy(comp_buffer + sizeof(size_t), &compBytes, sizeof(size_t));
+    size_t compBytes_sizeT = (size_t) compBytes;
+    memcpy(comp_buffer + sizeof(size_t), &compBytes_sizeT, sizeof(size_t));
+    memcpy(comp_buffer + 2 * sizeof(size_t), pDst, compBytes);
     compBytes += 2 * sizeof(size_t);
     size_t enc_len = compBytes + SGX_AESGCM_IV_SIZE + SGX_AESGCM_MAC_SIZE;
     size_t enc_b64_len = ((int) (4 * (double) (enc_len) / 3) + 3) & ~3;
-    if (compBytes != 2 * sizeof(size_t)) {
-        resp = enc_text_encrypt(comp_buffer, compBytes, pDst, enc_b64_len);
-    }
+    resp = enc_text_encrypt(comp_buffer, compBytes, pDst, enc_b64_len);
     free(comp_buffer);
-    delete comp_req;
 
     return resp + (enc_b64_len << 4);
 }
 
-int enc_text_decrypt_n_decompress(char *pSrc, size_t src_len, char *pDst) {
+int enc_text_decrypt_n_decompress(char *pSrc, size_t src_len, char *pDst, size_t dst_len = 0) {
     if (!status) {
         int resp = initMultithreading();
         resp = loadKey(0);
@@ -235,7 +208,12 @@ int enc_text_decrypt_n_decompress(char *pSrc, size_t src_len, char *pDst) {
     }
     int resp;
     char *decry_buffer = (char *) malloc(2 * src_len * sizeof(char));
-    resp = enc_text_decrypt(pSrc, src_len, decry_buffer, 2 * src_len);
+    if (dst_len == 0) {
+        dst_len = 2 * src_len;
+    }
+    resp = enc_text_decrypt(pSrc, src_len, decry_buffer, dst_len);
+
+
     int dec_len = (resp >> 4); // length of decrypted data (length of compress data + 2 * sizeof(int) )
     resp -= (dec_len << 4);
     size_t raw_bytes, comp_bytes;
@@ -243,26 +221,7 @@ int enc_text_decrypt_n_decompress(char *pSrc, size_t src_len, char *pDst) {
     memcpy(&comp_bytes, decry_buffer + sizeof(size_t), sizeof(size_t)); // length of compressed data
     assert(dec_len == (comp_bytes + 2 * sizeof(size_t)));
 
-    // buffer format: (size_t) decrypted length, (size_t) expected no. of raw bytes, decrypted data
-    auto req = new request;
-    req->ocall_index = CMD_DECOMPRESS;
-    req->is_done = -1;
-    memcpy(req->buffer, &comp_bytes, sizeof(size_t));
-    memcpy(req->buffer + sizeof(size_t), &raw_bytes, sizeof(size_t));
-    memcpy(req->buffer + 2 * sizeof(size_t), decry_buffer + 2 * sizeof(size_t), comp_bytes);
-    inQueue->enqueue(req);
-
-    while (true) {
-        if (req->is_done == -1) {
-            __asm__("pause");
-        } else {
-            dec_len = req->resp;
-            memcpy(pDst, req->buffer + 2 * sizeof(size_t) + comp_bytes,
-                   raw_bytes * sizeof(char));
-            spin_unlock(&req->is_done);
-            break;
-        }
-    }
+    dec_len = enc_decompress(decry_buffer + 2 * sizeof(size_t), comp_bytes, pDst, dst_len);
 
     if (dec_len < 0 || dec_len != (int) raw_bytes) {
         printf("unable to decompress it properly!");

@@ -40,11 +40,13 @@ pg_enc_int4_in(PG_FUNCTION_ARGS) {
             sgxErrorHandler(ans);
             //ereport(INFO, (errmsg("auto encryption: ENC(%d) = %s", dst_int, pDst)));
             PG_RETURN_CSTRING((const char *) pDst);
-        } else {
+        }
+        else {
             memcpy(pDst, pSrc, ENC_INT32_LENGTH_B64);
             pDst[ENC_INT32_LENGTH_B64 - 1] = '\0';
         }
-    } else {
+    }
+    else {
         if ((strlen(pSrc) != ENC_INT32_LENGTH_B64 - 1)) {
 //            ereport(ERROR,
 //                    (errmsg("Incorrect length of enc_int4 element, try 'select enable_debug_mode(1)' to allow auto encryption/decryption or select pg_enc_int4_encrypt")));
@@ -52,9 +54,11 @@ pg_enc_int4_in(PG_FUNCTION_ARGS) {
 //            dst_int = pg_atoi(pSrc, INT32_LENGTH, '\0');
 //            memcpy(pDst, &dst_int, sizeof(int32));
 //            pDst[sizeof(int32) + 1] = '\0';
-            memcpy(pDst, pSrc, ENC_INT32_LENGTH_B64);
-            pDst[ENC_INT32_LENGTH_B64 - 1] = '\0';
-        } else {
+            size_t srcLen = strlen(pSrc);
+            memcpy(pDst, pSrc, srcLen);
+            pDst[srcLen] = '\0';
+        }
+        else {
             memcpy(pDst, pSrc, ENC_INT32_LENGTH_B64);
             pDst[ENC_INT32_LENGTH_B64 - 1] = '\0';
         }
@@ -481,6 +485,26 @@ pg_enc_int4_decrypt(PG_FUNCTION_ARGS) {
     PG_RETURN_INT32(ans);
 }
 
+PG_FUNCTION_INFO_V1(pg_enc_int4_decrypt_block);
+
+Datum
+pg_enc_int4_decrypt_block(PG_FUNCTION_ARGS) {
+    int ans = 0;
+    char *enc_str = PG_GETARG_CSTRING(0);
+    size_t src_len = strlen(enc_str);
+    if (src_len <= 0) {
+        PG_RETURN_CSTRING(enc_str);
+    }
+    size_t dst_len = src_len - SGX_AESGCM_IV_SIZE - SGX_AESGCM_MAC_SIZE;
+    char *pDst = palloc(dst_len * sizeof(char));
+
+    ans = enc_text_decrypt(enc_str, src_len, pDst, dst_len);
+    ans -= (ans >> 4);// for passing dst_len out
+    sgxErrorHandler(ans);
+
+    PG_RETURN_CSTRING(pDst);
+}
+
 /*
  * The function calculates the sum of elements from input array
  * It is called by sql aggregate command SUM, which is firstly appends needed enc_int4 elements into array and then calls this function.
@@ -885,7 +909,8 @@ pg_int4_to_enc_int4(PG_FUNCTION_ARGS) {
         resp = enc_int32_encrypt(c1, pDst);
         sgxErrorHandler(resp);
         //ereport(INFO, (errmsg("auto encryption: ENC(%d) = %s", c1, pDst)));
-    } else
+    }
+    else
         ereport(ERROR,
                 (errmsg("Cannot convert int8 to enc_int4, try 'select enable_debug_mode(1)' to allow auto encryption/decryption or select pg_enc_int4_encrypt(%d)",
                         c1)));
@@ -915,7 +940,8 @@ pg_int8_to_enc_int4(PG_FUNCTION_ARGS) {
         resp = enc_int32_encrypt((int32) c1, pDst);
         sgxErrorHandler(resp);
         //ereport(INFO, (errmsg("auto encryption: ENC(%d) = %s", c1, pDst)));
-    } else
+    }
+    else
         ereport(ERROR,
                 (errmsg("Cannot convert int8 to enc_int4, try 'select enable_debug_mode(1)' to allow auto encryption/decryption or select pg_enc_int4_encrypt(%ld)",
                         c1)));

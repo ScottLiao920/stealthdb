@@ -52,24 +52,28 @@ pg_enc_text_in(PG_FUNCTION_ARGS) {
         if (resp == SGX_SUCCESS) {
             memcpy(pDst, pSrc, srcLen);
             pDst[srcLen] = '\0';
-        } else { //resp != SGX_SUCCESS
+        }
+        else { //resp != SGX_SUCCESS
             if (resp != SGX_ERROR_MAC_MISMATCH)
                 sgxErrorHandler(resp);
             else { //resp == SGX_ERROR_MAC_MISMATCH, i.e. decryption error
                 if (debugMode == true) {
                     resp = enc_text_encrypt(pSrc, srcLen, pDst, dst_len);
                     sgxErrorHandler(resp);
-                } else // debugMode == false
+                }
+                else // debugMode == false
                     ereport(ERROR,
                             (errmsg("Incorrect input of enc_text element, if you need to encrypt the varchar element try 'select enable_debug_mode(1)' to allow auto encryption/decryption or 'select pg_enc_text_encrypt(%s)'",
                                     pSrc)));
             }
         }
-    } else { // srcLen < min_enctext_len-1
+    }
+    else { // srcLen < min_enctext_len-1
         if (debugMode == true) {
             resp = enc_text_encrypt(pSrc, srcLen, pDst, dst_len);
             sgxErrorHandler(resp);
-        } else // debugMode == false
+        }
+        else // debugMode == false
             ereport(ERROR,
                     (errmsg("Incorrect length of enc_text element, if you need to encrypt the varchar element try 'select enable_debug_mode(1)' to allow auto encryption/decryption or 'select pg_enc_text_encrypt(%s)'",
                             pSrc)));
@@ -478,7 +482,8 @@ varchar_to_enc_text(PG_FUNCTION_ARGS) {
         memcpy(enc_str_var->src, pDst, len2);
         enc_str_var->length = len2;
         enc_str_var->src[enc_str_var->length] = '\0';
-    } else
+    }
+    else
         ereport(ERROR,
                 (errmsg("Cannot convert varchar to enc_text, try 'select enable_debug_mode(1)' to allow auto encryption/decryption or select pg_enc_text_encrypt(%s)",
                         src)));

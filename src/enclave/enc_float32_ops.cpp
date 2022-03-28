@@ -13,25 +13,25 @@
  @return:
  * SGX_error, if there was an error during decryption
 */
-int enc_float32_cmp(uint8_t* in1, size_t in1_size, uint8_t* in2,
-                    size_t in2_size, uint8_t* out, size_t out_size) {
-  int result, resp;
-  union_float4 lhs, rhs;
+int enc_float32_cmp(uint8_t *in1, size_t in1_size, uint8_t *in2,
+                    size_t in2_size, uint8_t *out, size_t out_size) {
+    int result, resp;
+    union_float4 lhs, rhs;
 
-  resp = decrypt_bytes(in1, in1_size, lhs.bytes, FLOAT4_LENGTH);
-  if (resp != SGX_SUCCESS) return resp;
+    resp = decrypt_bytes(in1, in1_size, lhs.bytes, FLOAT4_LENGTH);
+    if (resp != SGX_SUCCESS) return resp;
 
-  resp = decrypt_bytes(in2, in2_size, rhs.bytes, FLOAT4_LENGTH);
-  if (resp != SGX_SUCCESS) return resp;
+    resp = decrypt_bytes(in2, in2_size, rhs.bytes, FLOAT4_LENGTH);
+    if (resp != SGX_SUCCESS) return resp;
 
-  result = (lhs.val == rhs.val) ? 0 : (lhs.val < rhs.val) ? -1 : 1;
+    result = (lhs.val == rhs.val) ? 0 : (lhs.val < rhs.val) ? -1 : 1;
 
-  memcpy(out, &result, out_size);
+    memcpy(out, &result, out_size);
 
-  memset_s(lhs.bytes, FLOAT4_LENGTH, 0, FLOAT4_LENGTH);
-  memset_s(rhs.bytes, FLOAT4_LENGTH, 0, FLOAT4_LENGTH);
+    memset_s(lhs.bytes, FLOAT4_LENGTH, 0, FLOAT4_LENGTH);
+    memset_s(rhs.bytes, FLOAT4_LENGTH, 0, FLOAT4_LENGTH);
 
-  return resp;
+    return resp;
 }
 
 /* Add two aes_gcm-encrypted floats
@@ -58,26 +58,26 @@ int enc_float32_cmp(uint8_t* in1, size_t in1_size, uint8_t* in2,
  * we can check if the out size is less 8^4
  *
  */
-int enc_float32_add(uint8_t* in1, size_t in1_size, uint8_t* in2,
-                    size_t in2_size, uint8_t* out, size_t out_size) {
-  union_float4 lhs, rhs, result;
-  int resp;
+int enc_float32_add(uint8_t *in1, size_t in1_size, uint8_t *in2,
+                    size_t in2_size, uint8_t *out, size_t out_size) {
+    union_float4 lhs, rhs, result;
+    int resp;
 
-  resp = decrypt_bytes(in1, in1_size, lhs.bytes, FLOAT4_LENGTH);
-  if (resp != SGX_SUCCESS) return resp;
+    resp = decrypt_bytes(in1, in1_size, lhs.bytes, FLOAT4_LENGTH);
+    if (resp != SGX_SUCCESS) return resp;
 
-  resp = decrypt_bytes(in2, in2_size, rhs.bytes, FLOAT4_LENGTH);
-  if (resp != SGX_SUCCESS) return resp;
+    resp = decrypt_bytes(in2, in2_size, rhs.bytes, FLOAT4_LENGTH);
+    if (resp != SGX_SUCCESS) return resp;
 
-  result.val = lhs.val + rhs.val;
+    result.val = lhs.val + rhs.val;
 
-  resp = encrypt_bytes(result.bytes, FLOAT4_LENGTH, out, out_size);
+    resp = encrypt_bytes(result.bytes, FLOAT4_LENGTH, out, out_size);
 
-  memset_s(lhs.bytes, FLOAT4_LENGTH, 0, FLOAT4_LENGTH);
-  memset_s(rhs.bytes, FLOAT4_LENGTH, 0, FLOAT4_LENGTH);
-  memset_s(result.bytes, FLOAT4_LENGTH, 0, FLOAT4_LENGTH);
+    memset_s(lhs.bytes, FLOAT4_LENGTH, 0, FLOAT4_LENGTH);
+    memset_s(rhs.bytes, FLOAT4_LENGTH, 0, FLOAT4_LENGTH);
+    memset_s(result.bytes, FLOAT4_LENGTH, 0, FLOAT4_LENGTH);
 
-  return resp;
+    return resp;
 }
 
 /* Subtract one aes_gcm-encrypted float from another
@@ -93,26 +93,26 @@ int enc_float32_add(uint8_t* in1, size_t in1_size, uint8_t* in2,
     * SGX_error, if there was an error during encryption/decryption
     0, otherwise
 */
-int enc_float32_sub(uint8_t* in1, size_t in1_size, uint8_t* in2,
-                    size_t in2_size, uint8_t* out, size_t out_size) {
-  union_float4 lhs, rhs, result;
-  int resp;
+int enc_float32_sub(uint8_t *in1, size_t in1_size, uint8_t *in2,
+                    size_t in2_size, uint8_t *out, size_t out_size) {
+    union_float4 lhs, rhs, result;
+    int resp;
 
-  resp = decrypt_bytes(in1, in1_size, lhs.bytes, FLOAT4_LENGTH);
-  if (resp != SGX_SUCCESS) return resp;
+    resp = decrypt_bytes(in1, in1_size, lhs.bytes, FLOAT4_LENGTH);
+    if (resp != SGX_SUCCESS) return resp;
 
-  resp = decrypt_bytes(in2, in2_size, rhs.bytes, FLOAT4_LENGTH);
-  if (resp != SGX_SUCCESS) return resp;
+    resp = decrypt_bytes(in2, in2_size, rhs.bytes, FLOAT4_LENGTH);
+    if (resp != SGX_SUCCESS) return resp;
 
-  result.val = lhs.val - rhs.val;
+    result.val = lhs.val - rhs.val;
 
-  resp = encrypt_bytes(result.bytes, FLOAT4_LENGTH, out, out_size);
+    resp = encrypt_bytes(result.bytes, FLOAT4_LENGTH, out, out_size);
 
-  memset_s(lhs.bytes, FLOAT4_LENGTH, 0, FLOAT4_LENGTH);
-  memset_s(rhs.bytes, FLOAT4_LENGTH, 0, FLOAT4_LENGTH);
-  memset_s(result.bytes, FLOAT4_LENGTH, 0, FLOAT4_LENGTH);
+    memset_s(lhs.bytes, FLOAT4_LENGTH, 0, FLOAT4_LENGTH);
+    memset_s(rhs.bytes, FLOAT4_LENGTH, 0, FLOAT4_LENGTH);
+    memset_s(result.bytes, FLOAT4_LENGTH, 0, FLOAT4_LENGTH);
 
-  return resp;
+    return resp;
 }
 
 /* Multiply two aes_gcm-encrypted floats
@@ -128,27 +128,27 @@ int enc_float32_sub(uint8_t* in1, size_t in1_size, uint8_t* in2,
     * SGX_error, if there was an error during encryption/decryption
     0, otherwise
 */
-int enc_float32_mult(uint8_t* in1, size_t in1_size, uint8_t* in2,
-                     size_t in2_size, uint8_t* out, size_t out_size) {
-  union_float4 lhs, rhs, result;
-  int resp;
+int enc_float32_mult(uint8_t *in1, size_t in1_size, uint8_t *in2,
+                     size_t in2_size, uint8_t *out, size_t out_size) {
+    union_float4 lhs, rhs, result;
+    int resp;
 
-  resp = decrypt_bytes(in1, in1_size, lhs.bytes, FLOAT4_LENGTH);
-  if (resp != SGX_SUCCESS) return resp;
+    resp = decrypt_bytes(in1, in1_size, lhs.bytes, FLOAT4_LENGTH);
+    if (resp != SGX_SUCCESS) return resp;
 
-  resp = decrypt_bytes(in2, in2_size, rhs.bytes, FLOAT4_LENGTH);
-  if (resp != SGX_SUCCESS) return resp;
+    resp = decrypt_bytes(in2, in2_size, rhs.bytes, FLOAT4_LENGTH);
+    if (resp != SGX_SUCCESS) return resp;
 
-  result.val = lhs.val * rhs.val;
+    result.val = lhs.val * rhs.val;
 
-  resp = encrypt_bytes(result.bytes, FLOAT4_LENGTH, out, out_size);
+    resp = encrypt_bytes(result.bytes, FLOAT4_LENGTH, out, out_size);
 
-  // reset lhs&rhs.bytes to 0 before leaving enclave
-  memset_s(lhs.bytes, FLOAT4_LENGTH, 0, FLOAT4_LENGTH);
-  memset_s(rhs.bytes, FLOAT4_LENGTH, 0, FLOAT4_LENGTH);
-  memset_s(result.bytes, FLOAT4_LENGTH, 0, FLOAT4_LENGTH);
+    // reset lhs&rhs.bytes to 0 before leaving enclave
+    memset_s(lhs.bytes, FLOAT4_LENGTH, 0, FLOAT4_LENGTH);
+    memset_s(rhs.bytes, FLOAT4_LENGTH, 0, FLOAT4_LENGTH);
+    memset_s(result.bytes, FLOAT4_LENGTH, 0, FLOAT4_LENGTH);
 
-  return resp;
+    return resp;
 }
 
 /* Take the power of one aes_gcm-encrypted float by another
@@ -163,27 +163,27 @@ int enc_float32_mult(uint8_t* in1, size_t in1_size, uint8_t* in2,
     * SGX_error, if there was an error during encryption/decryption
     0, otherwise
 */
-int enc_float32_pow(uint8_t* in1, size_t in1_size, uint8_t* in2,
-                    size_t in2_size, uint8_t* out, size_t out_size) {
-  union_float4 lhs, rhs, result;
-  int resp;
+int enc_float32_pow(uint8_t *in1, size_t in1_size, uint8_t *in2,
+                    size_t in2_size, uint8_t *out, size_t out_size) {
+    union_float4 lhs, rhs, result;
+    int resp;
 
-  resp = decrypt_bytes(in1, in1_size, lhs.bytes, FLOAT4_LENGTH);
-  if (resp != SGX_SUCCESS) return resp;
+    resp = decrypt_bytes(in1, in1_size, lhs.bytes, FLOAT4_LENGTH);
+    if (resp != SGX_SUCCESS) return resp;
 
-  resp = decrypt_bytes(in2, in2_size, rhs.bytes, FLOAT4_LENGTH);
-  if (resp != SGX_SUCCESS) return resp;
+    resp = decrypt_bytes(in2, in2_size, rhs.bytes, FLOAT4_LENGTH);
+    if (resp != SGX_SUCCESS) return resp;
 
-  /*TODO: Check for overflow*/
-  result.val = pow(lhs.val, rhs.val);
+    /*TODO: Check for overflow*/
+    result.val = pow(lhs.val, rhs.val);
 
-  resp = encrypt_bytes(result.bytes, FLOAT4_LENGTH, out, out_size);
+    resp = encrypt_bytes(result.bytes, FLOAT4_LENGTH, out, out_size);
 
-  memset_s(lhs.bytes, FLOAT4_LENGTH, 0, FLOAT4_LENGTH);
-  memset_s(rhs.bytes, FLOAT4_LENGTH, 0, FLOAT4_LENGTH);
-  memset_s(result.bytes, FLOAT4_LENGTH, 0, FLOAT4_LENGTH);
+    memset_s(lhs.bytes, FLOAT4_LENGTH, 0, FLOAT4_LENGTH);
+    memset_s(rhs.bytes, FLOAT4_LENGTH, 0, FLOAT4_LENGTH);
+    memset_s(result.bytes, FLOAT4_LENGTH, 0, FLOAT4_LENGTH);
 
-  return resp;
+    return resp;
 }
 
 /* Divide two aes_gcm-encrypted floats
@@ -199,28 +199,28 @@ int enc_float32_pow(uint8_t* in1, size_t in1_size, uint8_t* in2,
     * SGX_error, if there was an error during encryption/decryption
     0, otherwise
 */
-int enc_float32_div(uint8_t* in1, size_t in1_size, uint8_t* in2,
-                    size_t in2_size, uint8_t* out, size_t out_size) {
-  union_float4 lhs, rhs, result;
-  int resp;
+int enc_float32_div(uint8_t *in1, size_t in1_size, uint8_t *in2,
+                    size_t in2_size, uint8_t *out, size_t out_size) {
+    union_float4 lhs, rhs, result;
+    int resp;
 
-  resp = decrypt_bytes(in1, in1_size, lhs.bytes, FLOAT4_LENGTH);
-  if (resp != SGX_SUCCESS) return resp;
+    resp = decrypt_bytes(in1, in1_size, lhs.bytes, FLOAT4_LENGTH);
+    if (resp != SGX_SUCCESS) return resp;
 
-  resp = decrypt_bytes(in2, in2_size, rhs.bytes, FLOAT4_LENGTH);
-  if (resp != SGX_SUCCESS) return resp;
+    resp = decrypt_bytes(in2, in2_size, rhs.bytes, FLOAT4_LENGTH);
+    if (resp != SGX_SUCCESS) return resp;
 
-  /*TODO: Check for overflow*/
-  if (rhs.val == 0) return ARITHMETIC_ERROR;
-  result.val = lhs.val / rhs.val;
+    /*TODO: Check for overflow*/
+    if (rhs.val == 0) return ARITHMETIC_ERROR;
+    result.val = lhs.val / rhs.val;
 
-  resp = encrypt_bytes(result.bytes, FLOAT4_LENGTH, out, out_size);
+    resp = encrypt_bytes(result.bytes, FLOAT4_LENGTH, out, out_size);
 
-  memset_s(lhs.bytes, FLOAT4_LENGTH, 0, FLOAT4_LENGTH);
-  memset_s(rhs.bytes, FLOAT4_LENGTH, 0, FLOAT4_LENGTH);
-  memset_s(result.bytes, FLOAT4_LENGTH, 0, FLOAT4_LENGTH);
+    memset_s(lhs.bytes, FLOAT4_LENGTH, 0, FLOAT4_LENGTH);
+    memset_s(rhs.bytes, FLOAT4_LENGTH, 0, FLOAT4_LENGTH);
+    memset_s(result.bytes, FLOAT4_LENGTH, 0, FLOAT4_LENGTH);
 
-  return resp;
+    return resp;
 }
 
 /* Take the modulus of one aes_gcm-encrypted float with respect to another
@@ -236,52 +236,52 @@ int enc_float32_div(uint8_t* in1, size_t in1_size, uint8_t* in2,
     * SGX_error, if there was an error during encryption/decryption
     0, otherwise
 */
-int enc_float32_mod(uint8_t* in1, size_t in1_size, uint8_t* in2,
-                    size_t in2_size, uint8_t* out, size_t out_size) {
-  union_float4 lhs, rhs, result;
-  int resp;
+int enc_float32_mod(uint8_t *in1, size_t in1_size, uint8_t *in2,
+                    size_t in2_size, uint8_t *out, size_t out_size) {
+    union_float4 lhs, rhs, result;
+    int resp;
 
-  resp = decrypt_bytes(in1, in1_size, lhs.bytes, FLOAT4_LENGTH);
-  if (resp != SGX_SUCCESS) return resp;
+    resp = decrypt_bytes(in1, in1_size, lhs.bytes, FLOAT4_LENGTH);
+    if (resp != SGX_SUCCESS) return resp;
 
-  resp = decrypt_bytes(in2, in2_size, rhs.bytes, FLOAT4_LENGTH);
-  if (resp != SGX_SUCCESS) return resp;
+    resp = decrypt_bytes(in2, in2_size, rhs.bytes, FLOAT4_LENGTH);
+    if (resp != SGX_SUCCESS) return resp;
 
-  /*TODO: Check for correctness*/
-  result.val = (int)lhs.val % (int)rhs.val;
+    /*TODO: Check for correctness*/
+    result.val = (int) lhs.val % (int) rhs.val;
 
-  resp = encrypt_bytes(result.bytes, FLOAT4_LENGTH, out, out_size);
+    resp = encrypt_bytes(result.bytes, FLOAT4_LENGTH, out, out_size);
 
-  memset_s(lhs.bytes, FLOAT4_LENGTH, 0, FLOAT4_LENGTH);
-  memset_s(rhs.bytes, FLOAT4_LENGTH, 0, FLOAT4_LENGTH);
-  memset_s(result.bytes, FLOAT4_LENGTH, 0, FLOAT4_LENGTH);
+    memset_s(lhs.bytes, FLOAT4_LENGTH, 0, FLOAT4_LENGTH);
+    memset_s(rhs.bytes, FLOAT4_LENGTH, 0, FLOAT4_LENGTH);
+    memset_s(result.bytes, FLOAT4_LENGTH, 0, FLOAT4_LENGTH);
 
-  return resp;
+    return resp;
 }
 
-int enc_float32_sum_bulk(uint8_t* in1, size_t in1_len, uint8_t* in2,
-                         size_t in2_len, uint8_t* out, size_t out_len) {
-  union_float4 temp, result;
-  int32_t bulk_size = 0, current_position = 0;
-  int resp, counter = 0;
+int enc_float32_sum_bulk(uint8_t *in1, size_t in1_len, uint8_t *in2,
+                         size_t in2_len, uint8_t *out, size_t out_len) {
+    union_float4 temp, result;
+    int32_t bulk_size = 0, current_position = 0;
+    int resp, counter = 0;
 
-  if (bytearray2int(in1, bulk_size, INT32_LENGTH)) return MEMORY_COPY_ERROR;
+    if (bytearray2int(in1, bulk_size, INT32_LENGTH)) return MEMORY_COPY_ERROR;
 
-  result.val = 0;
-  while (counter < bulk_size) {
-    resp = decrypt_bytes(in2 + current_position, ENC_FLOAT4_LENGTH, temp.bytes,
-                         FLOAT4_LENGTH);
-    if (resp != SGX_SUCCESS) return resp;
-    current_position += ENC_FLOAT4_LENGTH;
+    result.val = 0;
+    while (counter < bulk_size) {
+        resp = decrypt_bytes(in2 + current_position, ENC_FLOAT4_LENGTH, temp.bytes,
+                             FLOAT4_LENGTH);
+        if (resp != SGX_SUCCESS) return resp;
+        current_position += ENC_FLOAT4_LENGTH;
 
-    result.val += temp.val;
-    counter++;
-  }
+        result.val += temp.val;
+        counter++;
+    }
 
-  resp = encrypt_bytes(result.bytes, FLOAT4_LENGTH, out, out_len);
+    resp = encrypt_bytes(result.bytes, FLOAT4_LENGTH, out, out_len);
 
-  memset_s(temp.bytes, FLOAT4_LENGTH, 0, FLOAT4_LENGTH);
-  memset_s(result.bytes, FLOAT4_LENGTH, 0, FLOAT4_LENGTH);
+    memset_s(temp.bytes, FLOAT4_LENGTH, 0, FLOAT4_LENGTH);
+    memset_s(result.bytes, FLOAT4_LENGTH, 0, FLOAT4_LENGTH);
 
-  return resp;
+    return resp;
 }

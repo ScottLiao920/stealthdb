@@ -13,7 +13,7 @@
 extern "C" {
 #endif
 
-int MatchText(char*, int, char*, int);
+int MatchText(char *, int, char *, int);
 
 #ifdef __cplusplus
 }

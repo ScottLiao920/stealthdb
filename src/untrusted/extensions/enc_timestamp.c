@@ -13,8 +13,7 @@
 
 extern bool debugMode;
 
-static TimeOffset time2t(const int hour, const int min, const int sec, const fsec_t fsec)
-{
+static TimeOffset time2t(const int hour, const int min, const int sec, const fsec_t fsec) {
     return (((hour * MINS_PER_HOUR) + min) * SECS_PER_MINUTE) + sec + fsec;
 }
 
@@ -22,12 +21,11 @@ static TimeOffset time2t(const int hour, const int min, const int sec, const fse
  * @input: string as a postgres argument
 `* @return: timestamp
 */
-Timestamp pg_timestamp_in(char* str)
-{
+Timestamp pg_timestamp_in(char *str) {
 
     Timestamp result;
     char workbuf[MAXDATELEN + MAXDATEFIELDS];
-    char* field[MAXDATEFIELDS];
+    char *field[MAXDATEFIELDS];
     int ftype[MAXDATEFIELDS];
     int dterr;
     int nf;
@@ -38,7 +36,7 @@ Timestamp pg_timestamp_in(char* str)
     char buf[MAXDATELEN + 1];
     char src_byte[TIMESTAMP_LENGTH];
     int resp;
-    char* pDst = (char*)palloc((ENC_TIMESTAMP_LENGTH_B64) * sizeof(char));
+    char *pDst = (char *) palloc((ENC_TIMESTAMP_LENGTH_B64) * sizeof(char));
 
     dterr = ParseDateTime(str, workbuf, sizeof(workbuf), field, ftype, MAXDATEFIELDS, &nf);
 
@@ -47,39 +45,38 @@ Timestamp pg_timestamp_in(char* str)
     if (dterr != 0)
         DateTimeParseError(dterr, str, "timestamp");
 
-    switch (dtype)
-    {
-    case DTK_DATE:
-        if (tm2timestamp(tm, fsec, NULL, &result) != 0)
+    switch (dtype) {
+        case DTK_DATE:
+            if (tm2timestamp(tm, fsec, NULL, &result) != 0)
+                ereport(ERROR,
+                        (errcode(ERRCODE_DATETIME_VALUE_OUT_OF_RANGE),
+                                errmsg("timestamp out of range: \"%s\"", str)));
+            break;
+
+        case DTK_EPOCH:
+            result = SetEpochTimestamp();
+            break;
+
+        case DTK_LATE:
+            TIMESTAMP_NOEND(result);
+            break;
+
+        case DTK_EARLY:
+            TIMESTAMP_NOBEGIN(result);
+            break;
+
+        case DTK_INVALID:
             ereport(ERROR,
-                    (errcode(ERRCODE_DATETIME_VALUE_OUT_OF_RANGE),
-                     errmsg("timestamp out of range: \"%s\"", str)));
-        break;
+                    (errcode(ERRCODE_FEATURE_NOT_SUPPORTED),
+                            errmsg("date/time value \"%s\" is no longer supported", str)));
 
-    case DTK_EPOCH:
-        result = SetEpochTimestamp();
-        break;
+            TIMESTAMP_NOEND(result);
+            break;
 
-    case DTK_LATE:
-        TIMESTAMP_NOEND(result);
-        break;
-
-    case DTK_EARLY:
-        TIMESTAMP_NOBEGIN(result);
-        break;
-
-    case DTK_INVALID:
-        ereport(ERROR,
-                (errcode(ERRCODE_FEATURE_NOT_SUPPORTED),
-                 errmsg("date/time value \"%s\" is no longer supported", str)));
-
-        TIMESTAMP_NOEND(result);
-        break;
-
-    default:
-        elog(ERROR, "unexpected dtype %d while parsing timestamp \"%s\"",
-             dtype, str);
-        TIMESTAMP_NOEND(result);
+        default:
+            elog(ERROR, "unexpected dtype %d while parsing timestamp \"%s\"",
+                 dtype, str);
+            TIMESTAMP_NOEND(result);
     }
 
     return result;
@@ -91,19 +88,17 @@ Timestamp pg_timestamp_in(char* str)
  * @return: enc_timestamp element as a string
  */
 PG_FUNCTION_INFO_V1(pg_enc_timestamp_in);
+
 Datum
-    pg_enc_timestamp_in(PG_FUNCTION_ARGS)
-{
-    char* pSrc = PG_GETARG_CSTRING(0);
-    char* pDst = (char*)palloc(ENC_TIMESTAMP_LENGTH_B64 * sizeof(char));
+pg_enc_timestamp_in(PG_FUNCTION_ARGS) {
+    char *pSrc = PG_GETARG_CSTRING(0);
+    char *pDst = (char *) palloc(ENC_TIMESTAMP_LENGTH_B64 * sizeof(char));
     TIMESTAMP dst;
     int resp;
-    char* src = (char*)palloc(TIMESTAMP_LENGTH * sizeof(char));
+    char *src = (char *) palloc(TIMESTAMP_LENGTH * sizeof(char));
 
-    if (debugMode == true)
-    {
-        if (strlen(pSrc) != ENC_TIMESTAMP_LENGTH_B64 - 1)
-        {
+    if (debugMode == true) {
+        if (strlen(pSrc) != ENC_TIMESTAMP_LENGTH_B64 - 1) {
             dst = pg_timestamp_in(pSrc);
             memcpy(src, &dst, TIMESTAMP_LENGTH * sizeof(char));
             resp = enc_timestamp_encrypt(src, pDst);
@@ -111,20 +106,17 @@ Datum
             //ereport(INFO, (errmsg("auto encryption: ENC(%s) = %s", pSrc, pDst)));
             PG_RETURN_CSTRING(pDst);
         }
-        else
-        {
+        else {
             memcpy(pDst, pSrc, ENC_TIMESTAMP_LENGTH_B64);
             pDst[ENC_TIMESTAMP_LENGTH_B64 - 1] = '\0';
         }
     }
-    else
-    {
-        if (strlen(pSrc) != ENC_TIMESTAMP_LENGTH_B64 - 1)
-        {
-            ereport(ERROR, (errmsg("Incorrect length of enc_timestamp element, try 'select enable_debug_mode(1)' to allow auto encryption/decryption or 'select pg_enc_timestamp_encrypt()'")));
+    else {
+        if (strlen(pSrc) != ENC_TIMESTAMP_LENGTH_B64 - 1) {
+            ereport(ERROR,
+                    (errmsg("Incorrect length of enc_timestamp element, try 'select enable_debug_mode(1)' to allow auto encryption/decryption or 'select pg_enc_timestamp_encrypt()'")));
         }
-        else
-        {
+        else {
             memcpy(pDst, pSrc, ENC_TIMESTAMP_LENGTH_B64);
             pDst[ENC_TIMESTAMP_LENGTH_B64 - 1] = '\0';
         }
@@ -138,32 +130,30 @@ Datum
  * @return: string
  */
 PG_FUNCTION_INFO_V1(pg_enc_timestamp_out);
+
 Datum
-    pg_enc_timestamp_out(PG_FUNCTION_ARGS)
-{
-    char* c1 = PG_GETARG_CSTRING(0);
+pg_enc_timestamp_out(PG_FUNCTION_ARGS) {
+    char *c1 = PG_GETARG_CSTRING(0);
     TIMESTAMP timestamp;
     int resp;
-    char* result = (char*)palloc(ENC_TIMESTAMP_LENGTH_B64 * sizeof(char));
+    char *result = (char *) palloc(ENC_TIMESTAMP_LENGTH_B64 * sizeof(char));
     struct pg_tm tt, *tm = &tt;
     fsec_t fsec;
     char buf[MAXDATELEN + 1];
-    char* dst = (char*)palloc(TIMESTAMP_LENGTH * sizeof(char));
+    char *dst = (char *) palloc(TIMESTAMP_LENGTH * sizeof(char));
 
     memcpy(result, c1, ENC_TIMESTAMP_LENGTH_B64);
-    if (debugMode == true)
-    {
+    if (debugMode == true) {
         resp = enc_timestamp_decrypt(c1, dst);
         sgxErrorHandler(resp);
         memcpy(&timestamp, dst, TIMESTAMP_LENGTH * sizeof(char));
 
         if (timestamp2tm(timestamp, NULL, tm, &fsec, NULL, NULL) == 0)
             EncodeDateTime(tm, fsec, false, 0, NULL, 1, buf);
-        else
-        {
+        else {
             ereport(ERROR,
                     (errcode(ERRCODE_DATETIME_VALUE_OUT_OF_RANGE),
-                     errmsg("timestamp out of range")));
+                            errmsg("timestamp out of range")));
         }
         result = pstrdup(buf);
         //ereport(INFO, (errmsg("auto decryption: DEC('%s') = %s", c1, result)));
@@ -179,10 +169,10 @@ Datum
  *    @return: a string describing enc_timestamp element.
  */
 PG_FUNCTION_INFO_V1(pg_enc_timestamp_encrypt);
+
 Datum
-    pg_enc_timestamp_encrypt(PG_FUNCTION_ARGS)
-{
-    char* arg = PG_GETARG_CSTRING(0);
+pg_enc_timestamp_encrypt(PG_FUNCTION_ARGS) {
+    char *arg = PG_GETARG_CSTRING(0);
 #ifdef NOT_USED
     Oid typelem = PG_GETARG_OID(1);
 #endif
@@ -190,8 +180,8 @@ Datum
     int resp;
 
     Timestamp result;
-    char* dst = (char*)palloc(ENC_TIMESTAMP_LENGTH_B64 * sizeof(char));
-    char* src = (char*)palloc(TIMESTAMP_LENGTH);
+    char *dst = (char *) palloc(ENC_TIMESTAMP_LENGTH_B64 * sizeof(char));
+    char *src = (char *) palloc(TIMESTAMP_LENGTH);
 
     result = pg_timestamp_in(arg);
     memcpy(src, &result, sizeof(TIMESTAMP_LENGTH));
@@ -208,18 +198,18 @@ Datum
  *   @return: string
  */
 PG_FUNCTION_INFO_V1(pg_enc_timestamp_decrypt);
+
 Datum
-    pg_enc_timestamp_decrypt(PG_FUNCTION_ARGS)
-{
-    char* c1 = PG_GETARG_CSTRING(0);
+pg_enc_timestamp_decrypt(PG_FUNCTION_ARGS) {
+    char *c1 = PG_GETARG_CSTRING(0);
     Timestamp timestamp;
     int resp;
-    char* result;
+    char *result;
     struct pg_tm tt,
-        *tm = &tt;
+            *tm = &tt;
     fsec_t fsec;
     char buf[MAXDATELEN + 1];
-    char* dst = (char*)palloc(TIMESTAMP_LENGTH * sizeof(char));
+    char *dst = (char *) palloc(TIMESTAMP_LENGTH * sizeof(char));
 
     resp = enc_timestamp_decrypt(c1, dst);
     sgxErrorHandler(resp);
@@ -227,11 +217,10 @@ Datum
 
     if (timestamp2tm(timestamp, NULL, tm, &fsec, NULL, NULL) == 0)
         EncodeDateTime(tm, fsec, false, 0, NULL, 1, buf);
-    else
-    {
+    else {
         ereport(ERROR,
                 (errcode(ERRCODE_DATETIME_VALUE_OUT_OF_RANGE),
-                 errmsg("timestamp out of range")));
+                        errmsg("timestamp out of range")));
     }
 
     result = pstrdup(buf);
@@ -248,12 +237,12 @@ Datum
  *       false, otherwise
  */
 PG_FUNCTION_INFO_V1(pg_enc_timestamp_eq);
+
 Datum
-    pg_enc_timestamp_eq(PG_FUNCTION_ARGS)
-{
-    char* c1 = PG_GETARG_CSTRING(0);
-    char* c2 = PG_GETARG_CSTRING(1);
-    char* pDst = (char*)palloc((INT32_LENGTH) * sizeof(char));
+pg_enc_timestamp_eq(PG_FUNCTION_ARGS) {
+    char *c1 = PG_GETARG_CSTRING(0);
+    char *c2 = PG_GETARG_CSTRING(1);
+    char *pDst = (char *) palloc((INT32_LENGTH) * sizeof(char));
     int ans = 0;
     int resp = 0;
 
@@ -274,12 +263,12 @@ Datum
  *       false, otherwise
  */
 PG_FUNCTION_INFO_V1(pg_enc_timestamp_ne);
+
 Datum
-    pg_enc_timestamp_ne(PG_FUNCTION_ARGS)
-{
-    char* c1 = PG_GETARG_CSTRING(0);
-    char* c2 = PG_GETARG_CSTRING(1);
-    char* pDst = (char*)palloc((INT32_LENGTH) * sizeof(char));
+pg_enc_timestamp_ne(PG_FUNCTION_ARGS) {
+    char *c1 = PG_GETARG_CSTRING(0);
+    char *c2 = PG_GETARG_CSTRING(1);
+    char *pDst = (char *) palloc((INT32_LENGTH) * sizeof(char));
     int ans = 0;
     bool cmp;
     int resp = 0;
@@ -307,12 +296,12 @@ Datum
  *       false, otherwise
  */
 PG_FUNCTION_INFO_V1(pg_enc_timestamp_lt);
+
 Datum
-    pg_enc_timestamp_lt(PG_FUNCTION_ARGS)
-{
-    char* c1 = PG_GETARG_CSTRING(0);
-    char* c2 = PG_GETARG_CSTRING(1);
-    char* pDst = (char*)palloc((INT32_LENGTH) * sizeof(char));
+pg_enc_timestamp_lt(PG_FUNCTION_ARGS) {
+    char *c1 = PG_GETARG_CSTRING(0);
+    char *c2 = PG_GETARG_CSTRING(1);
+    char *pDst = (char *) palloc((INT32_LENGTH) * sizeof(char));
     int ans = 0;
     bool cmp;
     int resp = 0;
@@ -339,12 +328,12 @@ Datum
  *       false, otherwise
  */
 PG_FUNCTION_INFO_V1(pg_enc_timestamp_le);
+
 Datum
-    pg_enc_timestamp_le(PG_FUNCTION_ARGS)
-{
-    char* c1 = PG_GETARG_CSTRING(0);
-    char* c2 = PG_GETARG_CSTRING(1);
-    char* pDst = (char*)palloc((INT32_LENGTH) * sizeof(char));
+pg_enc_timestamp_le(PG_FUNCTION_ARGS) {
+    char *c1 = PG_GETARG_CSTRING(0);
+    char *c2 = PG_GETARG_CSTRING(1);
+    char *pDst = (char *) palloc((INT32_LENGTH) * sizeof(char));
     int ans = 0;
     bool cmp;
     int resp = 0;
@@ -371,12 +360,12 @@ Datum
  *       false, otherwise
  */
 PG_FUNCTION_INFO_V1(pg_enc_timestamp_gt);
+
 Datum
-    pg_enc_timestamp_gt(PG_FUNCTION_ARGS)
-{
-    char* c1 = PG_GETARG_CSTRING(0);
-    char* c2 = PG_GETARG_CSTRING(1);
-    char* pDst = (char*)palloc((INT32_LENGTH) * sizeof(char));
+pg_enc_timestamp_gt(PG_FUNCTION_ARGS) {
+    char *c1 = PG_GETARG_CSTRING(0);
+    char *c2 = PG_GETARG_CSTRING(1);
+    char *pDst = (char *) palloc((INT32_LENGTH) * sizeof(char));
     int ans = 0;
     bool cmp;
     int resp = 0;
@@ -403,12 +392,12 @@ Datum
  *       false, otherwise
  */
 PG_FUNCTION_INFO_V1(pg_enc_timestamp_ge);
+
 Datum
-    pg_enc_timestamp_ge(PG_FUNCTION_ARGS)
-{
-    char* c1 = PG_GETARG_CSTRING(0);
-    char* c2 = PG_GETARG_CSTRING(1);
-    char* pDst = (char*)palloc((INT32_LENGTH) * sizeof(char));
+pg_enc_timestamp_ge(PG_FUNCTION_ARGS) {
+    char *c1 = PG_GETARG_CSTRING(0);
+    char *c2 = PG_GETARG_CSTRING(1);
+    char *pDst = (char *) palloc((INT32_LENGTH) * sizeof(char));
     int ans = 0;
     bool cmp;
     int resp = 0;
@@ -427,16 +416,15 @@ Datum
 }
 
 PG_FUNCTION_INFO_V1(date_part);
+
 Datum
-    date_part(PG_FUNCTION_ARGS)
-{
-    char* get = text_to_cstring(PG_GETARG_TEXT_P(0));
-    if (strcmp(get, "year") != 0)
-    {
+date_part(PG_FUNCTION_ARGS) {
+    char *get = text_to_cstring(PG_GETARG_TEXT_P(0));
+    if (strcmp(get, "year") != 0) {
         ereport(ERROR, (errmsg("Only date_part('year', enc_timestamp) is currently implemented.")));
     }
-    char* timestamp = PG_GETARG_CSTRING(1);
-    char* result = palloc(ENC_INT32_LENGTH_B64 * sizeof(*result));
+    char *timestamp = PG_GETARG_CSTRING(1);
+    char *result = palloc(ENC_INT32_LENGTH_B64 * sizeof(*result));
 
     int resp = enc_timestamp_extract_year(timestamp, result);
     sgxErrorHandler(resp);
@@ -452,12 +440,12 @@ Datum
  * @return: -1, 0 ,1
  */
 PG_FUNCTION_INFO_V1(pg_enc_timestamp_cmp);
+
 Datum
-    pg_enc_timestamp_cmp(PG_FUNCTION_ARGS)
-{
-    char* c1 = PG_GETARG_CSTRING(0);
-    char* c2 = PG_GETARG_CSTRING(1);
-    char* pDst = (char*)palloc((INT32_LENGTH) * sizeof(char));
+pg_enc_timestamp_cmp(PG_FUNCTION_ARGS) {
+    char *c1 = PG_GETARG_CSTRING(0);
+    char *c2 = PG_GETARG_CSTRING(1);
+    char *pDst = (char *) palloc((INT32_LENGTH) * sizeof(char));
     int ans = 0;
     bool cmp;
     int resp = 0;

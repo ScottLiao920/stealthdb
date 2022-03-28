@@ -72,8 +72,7 @@
 #include "tools/like_match.h"
 
 int
-MatchText(char *t, int tlen, char *p, int plen)
-{
+MatchText(char *t, int tlen, char *p, int plen) {
     /* Fast path for match-everything pattern */
     if (plen == 1 && *p == '%')
         return LIKE_TRUE;
@@ -89,10 +88,8 @@ MatchText(char *t, int tlen, char *p, int plen)
      * text and pattern on a byte by byte basis, even for multi-byte
      * encodings.
      */
-    while (tlen > 0 && plen > 0)
-    {
-        if (*p == '\\')
-        {
+    while (tlen > 0 && plen > 0) {
+        if (*p == '\\') {
             /* Next pattern byte must match literally, whatever it is */
             NextByte(p, plen);
             /* ... and there had better be one, per SQL standard */
@@ -101,9 +98,8 @@ MatchText(char *t, int tlen, char *p, int plen)
             if (GETCHAR(*p) != GETCHAR(*t))
                 return LIKE_FALSE;
         }
-        else if (*p == '%')
-        {
-            char        firstpat;
+        else if (*p == '%') {
+            char firstpat;
 
             /*
              * % processing is essentially a search for a text position at
@@ -120,12 +116,10 @@ MatchText(char *t, int tlen, char *p, int plen)
              */
             NextByte(p, plen);
 
-            while (plen > 0)
-            {
+            while (plen > 0) {
                 if (*p == '%')
                     NextByte(p, plen);
-                else if (*p == '_')
-                {
+                else if (*p == '_') {
                     /* If not enough text left to match the pattern, ABORT */
                     if (tlen <= 0)
                         return LIKE_ABORT;
@@ -152,8 +146,7 @@ MatchText(char *t, int tlen, char *p, int plen)
              * have to consider a match to the zero-length substring at the
              * end of the text.
              */
-            if (*p == '\\')
-            {
+            if (*p == '\\') {
                 if (plen < 2)
                     return LIKE_ABORT;
                 firstpat = GETCHAR(p[1]);
@@ -161,11 +154,9 @@ MatchText(char *t, int tlen, char *p, int plen)
             else
                 firstpat = GETCHAR(*p);
 
-            while (tlen > 0)
-            {
-                if (GETCHAR(*t) == firstpat)
-                {
-                    int         matched = MatchText(t, tlen, p, plen);
+            while (tlen > 0) {
+                if (GETCHAR(*t) == firstpat) {
+                    int matched = MatchText(t, tlen, p, plen);
 
                     if (matched != LIKE_FALSE)
                         return matched; /* TRUE or ABORT */
@@ -180,15 +171,13 @@ MatchText(char *t, int tlen, char *p, int plen)
              */
             return LIKE_ABORT;
         }
-        else if (*p == '_')
-        {
+        else if (*p == '_') {
             /* _ matches any single character, and we know there is one */
             NextChar(t, tlen);
             NextByte(p, plen);
             continue;
         }
-        else if (GETCHAR(*p) != GETCHAR(*t))
-        {
+        else if (GETCHAR(*p) != GETCHAR(*t)) {
             /* non-wildcard pattern char fails to match text char */
             return LIKE_FALSE;
         }

@@ -73,10 +73,9 @@
  * into cstore_fdw objects (server and foreign table), we compare this option's
  * name and context against those of valid options.
  */
-typedef struct CStoreValidOption
-{
-	const char *optionName;
-	Oid optionContextId;
+typedef struct CStoreValidOption {
+    const char *optionName;
+    Oid optionContextId;
 
 } CStoreValidOption;
 
@@ -84,23 +83,22 @@ typedef struct CStoreValidOption
 /* Array of options that are valid for cstore_fdw */
 static const uint32 ValidOptionCount = 4;
 static const CStoreValidOption ValidOptionArray[] =
-{
-	/* foreign table options */
-	{ OPTION_NAME_FILENAME, ForeignTableRelationId },
-	{ OPTION_NAME_COMPRESSION_TYPE, ForeignTableRelationId },
-	{ OPTION_NAME_STRIPE_ROW_COUNT, ForeignTableRelationId },
-	{ OPTION_NAME_BLOCK_ROW_COUNT, ForeignTableRelationId }
-};
+        {
+                /* foreign table options */
+                {OPTION_NAME_FILENAME,         ForeignTableRelationId},
+                {OPTION_NAME_COMPRESSION_TYPE, ForeignTableRelationId},
+                {OPTION_NAME_STRIPE_ROW_COUNT, ForeignTableRelationId},
+                {OPTION_NAME_BLOCK_ROW_COUNT,  ForeignTableRelationId}
+        };
 
 
 /* Enumaration for cstore file's compression method */
-typedef enum
-{
-	COMPRESSION_TYPE_INVALID = -1,
-	COMPRESSION_NONE = 0,
-	COMPRESSION_PG_LZ = 1,
+typedef enum {
+    COMPRESSION_TYPE_INVALID = -1,
+    COMPRESSION_NONE = 0,
+    COMPRESSION_PG_LZ = 1,
 
-	COMPRESSION_COUNT
+    COMPRESSION_COUNT
 
 } CompressionType;
 
@@ -110,12 +108,11 @@ typedef enum
  * a cstore file. To resolve these values, we first check foreign table's options,
  * and if not present, we then fall back to the default values specified above.
  */
-typedef struct CStoreFdwOptions
-{
-	char *filename;
-	CompressionType compressionType;
-	uint64 stripeRowCount;
-	uint32 blockRowCount;
+typedef struct CStoreFdwOptions {
+    char *filename;
+    CompressionType compressionType;
+    uint64 stripeRowCount;
+    uint32 blockRowCount;
 
 } CStoreFdwOptions;
 
@@ -124,45 +121,42 @@ typedef struct CStoreFdwOptions
  * StripeMetadata represents information about a stripe. This information is
  * stored in the cstore file's footer.
  */
-typedef struct StripeMetadata
-{
-	uint64 fileOffset;
-	uint64 skipListLength;
-	uint64 dataLength;
-	uint64 footerLength;
+typedef struct StripeMetadata {
+    uint64 fileOffset;
+    uint64 skipListLength;
+    uint64 dataLength;
+    uint64 footerLength;
 
 } StripeMetadata;
 
 
 /* TableFooter represents the footer of a cstore file. */
-typedef struct TableFooter
-{
-	List *stripeMetadataList;
-	uint64 blockRowCount;
+typedef struct TableFooter {
+    List *stripeMetadataList;
+    uint64 blockRowCount;
 
 } TableFooter;
 
 
 /* ColumnBlockSkipNode contains statistics for a ColumnBlockData. */
-typedef struct ColumnBlockSkipNode
-{
-	/* statistics about values of a column block */
-	bool hasMinMax;
-	Datum minimumValue;
-	Datum maximumValue;
-	uint64 rowCount;
+typedef struct ColumnBlockSkipNode {
+    /* statistics about values of a column block */
+    bool hasMinMax;
+    Datum minimumValue;
+    Datum maximumValue;
+    uint64 rowCount;
 
-	/*
-	 * Offsets and sizes of value and exists streams in the column data.
-	 * These enable us to skip reading suppressed row blocks, and start reading
-	 * a block without reading previous blocks.
-	 */
-	uint64 valueBlockOffset;
-	uint64 valueLength;
-	uint64 existsBlockOffset;
-	uint64 existsLength;
+    /*
+     * Offsets and sizes of value and exists streams in the column data.
+     * These enable us to skip reading suppressed row blocks, and start reading
+     * a block without reading previous blocks.
+     */
+    uint64 valueBlockOffset;
+    uint64 valueLength;
+    uint64 existsBlockOffset;
+    uint64 existsLength;
 
-	CompressionType valueCompressionType;
+    CompressionType valueCompressionType;
 
 } ColumnBlockSkipNode;
 
@@ -172,11 +166,10 @@ typedef struct ColumnBlockSkipNode
  * skip node for each block of each column. blockSkipNodeArray[column][block]
  * is the entry for the specified column block.
  */
-typedef struct StripeSkipList
-{
-	ColumnBlockSkipNode **blockSkipNodeArray;
-	uint32 columnCount;
-	uint32 blockCount;
+typedef struct StripeSkipList {
+    ColumnBlockSkipNode **blockSkipNodeArray;
+    uint32 columnCount;
+    uint32 blockCount;
 
 } StripeSkipList;
 
@@ -188,13 +181,12 @@ typedef struct StripeSkipList
  * referenced by Datum's in valueArray. It is only used for by-reference Datum's.
  * There is a one-to-one correspondence between valueArray and existsArray.
  */
-typedef struct ColumnBlockData
-{
-	bool *existsArray;
-	Datum *valueArray;
+typedef struct ColumnBlockData {
+    bool *existsArray;
+    Datum *valueArray;
 
-	/* valueBuffer keeps actual data for type-by-reference datums from valueArray. */
-	StringInfo valueBuffer;
+    /* valueBuffer keeps actual data for type-by-reference datums from valueArray. */
+    StringInfo valueBuffer;
 
 } ColumnBlockData;
 
@@ -206,11 +198,10 @@ typedef struct ColumnBlockData
  * compression type if valueBuffer is compressed. Finally rowCount has
  * the number of rows in this block.
  */
-typedef struct ColumnBlockBuffers
-{
-	StringInfo existsBuffer;
-	StringInfo valueBuffer;
-	CompressionType valueCompressionType;
+typedef struct ColumnBlockBuffers {
+    StringInfo existsBuffer;
+    StringInfo valueBuffer;
+    CompressionType valueCompressionType;
 
 } ColumnBlockBuffers;
 
@@ -219,19 +210,17 @@ typedef struct ColumnBlockBuffers
  * ColumnBuffers represents data buffers for a column in a row stripe. Each
  * column is made of multiple column blocks.
  */
-typedef struct ColumnBuffers
-{
-	ColumnBlockBuffers **blockBuffersArray;
+typedef struct ColumnBuffers {
+    ColumnBlockBuffers **blockBuffersArray;
 
 } ColumnBuffers;
 
 
 /* StripeBuffers represents data for a row stripe in a cstore file. */
-typedef struct StripeBuffers
-{
-	uint32 columnCount;
-	uint32 rowCount;
-	ColumnBuffers **columnBuffersArray;
+typedef struct StripeBuffers {
+    uint32 columnCount;
+    uint32 rowCount;
+    ColumnBuffers **columnBuffersArray;
 
 } StripeBuffers;
 
@@ -241,70 +230,68 @@ typedef struct StripeBuffers
  * arrays of sizes. The number of elements in each of the arrays is equal
  * to the number of columns.
  */
-typedef struct StripeFooter
-{
-	uint32 columnCount;
-	uint64 *skipListSizeArray;
-	uint64 *existsSizeArray;
-	uint64 *valueSizeArray;
+typedef struct StripeFooter {
+    uint32 columnCount;
+    uint64 *skipListSizeArray;
+    uint64 *existsSizeArray;
+    uint64 *valueSizeArray;
 
 } StripeFooter;
 
 
 /* TableReadState represents state of a cstore file read operation. */
-typedef struct TableReadState
-{
-	FILE *tableFile;
-	TableFooter *tableFooter;
-	TupleDesc tupleDescriptor;
+typedef struct TableReadState {
+    FILE *tableFile;
+    TableFooter *tableFooter;
+    TupleDesc tupleDescriptor;
 
-	/*
-	 * List of Var pointers for columns in the query. We use this both for
-	 * getting vector of projected columns, and also when we want to build
-	 * base constraint to find selected row blocks.
-	 */
-	List *projectedColumnList;
+    /*
+     * List of Var pointers for columns in the query. We use this both for
+     * getting vector of projected columns, and also when we want to build
+     * base constraint to find selected row blocks.
+     */
+    List *projectedColumnList;
 
-	List *whereClauseList;
-	MemoryContext stripeReadContext;
-	StripeBuffers *stripeBuffers;
-	uint32 readStripeCount;
-	uint64 stripeReadRowCount;
-	ColumnBlockData **blockDataArray;
-	int32 deserializedBlockIndex;
+    List *whereClauseList;
+    MemoryContext stripeReadContext;
+    StripeBuffers *stripeBuffers;
+    uint32 readStripeCount;
+    uint64 stripeReadRowCount;
+    ColumnBlockData **blockDataArray;
+    int32 deserializedBlockIndex;
 
 } TableReadState;
 
 
 /* TableWriteState represents state of a cstore file write operation. */
-typedef struct TableWriteState
-{
-	FILE *tableFile;
-	TableFooter *tableFooter;
-	StringInfo tableFooterFilename;
-	CompressionType compressionType;
-	TupleDesc tupleDescriptor;
-	FmgrInfo **comparisonFunctionArray;
-	uint64 currentFileOffset;
-	Relation relation;
+typedef struct TableWriteState {
+    FILE *tableFile;
+    TableFooter *tableFooter;
+    StringInfo tableFooterFilename;
+    CompressionType compressionType;
+    TupleDesc tupleDescriptor;
+    FmgrInfo **comparisonFunctionArray;
+    uint64 currentFileOffset;
+    Relation relation;
 
-	MemoryContext stripeWriteContext;
-	StripeBuffers *stripeBuffers;
-	StripeSkipList *stripeSkipList;
-	uint32 stripeMaxRowCount;
-	ColumnBlockData **blockDataArray;
-	/*
-	 * compressionBuffer buffer is used as temporary storage during
-	 * data value compression operation. It is kept here to minimize
-	 * memory allocations. It lives in stripeWriteContext and gets
-	 * deallocated when memory context is reset.
-	 */
-	StringInfo compressionBuffer;
+    MemoryContext stripeWriteContext;
+    StripeBuffers *stripeBuffers;
+    StripeSkipList *stripeSkipList;
+    uint32 stripeMaxRowCount;
+    ColumnBlockData **blockDataArray;
+    /*
+     * compressionBuffer buffer is used as temporary storage during
+     * data value compression operation. It is kept here to minimize
+     * memory allocations. It lives in stripeWriteContext and gets
+     * deallocated when memory context is reset.
+     */
+    StringInfo compressionBuffer;
 
 } TableWriteState;
 
 /* Function declarations for extension loading and unloading */
 extern void _PG_init(void);
+
 extern void _PG_fini(void);
 
 /* event trigger function declarations */
@@ -312,41 +299,54 @@ extern Datum cstore_ddl_event_end_trigger(PG_FUNCTION_ARGS);
 
 /* Function declarations for utility UDFs */
 extern Datum cstore_table_size(PG_FUNCTION_ARGS);
+
 extern Datum cstore_clean_table_resources(PG_FUNCTION_ARGS);
 
 /* Function declarations for foreign data wrapper */
 extern Datum cstore_fdw_handler(PG_FUNCTION_ARGS);
+
 extern Datum cstore_fdw_validator(PG_FUNCTION_ARGS);
 
 /* Function declarations for writing to a cstore file */
-extern TableWriteState * CStoreBeginWrite(const char *filename,
-										  CompressionType compressionType,
-										  uint64 stripeMaxRowCount,
-										  uint32 blockRowCount,
-										  TupleDesc tupleDescriptor);
+extern TableWriteState *CStoreBeginWrite(const char *filename,
+                                         CompressionType compressionType,
+                                         uint64 stripeMaxRowCount,
+                                         uint32 blockRowCount,
+                                         TupleDesc tupleDescriptor);
+
 extern void CStoreWriteRow(TableWriteState *state, Datum *columnValues,
-						   bool *columnNulls);
-extern void CStoreEndWrite(TableWriteState * state);
+                           bool *columnNulls);
+
+extern void CStoreEndWrite(TableWriteState *state);
 
 /* Function declarations for reading from a cstore file */
-extern TableReadState * CStoreBeginRead(const char *filename, TupleDesc tupleDescriptor,
-										List *projectedColumnList, List *qualConditions);
-extern TableFooter * CStoreReadFooter(StringInfo tableFooterFilename);
+extern TableReadState *CStoreBeginRead(const char *filename, TupleDesc tupleDescriptor,
+                                       List *projectedColumnList, List *qualConditions);
+
+extern TableFooter *CStoreReadFooter(StringInfo tableFooterFilename);
+
 extern bool CStoreReadFinished(TableReadState *state);
+
 extern bool CStoreReadNextRow(TableReadState *state, Datum *columnValues,
-							  bool *columnNulls);
+                              bool *columnNulls);
+
 extern void CStoreEndRead(TableReadState *state);
 
 /* Function declarations for common functions */
-extern FmgrInfo * GetFunctionInfoOrNull(Oid typeId, Oid accessMethodId,
-										int16 procedureId);
-extern ColumnBlockData ** CreateEmptyBlockDataArray(uint32 columnCount, bool *columnMask,
-													uint32 blockRowCount);
+extern FmgrInfo *GetFunctionInfoOrNull(Oid typeId, Oid accessMethodId,
+                                       int16 procedureId);
+
+extern ColumnBlockData **CreateEmptyBlockDataArray(uint32 columnCount, bool *columnMask,
+                                                   uint32 blockRowCount);
+
 extern void FreeColumnBlockDataArray(ColumnBlockData **blockDataArray,
-									 uint32 columnCount);
+                                     uint32 columnCount);
+
 extern uint64 CStoreTableRowCount(const char *filename);
+
 extern bool CompressBuffer(StringInfo inputBuffer, StringInfo outputBuffer,
-						   CompressionType compressionType);
+                           CompressionType compressionType);
+
 extern StringInfo DecompressBuffer(StringInfo buffer, CompressionType compressionType);
 
 

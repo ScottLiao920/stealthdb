@@ -100,7 +100,8 @@ CompressBuffer(StringInfo inputBuffer, StringInfo outputBuffer,
                                           CSTORE_COMPRESS_RAWDATA(outputBuffer->data),
                                           PGLZ_strategy_always);
 #endif
-    } else {
+    }
+    else {
         int compressed_bytes = 0; // for lz4 compression
         size_t min_dst_len = LZ4_compressBound(inputBuffer->len) + CSTORE_COMPRESS_HDRSZ_LZ4;
         resetStringInfo(outputBuffer);
@@ -113,7 +114,8 @@ CompressBuffer(StringInfo inputBuffer, StringInfo outputBuffer,
             ereport(ERROR, (errmsg("\"LZ4 Compression Failed!"),
                     errdetail("Expected at least %u bytes, but received %u bytes",
                               min_dst_len, compressed_bytes)));
-        } else {
+        }
+        else {
             compressionResult = true;
             printf("We successfully compressed some data! Ratio: %.2f\n",
                    (float) compressed_bytes / inputBuffer->len);
@@ -146,7 +148,8 @@ DecompressBuffer(StringInfo buffer, CompressionType compressionType) {
     if (compressionType == COMPRESSION_NONE) {
         /* in case of no compression, return buffer */
         decompressedBuffer = buffer;
-    } else {
+    }
+    else {
         if (compressionType == COMPRESSION_PG_LZ) {
             uint32 compressedDataSize = VARSIZE(buffer->data) - CSTORE_COMPRESS_HDRSZ;
             uint32 decompressedDataSize = CSTORE_COMPRESS_RAWSIZE(buffer->data);
@@ -188,7 +191,8 @@ DecompressBuffer(StringInfo buffer, CompressionType compressionType) {
             decompressedBuffer->data = decompressedData;
             decompressedBuffer->len = decompressedDataSize;
             decompressedBuffer->maxlen = decompressedDataSize;
-        } else {
+        }
+        else {
             size_t compressedDataSize = ((LZ4CompressHeader *) (buffer->data))->comp_len;
             int decompressedDataSize_expected = (int) CSTORE_COMPRESS_RAWSIZE_LZ4(buffer->data);
             int decompressedDataSize_real = 0;

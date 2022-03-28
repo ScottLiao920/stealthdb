@@ -14,13 +14,12 @@
  @return:
  * SGX_error, if there was an error during decryption
 */
-int enc_timestamp_cmp(uint8_t* in1,
+int enc_timestamp_cmp(uint8_t *in1,
                       size_t in1_size,
-                      uint8_t* in2,
+                      uint8_t *in2,
                       size_t in2_size,
-                      uint8_t* out,
-                      size_t out_size)
-{
+                      uint8_t *out,
+                      size_t out_size) {
     int resp, cmp;
 
     union {
@@ -46,11 +45,10 @@ int enc_timestamp_cmp(uint8_t* in1,
     return resp;
 }
 
-int enc_timestamp_extract_year(uint8_t* in,
+int enc_timestamp_extract_year(uint8_t *in,
                                size_t in_size,
-                               uint8_t* out,
-                               size_t out_size)
-{
+                               uint8_t *out,
+                               size_t out_size) {
     union {
         int val;
         unsigned char bytes[INT32_LENGTH];

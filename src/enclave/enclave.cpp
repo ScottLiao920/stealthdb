@@ -23,7 +23,8 @@ int compressBufferEnclave(char *pSrc, char *pDst, size_t src_len, size_t dst_len
     compressed_bytes = LZ4_compress_default(pSrc, pDst, src_len, dst_len);
     if (compressed_bytes <= 0) {
         return -1;
-    } else { return compressed_bytes; }
+    }
+    else { return compressed_bytes; }
 }
 
 /* Decompress buffer inside enclave
@@ -31,13 +32,15 @@ int compressBufferEnclave(char *pSrc, char *pDst, size_t src_len, size_t dst_len
  * */
 int decompressBufferEnclave(char *pSrc, char *pDst, size_t src_len, size_t dst_len) {
     int decompressed_bytes = 0;
-    if ((int) dst_len < LZ4_compressBound(src_len)) {
-        return SGX_ERROR_UNEXPECTED;
+    int compBound = LZ4_compressBound(src_len);
+    if ((int) dst_len < compBound) {
+        return -1;
     }
     decompressed_bytes = LZ4_decompress_safe(pSrc, pDst, src_len, dst_len);
     if (decompressed_bytes <= 0) {
-        return SGX_ERROR_UNEXPECTED;
-    } else { return decompressed_bytes; }
+        return -1;
+    }
+    else { return decompressed_bytes; }
 }
 
 /* Generate a master key

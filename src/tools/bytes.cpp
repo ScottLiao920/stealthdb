@@ -9,8 +9,7 @@
                 1, if the size of array is less than INT32_LENGTH
                 0 otherwise
 */
-int int2bytearray(int src, uint8_t* pDst, size_t dstLen)
-{
+int int2bytearray(int src, uint8_t *pDst, size_t dstLen) {
     if (dstLen < INT32_LENGTH)
         return 1;
 
@@ -30,8 +29,7 @@ int int2bytearray(int src, uint8_t* pDst, size_t dstLen)
                 0 otherwise
 
                 */
-int bytearray2int(uint8_t* pSrc, int& dst, size_t srcLen)
-{
+int bytearray2int(uint8_t *pSrc, int &dst, size_t srcLen) {
     if (srcLen < INT32_LENGTH)
         return 1;
 

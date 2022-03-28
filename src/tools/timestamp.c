@@ -10,8 +10,7 @@
  * Portions Copyright (c) 1994, Regents of the University of California
  */
 
-int year_from_timestamp(int64_t timestamp)
-{
+int year_from_timestamp(int64_t timestamp) {
 
     int64_t date;
     unsigned int quad;
@@ -19,8 +18,7 @@ int year_from_timestamp(int64_t timestamp)
     int year;
 
     TMODULO(timestamp, date, USECS_PER_DAY);
-    if (timestamp < INT64CONST(0))
-    {
+    if (timestamp < INT64CONST(0)) {
         timestamp += USECS_PER_DAY;
         date -= 1;
     }
@@ -29,7 +27,7 @@ int year_from_timestamp(int64_t timestamp)
     date += POSTGRES_EPOCH_JDATE;
 
     /* Julian day routine does not work for negative Julian days */
-    if (date < 0 || date > (int64_t)INT_MAX)
+    if (date < 0 || date > (int64_t) INT_MAX)
         return -1;
 
     date += 32044;

@@ -1,23 +1,19 @@
 #include "enclave/Queue.hpp"
 
-Queue::Queue()
-{
+Queue::Queue() {
     front = rear = 0;
-    for (int i = 0; i < queue_size; i++)
-    {
+    for (int i = 0; i < queue_size; i++) {
         q[i] = NULL;
     }
 }
 
 Queue::~Queue() {}
 
-int Queue::enqueue(request* elem)
-{
+int Queue::enqueue(request *elem) {
     spin_lock(&_lock);
 
-    if (rear - front == queue_size)
-    {
-      // pre-allocated buffer size not enough alr
+    if (rear - front == queue_size) {
+        // pre-allocated buffer size not enough alr
         spin_unlock(&_lock);
         abort();
         return -1;
@@ -30,19 +26,17 @@ int Queue::enqueue(request* elem)
     return 0;
 }
 
-request*
-Queue::dequeue()
-{
+request *
+Queue::dequeue() {
     spin_lock(&_lock);
 
-    if (front == rear)
-    {
+    if (front == rear) {
         // no element currently in the queue;
         spin_unlock(&_lock);
         return NULL;
     }
 
-    request* result = q[front % queue_size];
+    request *result = q[front % queue_size];
     ++front;
     spin_unlock(&_lock);
 

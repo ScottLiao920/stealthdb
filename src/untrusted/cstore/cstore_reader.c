@@ -310,7 +310,8 @@ CStoreReadNextRow(TableReadState *readState, Datum *columnValues, bool *columnNu
         lastBlockIndex = stripeRowCount / tableFooter->blockRowCount;
         if (blockIndex == lastBlockIndex) {
             blockRowCount = stripeRowCount % tableFooter->blockRowCount;
-        } else {
+        }
+        else {
             blockRowCount = tableFooter->blockRowCount;
         }
 
@@ -1074,7 +1075,8 @@ DeserializeBoolArray(StringInfo boolArrayBuffer, bool *boolArray,
         uint8 shiftedBit = (boolArrayBuffer->data[byteIndex] & bitmask);
         if (shiftedBit == 0) {
             boolArray[boolArrayIndex] = false;
-        } else {
+        }
+        else {
             boolArray[boolArrayIndex] = true;
         }
     }
@@ -1172,11 +1174,13 @@ DeserializeBlockData(StripeBuffers *stripeBuffers, uint64 blockIndex,
                 pfree(decryptedBuffer->data);
                 pfree(decryptedBuffer);
                 sgxErrorHandler(resp);
-            } else if (strcmp(is_enc, enc_name) != 0) {
+            }
+            else if (strcmp(is_enc, enc_name) != 0) {
                 // no need encryption at all
                 valueBuffer = DecompressBuffer(blockBuffers->valueBuffer,
                                                blockBuffers->valueCompressionType);
-            } else {
+            }
+            else {
                 // pglz+encryption
                 int resp;
                 size_t src_len = blockBuffers->valueBuffer->len;
@@ -1212,7 +1216,8 @@ DeserializeBlockData(StripeBuffers *stripeBuffers, uint64 blockIndex,
 
             /* store current block's data buffer to be freed at next block read */
             blockData->valueBuffer = valueBuffer;
-        } else if (columnAdded) {
+        }
+        else if (columnAdded) {
             /*
              * This is a column that was added after creation of this stripe.
              * So we use either the default value or NULL.
@@ -1227,7 +1232,8 @@ DeserializeBlockData(StripeBuffers *stripeBuffers, uint64 blockIndex,
                     blockData->existsArray[rowIndex] = true;
                     blockData->valueArray[rowIndex] = defaultValue;
                 }
-            } else {
+            }
+            else {
                 memset(blockData->existsArray, false, rowCount);
             }
 
@@ -1261,7 +1267,8 @@ ColumnDefaultValue(TupleConstr *tupleConstraints, Form_pg_attribute attributeFor
     if (IsA(defaultValueNode, Const)) {
         Const *constNode = (Const *) defaultValueNode;
         defaultValue = constNode->constvalue;
-    } else {
+    }
+    else {
         const char *columnName = NameStr(attributeForm->attname);
         ereport(ERROR, (errmsg("unsupported default value for column \"%s\"", columnName),
                 errhint("Expression is either mutable or "

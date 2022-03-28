@@ -128,7 +128,8 @@ CStoreBeginWrite(const char *filename, CompressionType compressionType,
         tableFooter = palloc0(sizeof(TableFooter));
         tableFooter->blockRowCount = blockRowCount;
         tableFooter->stripeMetadataList = NIL;
-    } else {
+    }
+    else {
         tableFile = AllocateFile(filename, "r+");
         if (tableFile == NULL) {
             ereport(ERROR, (errcode_for_file_access(),
@@ -263,7 +264,8 @@ CStoreWriteRow(TableWriteState *writeState, Datum *columnValues, bool *columnNul
 
         if (columnNulls[columnIndex]) {
             blockData->existsArray[blockRowIndex] = false;
-        } else {
+        }
+        else {
             FmgrInfo *comparisonFunction =
                     writeState->comparisonFunctionArray[columnIndex];
             Form_pg_attribute attributeForm =
@@ -310,7 +312,8 @@ CStoreWriteRow(TableWriteState *writeState, Datum *columnValues, bool *columnNul
          */
         MemoryContextSwitchTo(oldContext);
         AppendStripeMetadata(tableFooter, stripeMetadata);
-    } else {
+    }
+    else {
         MemoryContextSwitchTo(oldContext);
     }
 }
@@ -718,10 +721,12 @@ SerializeSingleDatum(StringInfo datumBuffer, Datum datum, bool datumTypeByValue,
     if (datumTypeLength > 0) {
         if (datumTypeByValue) {
             store_att_byval(currentDatumDataPointer, datum, datumTypeLength);
-        } else {
+        }
+        else {
             memcpy(currentDatumDataPointer, DatumGetPointer(datum), datumTypeLength);
         }
-    } else {
+    }
+    else {
         Assert(!datumTypeByValue);
         memcpy(currentDatumDataPointer, DatumGetPointer(datum), datumLength);
     }
@@ -796,7 +801,8 @@ SerializeBlockData(TableWriteState *writeState, uint32 blockIndex, uint32 rowCou
                 enlargeStringInfo(serializedValueBuffer, (enc_len + 1) * sizeof(char));
                 memcpy(serializedValueBuffer->data, compressionBuffer->data, enc_len);
 //                serializedValueBuffer->data[enc_len] = '\0';
-            } else {
+            }
+            else {
                 compressed = CompressBuffer(serializedValueBuffer, compressionBuffer,
                                             requestedCompressionType);
                 if (compressed) {
@@ -812,7 +818,8 @@ SerializeBlockData(TableWriteState *writeState, uint32 blockIndex, uint32 rowCou
             }
             sgxErrorHandler(resp);
             pfree(tmpPtr);
-        } else {
+        }
+        else {
             // column not requiring an encrypted data type, no encryption need, just use conventional methods
             compressed = CompressBuffer(serializedValueBuffer, compressionBuffer,
                                         requestedCompressionType);
@@ -859,7 +866,8 @@ UpdateBlockSkipNodeMinMax(ColumnBlockSkipNode *blockSkipNode, Datum columnValue,
     if (!hasMinMax) {
         currentMinimum = DatumCopy(columnValue, columnTypeByValue, columnTypeLength);
         currentMaximum = DatumCopy(columnValue, columnTypeByValue, columnTypeLength);
-    } else {
+    }
+    else {
         Datum minimumComparisonDatum = FunctionCall2Coll(comparisonFunction,
                                                          columnCollation, columnValue,
                                                          previousMinimum);
@@ -871,13 +879,15 @@ UpdateBlockSkipNodeMinMax(ColumnBlockSkipNode *blockSkipNode, Datum columnValue,
 
         if (minimumComparison < 0) {
             currentMinimum = DatumCopy(columnValue, columnTypeByValue, columnTypeLength);
-        } else {
+        }
+        else {
             currentMinimum = previousMinimum;
         }
 
         if (maximumComparison > 0) {
             currentMaximum = DatumCopy(columnValue, columnTypeByValue, columnTypeLength);
-        } else {
+        }
+        else {
             currentMaximum = previousMaximum;
         }
     }
@@ -895,7 +905,8 @@ DatumCopy(Datum datum, bool datumTypeByValue, int datumTypeLength) {
 
     if (datumTypeByValue) {
         datumCopy = datum;
-    } else {
+    }
+    else {
         uint32 datumLength = att_addlength_datum(0, datumTypeLength, datum);
         char *datumData = palloc0(datumLength);
         memcpy(datumData, DatumGetPointer(datum), datumLength);

@@ -299,7 +299,8 @@ cstore_ddl_event_end_trigger(PG_FUNCTION_ARGS) {
         if (strncmp(foreignWrapperName, CSTORE_FDW_NAME, NAMEDATALEN) == 0) {
             CreateCStoreDatabaseDirectory(MyDatabaseId);
         }
-    } else if (nodeTag(parseTree) == T_CreateForeignTableStmt) {
+    }
+    else if (nodeTag(parseTree) == T_CreateForeignTableStmt) {
         CreateForeignTableStmt *createStatement = (CreateForeignTableStmt *) parseTree;
         char *serverName = createStatement->servername;
 
@@ -381,10 +382,12 @@ CStoreProcessUtility(Node *parseTree, const char *queryString,
                 UINT64_FORMAT, processed);
             }
 #endif
-        } else {
+        }
+        else {
             CALL_PREVIOUS_UTILITY();
         }
-    } else if (nodeTag(parseTree) == T_DropStmt) {
+    }
+    else if (nodeTag(parseTree) == T_DropStmt) {
         DropStmt *dropStmt = (DropStmt *) parseTree;
 
         if (dropStmt->removeType == OBJECT_EXTENSION) {
@@ -414,7 +417,8 @@ CStoreProcessUtility(Node *parseTree, const char *queryString,
             if (removeCStoreDirectory) {
                 RemoveCStoreDatabaseDirectory(MyDatabaseId);
             }
-        } else {
+        }
+        else {
             ListCell *fileListCell = NULL;
             List *droppedTables = DroppedCStoreFilenameList((DropStmt *) parseTree);
 
@@ -427,7 +431,8 @@ CStoreProcessUtility(Node *parseTree, const char *queryString,
                 DeleteCStoreTableFiles(fileName);
             }
         }
-    } else if (nodeTag(parseTree) == T_TruncateStmt) {
+    }
+    else if (nodeTag(parseTree) == T_TruncateStmt) {
         TruncateStmt *truncateStatement = (TruncateStmt *) parseTree;
         List *allTablesList = truncateStatement->relations;
         List *cstoreTablesList = FindCStoreTables(allTablesList);
@@ -453,11 +458,13 @@ CStoreProcessUtility(Node *parseTree, const char *queryString,
             Relation relation = (Relation) lfirst(cstoreRelationCell);
             relation_close(relation, AccessExclusiveLock);
         }
-    } else if (nodeTag(parseTree) == T_AlterTableStmt) {
+    }
+    else if (nodeTag(parseTree) == T_AlterTableStmt) {
         AlterTableStmt *alterTable = (AlterTableStmt *) parseTree;
         CStoreProcessAlterTableCommand(alterTable);
         CALL_PREVIOUS_UTILITY();
-    } else if (nodeTag(parseTree) == T_DropdbStmt) {
+    }
+    else if (nodeTag(parseTree) == T_DropdbStmt) {
         DropdbStmt *dropDdStmt = (DropdbStmt *) parseTree;
         bool missingOk = true;
         Oid databaseOid = get_database_oid(dropDdStmt->dbname, missingOk);
@@ -496,7 +503,8 @@ CopyCStoreTableStatement(CopyStmt *copyStatement) {
             if (distributedTable || distributedCopy) {
                 /* let COPY on distributed tables fall through to Citus */
                 copyCStoreTableStatement = false;
-            } else {
+            }
+            else {
                 copyCStoreTableStatement = true;
             }
         }
@@ -522,7 +530,8 @@ CheckSuperuserPrivilegesForCopy(const CopyStmt *copyStatement) {
                     errmsg("must be superuser to COPY to or from a program"),
                     errhint("Anyone can COPY to stdout or from stdin. "
                             "psql's \\copy command also works for anyone.")));
-        } else {
+        }
+        else {
             ereport(ERROR, (errcode(ERRCODE_INSUFFICIENT_PRIVILEGE),
                     errmsg("must be superuser to COPY to or from a file"),
                     errhint("Anyone can COPY to stdout or from stdin. "
@@ -544,7 +553,8 @@ CStoreProcessCopyCommand(CopyStmt *copyStatement, const char *queryString) {
 
     if (copyStatement->is_from) {
         processedCount = CopyIntoCStoreTable(copyStatement, queryString);
-    } else {
+    }
+    else {
         processedCount = CopyOutCStoreTable(copyStatement, queryString);
     }
 
@@ -863,7 +873,8 @@ OpenRelationsForTruncate(List *cstoreTableList) {
         /* check if this relation is repeated */
         if (list_member_oid(relationIdList, relationId)) {
             relation_close(relation, AccessExclusiveLock);
-        } else {
+        }
+        else {
             relationIdList = lappend_oid(relationIdList, relationId);
             relationList = lappend(relationList, relation);
         }
@@ -1097,10 +1108,12 @@ DirectoryExists(StringInfo directoryName) {
                     errhint("You need to remove or rename the file \"%s\".",
                             directoryName->data)));
         }
-    } else {
+    }
+    else {
         if (errno == ENOENT) {
             directoryExists = false;
-        } else {
+        }
+        else {
             ereport(ERROR, (errcode_for_file_access(),
                     errmsg("could not stat directory \"%s\": %m",
                            directoryName->data)));
@@ -1274,11 +1287,14 @@ cstore_fdw_validator(PG_FUNCTION_ARGS) {
 
         if (strncmp(optionName, OPTION_NAME_FILENAME, NAMEDATALEN) == 0) {
             filename = defGetString(optionDef);
-        } else if (strncmp(optionName, OPTION_NAME_COMPRESSION_TYPE, NAMEDATALEN) == 0) {
+        }
+        else if (strncmp(optionName, OPTION_NAME_COMPRESSION_TYPE, NAMEDATALEN) == 0) {
             compressionTypeString = defGetString(optionDef);
-        } else if (strncmp(optionName, OPTION_NAME_STRIPE_ROW_COUNT, NAMEDATALEN) == 0) {
+        }
+        else if (strncmp(optionName, OPTION_NAME_STRIPE_ROW_COUNT, NAMEDATALEN) == 0) {
             stripeRowCountString = defGetString(optionDef);
-        } else if (strncmp(optionName, OPTION_NAME_BLOCK_ROW_COUNT, NAMEDATALEN) == 0) {
+        }
+        else if (strncmp(optionName, OPTION_NAME_BLOCK_ROW_COUNT, NAMEDATALEN) == 0) {
             blockRowCountString = defGetString(optionDef);
         }
     }
@@ -1538,7 +1554,8 @@ ParseCompressionType(const char *compressionTypeString) {
 
     if (strncmp(compressionTypeString, COMPRESSION_STRING_NONE, NAMEDATALEN) == 0) {
         compressionType = COMPRESSION_NONE;
-    } else if (strncmp(compressionTypeString, COMPRESSION_STRING_PG_LZ, NAMEDATALEN) == 0) {
+    }
+    else if (strncmp(compressionTypeString, COMPRESSION_STRING_PG_LZ, NAMEDATALEN) == 0) {
         compressionType = COMPRESSION_PG_LZ;
     }
     if (strncmp(compressionTypeString, COMPRESSION_STRING_LZ4, NAMEDATALEN) == 0) {
@@ -1722,7 +1739,8 @@ TupleCountEstimate(RelOptInfo *baserel, const char *filename) {
         BlockNumber pageCount = PageCount(filename);
 
         tupleCountEstimate = clamp_row_est(tupleDensity * (double) pageCount);
-    } else {
+    }
+    else {
         tupleCountEstimate = (double) CStoreTableRowCount(filename);
     }
 
@@ -1833,7 +1851,8 @@ ColumnList(RelOptInfo *baserel, Oid foreignTableId) {
             if (neededColumn->varattno == columnIndex) {
                 column = neededColumn;
                 break;
-            } else if (neededColumn->varattno == wholeRow) {
+            }
+            else if (neededColumn->varattno == wholeRow) {
                 Index tableId = neededColumn->varno;
 
                 column = makeVar(tableId, columnIndex, attributeForm->atttypid,
@@ -2101,7 +2120,8 @@ CStoreAcquireSampleRows(Relation relation, int logLevel,
             sampleRows[sampleRowCount] = heap_form_tuple(tupleDescriptor, columnValues,
                                                          columnNulls);
             sampleRowCount++;
-        } else {
+        }
+        else {
             /*
              * t in Vitter's paper is the number of records already processed.
              * If we need to compute a new S value, we must use the "not yet

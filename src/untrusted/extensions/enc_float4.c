@@ -18,18 +18,17 @@ extern bool debugMode;
  * @return: string
  */
 PG_FUNCTION_INFO_V1(pg_enc_float4_out);
+
 Datum
-    pg_enc_float4_out(PG_FUNCTION_ARGS)
-{
-    char* pSrc = PG_GETARG_CSTRING(0);
-    char* str = (char*)palloc(ENC_FLOAT4_LENGTH_B64 * sizeof(char));
-    char* pDst = (char*)palloc((FLOAT4_LENGTH) * sizeof(char));
+pg_enc_float4_out(PG_FUNCTION_ARGS) {
+    char *pSrc = PG_GETARG_CSTRING(0);
+    char *str = (char *) palloc(ENC_FLOAT4_LENGTH_B64 * sizeof(char));
+    char *pDst = (char *) palloc((FLOAT4_LENGTH) * sizeof(char));
     int resp = ENCLAVE_IS_NOT_RUNNING;
     float ans;
 
     memcpy(str, pSrc, ENC_FLOAT4_LENGTH_B64);
-    if (debugMode == true)
-    {
+    if (debugMode == true) {
         resp = enc_float32_decrypt(pSrc, pDst);
         memcpy(&ans, pDst, FLOAT4_LENGTH);
         sgxErrorHandler(resp);
@@ -45,12 +44,12 @@ Datum
 // DEBUG FUNCTION
 // WILL BE DELETED IN THE PRODUCT
 PG_FUNCTION_INFO_V1(pg_enc_float4_encrypt);
+
 Datum
-    pg_enc_float4_encrypt(PG_FUNCTION_ARGS)
-{
+pg_enc_float4_encrypt(PG_FUNCTION_ARGS) {
     float src = PG_GETARG_FLOAT4(0);
     int ans;
-    char* pDst = (char*)palloc((ENC_FLOAT4_LENGTH_B64) * sizeof(char));
+    char *pDst = (char *) palloc((ENC_FLOAT4_LENGTH_B64) * sizeof(char));
     ans = enc_float32_encrypt(src, pDst);
 
     sgxErrorHandler(ans);
@@ -61,12 +60,12 @@ Datum
 // DEBUG FUNCTION
 // WILL BE DELETED IN THE PRODUCT
 PG_FUNCTION_INFO_V1(pg_enc_float4_decrypt);
+
 Datum
-    pg_enc_float4_decrypt(PG_FUNCTION_ARGS)
-{
+pg_enc_float4_decrypt(PG_FUNCTION_ARGS) {
     float dst = 0;
-    char* c1 = PG_GETARG_CSTRING(0);
-    char* pDst = (char*)palloc((ENC_FLOAT4_LENGTH_B64) * sizeof(char));
+    char *c1 = PG_GETARG_CSTRING(0);
+    char *pDst = (char *) palloc((ENC_FLOAT4_LENGTH_B64) * sizeof(char));
     int resp = ENCLAVE_IS_NOT_RUNNING;
     resp = enc_float32_decrypt(c1, pDst);
     memcpy(&dst, pDst, FLOAT4_LENGTH);
@@ -84,25 +83,24 @@ Datum
  * @return: an encrypted result. output format: BASE64(iv[12 bytes]||AES-GCM(s1+s2)[4 bytes]||AUTHTAG[16bytes])
  */
 PG_FUNCTION_INFO_V1(pg_enc_float4_addfinal);
+
 Datum
-    pg_enc_float4_addfinal(PG_FUNCTION_ARGS)
-{
-    ArrayType* v = PG_GETARG_ARRAYTYPE_P(0);
+pg_enc_float4_addfinal(PG_FUNCTION_ARGS) {
+    ArrayType *v = PG_GETARG_ARRAYTYPE_P(0);
     int resp = ENCLAVE_IS_NOT_RUNNING;
     bool isnull;
     Datum value;
-    char* pSrc1 = (char*)palloc((ENC_FLOAT4_LENGTH_B64 + 1) * sizeof(char));
-    char* pSrc2 = (char*)palloc((ENC_FLOAT4_LENGTH_B64 + 1) * sizeof(char));
-    char* pTemp = (char*)palloc((ENC_FLOAT4_LENGTH_B64 + 1) * sizeof(char));
-    ArrayMetaState* my_extra = (ArrayMetaState*)fcinfo->flinfo->fn_extra;
+    char *pSrc1 = (char *) palloc((ENC_FLOAT4_LENGTH_B64 + 1) * sizeof(char));
+    char *pSrc2 = (char *) palloc((ENC_FLOAT4_LENGTH_B64 + 1) * sizeof(char));
+    char *pTemp = (char *) palloc((ENC_FLOAT4_LENGTH_B64 + 1) * sizeof(char));
+    ArrayMetaState *my_extra = (ArrayMetaState *) fcinfo->flinfo->fn_extra;
     ArrayIterator array_iterator = array_create_iterator(v, 0); //, my_extra);
 
     array_iterate(array_iterator, &value, &isnull);
     memcpy(pSrc1, DatumGetCString(value), ENC_FLOAT4_LENGTH_B64);
     pSrc1[ENC_FLOAT4_LENGTH_B64 - 1] = '\0';
 
-    while (array_iterate(array_iterator, &value, &isnull))
-    {
+    while (array_iterate(array_iterator, &value, &isnull)) {
         memcpy(pTemp, DatumGetCString(value), ENC_FLOAT4_LENGTH_B64);
         pTemp[ENC_FLOAT4_LENGTH_B64 - 1] = '\0';
         resp = enc_float32_add(pSrc1, pTemp, pSrc2);
@@ -119,30 +117,28 @@ Datum
 }
 
 PG_FUNCTION_INFO_V1(pg_enc_float4_sum_bulk);
+
 Datum
-    pg_enc_float4_sum_bulk(PG_FUNCTION_ARGS)
-{
-    ArrayType* v = PG_GETARG_ARRAYTYPE_P(0);
+pg_enc_float4_sum_bulk(PG_FUNCTION_ARGS) {
+    ArrayType *v = PG_GETARG_ARRAYTYPE_P(0);
     int resp = ENCLAVE_IS_NOT_RUNNING;
     ArrayIterator array_iterator;
-    ArrayMetaState* my_extra = (ArrayMetaState*)fcinfo->flinfo->fn_extra;
+    ArrayMetaState *my_extra = (ArrayMetaState *) fcinfo->flinfo->fn_extra;
     bool isnull;
     Datum value;
     size_t bulk_size = BULK_SIZE;
     unsigned long current_position = 0, counter = 0;
-    char* pSrc2 = (char*)palloc((ENC_FLOAT4_LENGTH_B64) * sizeof(char));
-    char* pTemp = (char*)palloc((ENC_FLOAT4_LENGTH_B64) * sizeof(char) * bulk_size);
+    char *pSrc2 = (char *) palloc((ENC_FLOAT4_LENGTH_B64) * sizeof(char));
+    char *pTemp = (char *) palloc((ENC_FLOAT4_LENGTH_B64) * sizeof(char) * bulk_size);
 
     array_iterator = array_create_iterator(v, 0); //, my_extra);
-    while (array_iterate(array_iterator, &value, &isnull))
-    {
+    while (array_iterate(array_iterator, &value, &isnull)) {
         //      ereport(INFO, (errmsg("add %d:  %s", current_position, DatumGetCString(value))));
         memcpy(pTemp + current_position, DatumGetCString(value), ENC_FLOAT4_LENGTH_B64);
         current_position += ENC_FLOAT4_LENGTH_B64;
         counter++;
 
-        if (counter % (bulk_size) == 0)
-        {
+        if (counter % (bulk_size) == 0) {
             resp = enc_float32_sum_bulk(bulk_size, pTemp, pSrc2);
             //ereport(INFO, (errmsg("ret %d", resp)));
             sgxErrorHandler(resp);
@@ -170,28 +166,27 @@ Datum
  * @return: an encrypted result (encrypted float4). output format: BASE64(iv[12 bytes]||AES-GCM(s1+s2)[4 bytes]||AUTHTAG[16bytes])
  */
 PG_FUNCTION_INFO_V1(pg_enc_float4_avgfinal);
+
 Datum
-    pg_enc_float4_avgfinal(PG_FUNCTION_ARGS)
-{
-    ArrayType* v = PG_GETARG_ARRAYTYPE_P(0);
+pg_enc_float4_avgfinal(PG_FUNCTION_ARGS) {
+    ArrayType *v = PG_GETARG_ARRAYTYPE_P(0);
     int resp = ENCLAVE_IS_NOT_RUNNING;
     bool isnull;
     Datum value;
     int ndims1 = ARR_NDIM(v); //array dimension
-    int* dims1 = ARR_DIMS(v);
+    int *dims1 = ARR_DIMS(v);
     int nitems = ArrayGetNItems(ndims1, dims1); //number of items in array
-    char* pSrc1 = palloc((ENC_FLOAT4_LENGTH_B64 + 1) * sizeof(*pSrc1));
-    char* pSrc2 = palloc((ENC_FLOAT4_LENGTH_B64 + 1) * sizeof(*pSrc2));
-    char* pTemp = palloc((ENC_FLOAT4_LENGTH_B64 + 1) * sizeof(*pTemp));
-    ArrayMetaState* my_extra = (ArrayMetaState*)fcinfo->flinfo->fn_extra;
+    char *pSrc1 = palloc((ENC_FLOAT4_LENGTH_B64 + 1) * sizeof(*pSrc1));
+    char *pSrc2 = palloc((ENC_FLOAT4_LENGTH_B64 + 1) * sizeof(*pSrc2));
+    char *pTemp = palloc((ENC_FLOAT4_LENGTH_B64 + 1) * sizeof(*pTemp));
+    ArrayMetaState *my_extra = (ArrayMetaState *) fcinfo->flinfo->fn_extra;
     ArrayIterator array_iterator = array_create_iterator(v, 0); //, my_extra);
 
     array_iterate(array_iterator, &value, &isnull);
     memcpy(pSrc1, DatumGetCString(value), ENC_FLOAT4_LENGTH_B64);
     pSrc1[ENC_FLOAT4_LENGTH_B64 - 1] = '\0';
 
-    while (array_iterate(array_iterator, &value, &isnull))
-    {
+    while (array_iterate(array_iterator, &value, &isnull)) {
         memcpy(pTemp, DatumGetCString(value), ENC_FLOAT4_LENGTH_B64);
         pTemp[ENC_FLOAT4_LENGTH_B64 - 1] = '\0';
         resp = enc_float32_add(pSrc1, pTemp, pSrc2);
@@ -214,35 +209,33 @@ Datum
 }
 
 PG_FUNCTION_INFO_V1(pg_enc_float4_avg_bulk);
+
 Datum
-    pg_enc_float4_avg_bulk(PG_FUNCTION_ARGS)
-{
-    ArrayType* v = PG_GETARG_ARRAYTYPE_P(0);
+pg_enc_float4_avg_bulk(PG_FUNCTION_ARGS) {
+    ArrayType *v = PG_GETARG_ARRAYTYPE_P(0);
     int resp = ENCLAVE_IS_NOT_RUNNING;
     ArrayIterator array_iterator;
-    ArrayMetaState* my_extra = (ArrayMetaState*)fcinfo->flinfo->fn_extra;
+    ArrayMetaState *my_extra = (ArrayMetaState *) fcinfo->flinfo->fn_extra;
     bool isnull;
     size_t bulk_size = BULK_SIZE;
     unsigned long current_position = 0, counter = 0;
     Datum value;
     int ndims1 = ARR_NDIM(v); //array dimension
-    int* dims1 = ARR_DIMS(v);
+    int *dims1 = ARR_DIMS(v);
     int nitems = ArrayGetNItems(ndims1, dims1); //number of items in array
-    char* pSrc1 = (char*)palloc((ENC_FLOAT4_LENGTH_B64) * sizeof(char));
-    char* pSrc2 = (char*)palloc((ENC_FLOAT4_LENGTH_B64) * sizeof(char));
-    char* pTemp = (char*)palloc((ENC_FLOAT4_LENGTH_B64) * sizeof(char) * bulk_size);
+    char *pSrc1 = (char *) palloc((ENC_FLOAT4_LENGTH_B64) * sizeof(char));
+    char *pSrc2 = (char *) palloc((ENC_FLOAT4_LENGTH_B64) * sizeof(char));
+    char *pTemp = (char *) palloc((ENC_FLOAT4_LENGTH_B64) * sizeof(char) * bulk_size);
 
     array_iterator = array_create_iterator(v, 0); //, my_extra);
 
-    while (array_iterate(array_iterator, &value, &isnull))
-    {
+    while (array_iterate(array_iterator, &value, &isnull)) {
         //ereport(INFO, (errmsg("add %d:  %s", current_position, DatumGetCString(value))));
         memcpy(pTemp + current_position, DatumGetCString(value), ENC_FLOAT4_LENGTH_B64);
         current_position += ENC_FLOAT4_LENGTH_B64;
         counter++;
 
-        if (counter % (bulk_size) == 0)
-        {
+        if (counter % (bulk_size) == 0) {
             resp = enc_float32_sum_bulk(bulk_size, pTemp, pSrc2);
             //ereport(INFO, (errmsg("ret %d", resp)));
             sgxErrorHandler(resp);
@@ -278,22 +271,22 @@ Datum
  * @return: an encrypted result. output format: BASE64(iv[12 bytes]||AES-GCM(s1+s2)[4 bytes]||AUTHTAG[16bytes])
  */
 PG_FUNCTION_INFO_V1(pg_enc_float4_maxfinal);
+
 Datum
-    pg_enc_float4_maxfinal(PG_FUNCTION_ARGS)
-{
-    ArrayType* v = PG_GETARG_ARRAYTYPE_P(0);
+pg_enc_float4_maxfinal(PG_FUNCTION_ARGS) {
+    ArrayType *v = PG_GETARG_ARRAYTYPE_P(0);
     int resp = ENCLAVE_IS_NOT_RUNNING;
     int ans = 0;
     ArrayIterator array_iterator;
-    ArrayMetaState* my_extra = (ArrayMetaState*)fcinfo->flinfo->fn_extra;
+    ArrayMetaState *my_extra = (ArrayMetaState *) fcinfo->flinfo->fn_extra;
     bool isnull;
     Datum value;
 
     int item_count = ArrayGetNItems(ARR_NDIM(v), ARR_DIMS(v)); //number of items in array
 
-    char* max = palloc(ENC_FLOAT4_LENGTH_B64 * sizeof(*max));
-    char* value_bytes = palloc(ENC_FLOAT4_LENGTH_B64 * sizeof(*value_bytes));
-    char* res = palloc(FLOAT4_LENGTH * sizeof(*res));
+    char *max = palloc(ENC_FLOAT4_LENGTH_B64 * sizeof(*max));
+    char *value_bytes = palloc(ENC_FLOAT4_LENGTH_B64 * sizeof(*value_bytes));
+    char *res = palloc(FLOAT4_LENGTH * sizeof(*res));
 
     array_iterator = array_create_iterator(v, 0); //, my_extra);
     array_iterate(array_iterator, &value, &isnull);
@@ -301,8 +294,7 @@ Datum
     memcpy(max, DatumGetCString(value), ENC_FLOAT4_LENGTH_B64);
     max[ENC_FLOAT4_LENGTH_B64 - 1] = '\0';
 
-    while (array_iterate(array_iterator, &value, &isnull))
-    {
+    while (array_iterate(array_iterator, &value, &isnull)) {
         memcpy(value_bytes, DatumGetCString(value), ENC_FLOAT4_LENGTH_B64);
         value_bytes[ENC_FLOAT4_LENGTH_B64 - 1] = '\0';
 
@@ -310,8 +302,7 @@ Datum
         sgxErrorHandler(resp);
         memcpy(&ans, res, FLOAT4_LENGTH);
 
-        if (ans == -1)
-        {
+        if (ans == -1) {
             memcpy(max, value_bytes, ENC_FLOAT4_LENGTH_B64);
             max[ENC_FLOAT4_LENGTH_B64 - 1] = '\0';
         }
@@ -324,22 +315,22 @@ Datum
 }
 
 PG_FUNCTION_INFO_V1(pg_enc_float4_max_bulk);
+
 Datum
-    pg_enc_float4_max_bulk(PG_FUNCTION_ARGS)
-{
-    ArrayType* v = PG_GETARG_ARRAYTYPE_P(0);
+pg_enc_float4_max_bulk(PG_FUNCTION_ARGS) {
+    ArrayType *v = PG_GETARG_ARRAYTYPE_P(0);
     int resp = ENCLAVE_IS_NOT_RUNNING;
     int ans = 0;
     ArrayIterator array_iterator;
-    ArrayMetaState* my_extra = (ArrayMetaState*)fcinfo->flinfo->fn_extra;
+    ArrayMetaState *my_extra = (ArrayMetaState *) fcinfo->flinfo->fn_extra;
     bool isnull;
     Datum value;
 
     int item_count = ArrayGetNItems(ARR_NDIM(v), ARR_DIMS(v)); //number of items in array
 
-    char* max = palloc(ENC_FLOAT4_LENGTH_B64 * sizeof(*max));
-    char* value_bytes = palloc(ENC_FLOAT4_LENGTH_B64 * sizeof(*value_bytes));
-    char* res = palloc(FLOAT4_LENGTH * sizeof(*res));
+    char *max = palloc(ENC_FLOAT4_LENGTH_B64 * sizeof(*max));
+    char *value_bytes = palloc(ENC_FLOAT4_LENGTH_B64 * sizeof(*value_bytes));
+    char *res = palloc(FLOAT4_LENGTH * sizeof(*res));
 
     array_iterator = array_create_iterator(v, 0); //, my_extra);
     array_iterate(array_iterator, &value, &isnull);
@@ -347,8 +338,7 @@ Datum
     memcpy(max, DatumGetCString(value), ENC_FLOAT4_LENGTH_B64);
     max[ENC_FLOAT4_LENGTH_B64 - 1] = '\0';
 
-    while (array_iterate(array_iterator, &value, &isnull))
-    {
+    while (array_iterate(array_iterator, &value, &isnull)) {
         memcpy(value_bytes, DatumGetCString(value), ENC_FLOAT4_LENGTH_B64);
         value_bytes[ENC_FLOAT4_LENGTH_B64 - 1] = '\0';
 
@@ -356,8 +346,7 @@ Datum
         sgxErrorHandler(resp);
         memcpy(&ans, res, FLOAT4_LENGTH);
 
-        if (ans == -1)
-        {
+        if (ans == -1) {
             memcpy(max, value_bytes, ENC_FLOAT4_LENGTH_B64);
             max[ENC_FLOAT4_LENGTH_B64 - 1] = '\0';
         }
@@ -377,24 +366,24 @@ Datum
  * @return: an encrypted result. output format: BASE64(iv[12 bytes]||AES-GCM(s1+s2)[4 bytes]||AUTHTAG[16bytes])
  */
 PG_FUNCTION_INFO_V1(pg_enc_float4_minfinal);
+
 Datum
-    pg_enc_float4_minfinal(PG_FUNCTION_ARGS)
-{
-    ArrayType* v = PG_GETARG_ARRAYTYPE_P(0);
+pg_enc_float4_minfinal(PG_FUNCTION_ARGS) {
+    ArrayType *v = PG_GETARG_ARRAYTYPE_P(0);
     int resp = ENCLAVE_IS_NOT_RUNNING;
     int ans = 0;
     ArrayIterator array_iterator;
-    ArrayMetaState* my_extra = (ArrayMetaState*)fcinfo->flinfo->fn_extra;
+    ArrayMetaState *my_extra = (ArrayMetaState *) fcinfo->flinfo->fn_extra;
     bool isnull;
     Datum value;
 
     int ndims1 = ARR_NDIM(v); //array dimension
-    int* dims1 = ARR_DIMS(v);
+    int *dims1 = ARR_DIMS(v);
     int nitems = ArrayGetNItems(ndims1, dims1); //number of items in array
 
-    char* pSrc1 = palloc((ENC_FLOAT4_LENGTH_B64) * sizeof(*pSrc1));
-    char* pTemp = palloc((ENC_FLOAT4_LENGTH_B64) * sizeof(*pTemp));
-    char* pDst = palloc((FLOAT4_LENGTH) * sizeof(*pDst));
+    char *pSrc1 = palloc((ENC_FLOAT4_LENGTH_B64) * sizeof(*pSrc1));
+    char *pTemp = palloc((ENC_FLOAT4_LENGTH_B64) * sizeof(*pTemp));
+    char *pDst = palloc((FLOAT4_LENGTH) * sizeof(*pDst));
 
     array_iterator = array_create_iterator(v, 0); //, my_extra);
     array_iterate(array_iterator, &value, &isnull);
@@ -402,8 +391,7 @@ Datum
     memcpy(pSrc1, DatumGetCString(value), ENC_FLOAT4_LENGTH_B64);
     pSrc1[ENC_FLOAT4_LENGTH_B64 - 1] = '\0';
 
-    while (array_iterate(array_iterator, &value, &isnull))
-    {
+    while (array_iterate(array_iterator, &value, &isnull)) {
         memcpy(pTemp, DatumGetCString(value), ENC_FLOAT4_LENGTH_B64);
         pTemp[ENC_FLOAT4_LENGTH_B64 - 1] = '\0';
 
@@ -411,8 +399,7 @@ Datum
         sgxErrorHandler(resp);
         memcpy(&ans, pDst, FLOAT4_LENGTH);
 
-        if (ans == 1)
-        {
+        if (ans == 1) {
             memcpy(pSrc1, pTemp, ENC_FLOAT4_LENGTH_B64);
         }
         pSrc1[ENC_FLOAT4_LENGTH_B64 - 1] = '\0';
@@ -425,24 +412,24 @@ Datum
 }
 
 PG_FUNCTION_INFO_V1(pg_enc_float4_min_bulk);
+
 Datum
-    pg_enc_float4_min_bulk(PG_FUNCTION_ARGS)
-{
-    ArrayType* v = PG_GETARG_ARRAYTYPE_P(0);
+pg_enc_float4_min_bulk(PG_FUNCTION_ARGS) {
+    ArrayType *v = PG_GETARG_ARRAYTYPE_P(0);
     int resp = ENCLAVE_IS_NOT_RUNNING;
     int ans = 0;
     ArrayIterator array_iterator;
-    ArrayMetaState* my_extra = (ArrayMetaState*)fcinfo->flinfo->fn_extra;
+    ArrayMetaState *my_extra = (ArrayMetaState *) fcinfo->flinfo->fn_extra;
     bool isnull;
     Datum value;
 
     int ndims1 = ARR_NDIM(v); //array dimension
-    int* dims1 = ARR_DIMS(v);
+    int *dims1 = ARR_DIMS(v);
     int nitems = ArrayGetNItems(ndims1, dims1); //number of items in array
 
-    char* pSrc1 = palloc((ENC_FLOAT4_LENGTH_B64) * sizeof(*pSrc1));
-    char* pTemp = palloc((ENC_FLOAT4_LENGTH_B64) * sizeof(*pTemp));
-    char* pDst = palloc((FLOAT4_LENGTH) * sizeof(*pDst));
+    char *pSrc1 = palloc((ENC_FLOAT4_LENGTH_B64) * sizeof(*pSrc1));
+    char *pTemp = palloc((ENC_FLOAT4_LENGTH_B64) * sizeof(*pTemp));
+    char *pDst = palloc((FLOAT4_LENGTH) * sizeof(*pDst));
 
     array_iterator = array_create_iterator(v, 0); //, my_extra);
     array_iterate(array_iterator, &value, &isnull);
@@ -450,8 +437,7 @@ Datum
     memcpy(pSrc1, DatumGetCString(value), ENC_FLOAT4_LENGTH_B64);
     pSrc1[ENC_FLOAT4_LENGTH_B64 - 1] = '\0';
 
-    while (array_iterate(array_iterator, &value, &isnull))
-    {
+    while (array_iterate(array_iterator, &value, &isnull)) {
         memcpy(pTemp, DatumGetCString(value), ENC_FLOAT4_LENGTH_B64);
         pTemp[ENC_FLOAT4_LENGTH_B64 - 1] = '\0';
 
@@ -459,8 +445,7 @@ Datum
         sgxErrorHandler(resp);
         memcpy(&ans, pDst, FLOAT4_LENGTH);
 
-        if (ans == 1)
-        {
+        if (ans == 1) {
             memcpy(pSrc1, pTemp, ENC_FLOAT4_LENGTH_B64);
         }
         pSrc1[ENC_FLOAT4_LENGTH_B64 - 1] = '\0';
@@ -480,13 +465,13 @@ Datum
 */
 
 PG_FUNCTION_INFO_V1(pg_enc_float4_add);
+
 Datum
-    pg_enc_float4_add(PG_FUNCTION_ARGS)
-{
-    char* lhs = PG_GETARG_CSTRING(0);
-    char* rhs = PG_GETARG_CSTRING(1);
+pg_enc_float4_add(PG_FUNCTION_ARGS) {
+    char *lhs = PG_GETARG_CSTRING(0);
+    char *rhs = PG_GETARG_CSTRING(1);
     int result_size = ENC_FLOAT4_LENGTH_B64 * sizeof(char);
-    char* result = palloc(result_size);
+    char *result = palloc(result_size);
     int resp = ENCLAVE_IS_NOT_RUNNING;
 
     resp = enc_float32_add(lhs, rhs, result);
@@ -503,14 +488,14 @@ Datum
  * @return: an encrypted result of input values . output format: BASE64(iv[12 bytes]||AES-GCM(s1+s2)[4 bytes]||AUTHTAG[16bytes])
  */
 PG_FUNCTION_INFO_V1(pg_enc_float4_subs);
+
 Datum
-    pg_enc_float4_subs(PG_FUNCTION_ARGS)
-{
-    char* lhs = PG_GETARG_CSTRING(0);
-    char* rhs = PG_GETARG_CSTRING(1);
+pg_enc_float4_subs(PG_FUNCTION_ARGS) {
+    char *lhs = PG_GETARG_CSTRING(0);
+    char *rhs = PG_GETARG_CSTRING(1);
     int resp = ENCLAVE_IS_NOT_RUNNING;
     int result_size = ENC_FLOAT4_LENGTH_B64 * sizeof(char);
-    char* result = palloc(result_size);
+    char *result = palloc(result_size);
 
     resp = enc_float32_sub(lhs, rhs, result);
     sgxErrorHandler(resp);
@@ -526,13 +511,13 @@ Datum
  * @return: an encrypted result of input values . output format: BASE64(iv[12 bytes]||AES-GCM(s1+s2)[4 bytes]||AUTHTAG[16bytes])
  */
 PG_FUNCTION_INFO_V1(pg_enc_float4_mult);
+
 Datum
-    pg_enc_float4_mult(PG_FUNCTION_ARGS)
-{
-    char* c1 = PG_GETARG_CSTRING(0);
-    char* c2 = PG_GETARG_CSTRING(1);
+pg_enc_float4_mult(PG_FUNCTION_ARGS) {
+    char *c1 = PG_GETARG_CSTRING(0);
+    char *c2 = PG_GETARG_CSTRING(1);
     int resp = ENCLAVE_IS_NOT_RUNNING;
-    char* pDst = (char*)palloc((ENC_FLOAT4_LENGTH_B64) * sizeof(char));
+    char *pDst = (char *) palloc((ENC_FLOAT4_LENGTH_B64) * sizeof(char));
 
     resp = enc_float32_mult(c1, c2, pDst);
     sgxErrorHandler(resp);
@@ -549,13 +534,13 @@ Datum
  */
 
 PG_FUNCTION_INFO_V1(pg_enc_float4_div);
+
 Datum
-    pg_enc_float4_div(PG_FUNCTION_ARGS)
-{
-    char* c1 = PG_GETARG_CSTRING(0);
-    char* c2 = PG_GETARG_CSTRING(1);
+pg_enc_float4_div(PG_FUNCTION_ARGS) {
+    char *c1 = PG_GETARG_CSTRING(0);
+    char *c2 = PG_GETARG_CSTRING(1);
     int resp = ENCLAVE_IS_NOT_RUNNING;
-    char* pDst = palloc((ENC_FLOAT4_LENGTH_B64) * sizeof(*pDst));
+    char *pDst = palloc((ENC_FLOAT4_LENGTH_B64) * sizeof(*pDst));
 
     resp = enc_float32_div(c1, c2, pDst);
     sgxErrorHandler(resp);
@@ -572,13 +557,13 @@ Datum
  * @return: an encrypted result of input values . output format: BASE64(iv[12 bytes]||AES-GCM(s1+s2)[4 bytes]||AUTHTAG[16bytes])
  */
 PG_FUNCTION_INFO_V1(pg_enc_float4_exp);
+
 Datum
-    pg_enc_float4_exp(PG_FUNCTION_ARGS)
-{
-    char* c1 = PG_GETARG_CSTRING(0);
-    char* c2 = PG_GETARG_CSTRING(1);
+pg_enc_float4_exp(PG_FUNCTION_ARGS) {
+    char *c1 = PG_GETARG_CSTRING(0);
+    char *c2 = PG_GETARG_CSTRING(1);
     int resp = ENCLAVE_IS_NOT_RUNNING;
-    char* pDst = (char*)palloc((ENC_FLOAT4_LENGTH_B64) * sizeof(char));
+    char *pDst = (char *) palloc((ENC_FLOAT4_LENGTH_B64) * sizeof(char));
 
     resp = enc_float32_pow(c1, c2, pDst);
     sgxErrorHandler(resp);
@@ -596,12 +581,12 @@ Datum
  *       false, otherwise
 */
 PG_FUNCTION_INFO_V1(pg_enc_float4_eq);
+
 Datum
-    pg_enc_float4_eq(PG_FUNCTION_ARGS)
-{
-    char* c1 = PG_GETARG_CSTRING(0);
-    char* c2 = PG_GETARG_CSTRING(1);
-    char* pDst = (char*)palloc((FLOAT4_LENGTH) * sizeof(char));
+pg_enc_float4_eq(PG_FUNCTION_ARGS) {
+    char *c1 = PG_GETARG_CSTRING(0);
+    char *c2 = PG_GETARG_CSTRING(1);
+    char *pDst = (char *) palloc((FLOAT4_LENGTH) * sizeof(char));
     int ans = 0;
     int resp = ENCLAVE_IS_NOT_RUNNING;
     bool cmp = false;
@@ -626,12 +611,12 @@ Datum
  *       false, otherwise
  */
 PG_FUNCTION_INFO_V1(pg_enc_float4_ne);
+
 Datum
-    pg_enc_float4_ne(PG_FUNCTION_ARGS)
-{
-    char* c1 = PG_GETARG_CSTRING(0);
-    char* c2 = PG_GETARG_CSTRING(1);
-    char* pDst = (char*)palloc((FLOAT4_LENGTH) * sizeof(char));
+pg_enc_float4_ne(PG_FUNCTION_ARGS) {
+    char *c1 = PG_GETARG_CSTRING(0);
+    char *c2 = PG_GETARG_CSTRING(1);
+    char *pDst = (char *) palloc((FLOAT4_LENGTH) * sizeof(char));
     int ans = 0;
     int resp = ENCLAVE_IS_NOT_RUNNING;
     bool cmp = false;
@@ -659,12 +644,12 @@ Datum
  *       false, otherwise
  */
 PG_FUNCTION_INFO_V1(pg_enc_float4_lt);
+
 Datum
-    pg_enc_float4_lt(PG_FUNCTION_ARGS)
-{
-    char* c1 = PG_GETARG_CSTRING(0);
-    char* c2 = PG_GETARG_CSTRING(1);
-    char* pDst = (char*)palloc((FLOAT4_LENGTH) * sizeof(char));
+pg_enc_float4_lt(PG_FUNCTION_ARGS) {
+    char *c1 = PG_GETARG_CSTRING(0);
+    char *c2 = PG_GETARG_CSTRING(1);
+    char *pDst = (char *) palloc((FLOAT4_LENGTH) * sizeof(char));
     int ans = 0;
     int resp = ENCLAVE_IS_NOT_RUNNING;
     bool cmp;
@@ -692,12 +677,12 @@ Datum
  *       false, otherwise
  */
 PG_FUNCTION_INFO_V1(pg_enc_float4_le);
+
 Datum
-    pg_enc_float4_le(PG_FUNCTION_ARGS)
-{
-    char* c1 = PG_GETARG_CSTRING(0);
-    char* c2 = PG_GETARG_CSTRING(1);
-    char* pDst = (char*)palloc((FLOAT4_LENGTH) * sizeof(char));
+pg_enc_float4_le(PG_FUNCTION_ARGS) {
+    char *c1 = PG_GETARG_CSTRING(0);
+    char *c2 = PG_GETARG_CSTRING(1);
+    char *pDst = (char *) palloc((FLOAT4_LENGTH) * sizeof(char));
     int ans = 0;
     int resp = ENCLAVE_IS_NOT_RUNNING;
     bool cmp;
@@ -725,12 +710,12 @@ Datum
  *          false, otherwise
  */
 PG_FUNCTION_INFO_V1(pg_enc_float4_gt);
+
 Datum
-    pg_enc_float4_gt(PG_FUNCTION_ARGS)
-{
-    char* c1 = PG_GETARG_CSTRING(0);
-    char* c2 = PG_GETARG_CSTRING(1);
-    char* pDst = (char*)palloc((FLOAT4_LENGTH) * sizeof(char));
+pg_enc_float4_gt(PG_FUNCTION_ARGS) {
+    char *c1 = PG_GETARG_CSTRING(0);
+    char *c2 = PG_GETARG_CSTRING(1);
+    char *pDst = (char *) palloc((FLOAT4_LENGTH) * sizeof(char));
     int ans = 0;
     int resp = ENCLAVE_IS_NOT_RUNNING;
     bool cmp;
@@ -758,12 +743,12 @@ Datum
  *          false, otherwise
  */
 PG_FUNCTION_INFO_V1(pg_enc_float4_ge);
+
 Datum
-    pg_enc_float4_ge(PG_FUNCTION_ARGS)
-{
-    char* c1 = PG_GETARG_CSTRING(0);
-    char* c2 = PG_GETARG_CSTRING(1);
-    char* pDst = (char*)palloc((FLOAT4_LENGTH) * sizeof(char));
+pg_enc_float4_ge(PG_FUNCTION_ARGS) {
+    char *c1 = PG_GETARG_CSTRING(0);
+    char *c2 = PG_GETARG_CSTRING(1);
+    char *pDst = (char *) palloc((FLOAT4_LENGTH) * sizeof(char));
     int ans = 0;
     int resp = ENCLAVE_IS_NOT_RUNNING;
     bool cmp;
@@ -789,12 +774,12 @@ Datum
  * @return: -1, 0 ,1
  */
 PG_FUNCTION_INFO_V1(pg_enc_float4_cmp);
+
 Datum
-    pg_enc_float4_cmp(PG_FUNCTION_ARGS)
-{
-    char* c1 = PG_GETARG_CSTRING(0);
-    char* c2 = PG_GETARG_CSTRING(1);
-    char* pDst = (char*)palloc((FLOAT4_LENGTH) * sizeof(char));
+pg_enc_float4_cmp(PG_FUNCTION_ARGS) {
+    char *c1 = PG_GETARG_CSTRING(0);
+    char *c2 = PG_GETARG_CSTRING(1);
+    char *pDst = (char *) palloc((FLOAT4_LENGTH) * sizeof(char));
     int resp = ENCLAVE_IS_NOT_RUNNING;
     int ans = 0;
 
@@ -815,13 +800,13 @@ Datum
  * @return: an encrypted result of input values . output format: BASE64(iv[12 bytes]||AES-GCM(s1+s2)[4 bytes]||AUTHTAG[16bytes])
  */
 PG_FUNCTION_INFO_V1(pg_enc_float4_mod);
+
 Datum
-    pg_enc_float4_mod(PG_FUNCTION_ARGS)
-{
-    char* c1 = PG_GETARG_CSTRING(0);
-    char* c2 = PG_GETARG_CSTRING(1);
+pg_enc_float4_mod(PG_FUNCTION_ARGS) {
+    char *c1 = PG_GETARG_CSTRING(0);
+    char *c2 = PG_GETARG_CSTRING(1);
     int resp = ENCLAVE_IS_NOT_RUNNING;
-    char* pDst = (char*)palloc((ENC_FLOAT4_LENGTH_B64) * sizeof(char));
+    char *pDst = (char *) palloc((ENC_FLOAT4_LENGTH_B64) * sizeof(char));
 
     resp = enc_float32_mod(c1, c2, pDst);
     sgxErrorHandler(resp);
@@ -838,26 +823,25 @@ Datum
  * @return: an encrypted result. output format: BASE64(iv[12 bytes]||AES-GCM(s1+s2)[4 bytes]||AUTHTAG[16bytes])
  */
 PG_FUNCTION_INFO_V1(float4_to_enc_float4);
+
 Datum
-    float4_to_enc_float4(PG_FUNCTION_ARGS)
-{
+float4_to_enc_float4(PG_FUNCTION_ARGS) {
     float src = PG_GETARG_FLOAT4(0);
     int ans;
-    char* pDst = (char*)palloc((ENC_FLOAT4_LENGTH_B64) * sizeof(char));
+    char *pDst = (char *) palloc((ENC_FLOAT4_LENGTH_B64) * sizeof(char));
 
     ans = enc_float32_encrypt(src, pDst);
     sgxErrorHandler(ans);
     //ereport(INFO, (errmsg("auto encryption: ENC(%f) = %s", src, pDst)));
 
-    PG_RETURN_CSTRING((const char*)pDst);
+    PG_RETURN_CSTRING((const char *) pDst);
 }
 
-float4 pg_float4_in(char* num)
-{
+float4 pg_float4_in(char *num) {
 
-    char* orig_num;
+    char *orig_num;
     double val;
-    char* endptr;
+    char *endptr;
 
     /*
      * endptr points to the first character _after_ the sequence we recognized
@@ -867,7 +851,7 @@ float4 pg_float4_in(char* num)
     orig_num = num;
 
     /* skip leading whitespace */
-    while (*num != '\0' && isspace((unsigned char)*num))
+    while (*num != '\0' && isspace((unsigned char) *num))
         num++;
 
     /*
@@ -877,15 +861,14 @@ float4 pg_float4_in(char* num)
     if (*num == '\0')
         ereport(ERROR,
                 (errcode(ERRCODE_INVALID_TEXT_REPRESENTATION),
-                 errmsg("invalid input syntax for type %s: \"%s\"",
-                        "real", orig_num)));
+                        errmsg("invalid input syntax for type %s: \"%s\"",
+                               "real", orig_num)));
 
     errno = 0;
     val = strtod(num, &endptr);
 
     /* did we not see anything that looks like a double? */
-    if (endptr == num || errno != 0)
-    {
+    if (endptr == num || errno != 0) {
         int save_errno = errno;
 
         /*
@@ -898,43 +881,35 @@ float4 pg_float4_in(char* num)
          * forms of NaN, but we consider these forms unportable and don't try
          * to support them.  You can use 'em if your strtod() takes 'em.
          */
-        if (pg_strncasecmp(num, "NaN", 3) == 0)
-        {
+        if (pg_strncasecmp(num, "NaN", 3) == 0) {
             val = get_float4_nan();
             endptr = num + 3;
         }
-        else if (pg_strncasecmp(num, "Infinity", 8) == 0)
-        {
+        else if (pg_strncasecmp(num, "Infinity", 8) == 0) {
             val = get_float4_infinity();
             endptr = num + 8;
         }
-        else if (pg_strncasecmp(num, "+Infinity", 9) == 0)
-        {
+        else if (pg_strncasecmp(num, "+Infinity", 9) == 0) {
             val = get_float4_infinity();
             endptr = num + 9;
         }
-        else if (pg_strncasecmp(num, "-Infinity", 9) == 0)
-        {
+        else if (pg_strncasecmp(num, "-Infinity", 9) == 0) {
             val = -get_float4_infinity();
             endptr = num + 9;
         }
-        else if (pg_strncasecmp(num, "inf", 3) == 0)
-        {
+        else if (pg_strncasecmp(num, "inf", 3) == 0) {
             val = get_float4_infinity();
             endptr = num + 3;
         }
-        else if (pg_strncasecmp(num, "+inf", 4) == 0)
-        {
+        else if (pg_strncasecmp(num, "+inf", 4) == 0) {
             val = get_float4_infinity();
             endptr = num + 4;
         }
-        else if (pg_strncasecmp(num, "-inf", 4) == 0)
-        {
+        else if (pg_strncasecmp(num, "-inf", 4) == 0) {
             val = -get_float4_infinity();
             endptr = num + 4;
         }
-        else if (save_errno == ERANGE)
-        {
+        else if (save_errno == ERANGE) {
             /*
              * Some platforms return ERANGE for denormalized numbers (those
              * that are not zero, but are too close to zero to have full
@@ -945,14 +920,14 @@ float4 pg_float4_in(char* num)
             if (val == 0.0 || val >= HUGE_VAL || val <= -HUGE_VAL)
                 ereport(ERROR,
                         (errcode(ERRCODE_NUMERIC_VALUE_OUT_OF_RANGE),
-                         errmsg("\"%s\" is out of range for type real",
-                                orig_num)));
+                                errmsg("\"%s\" is out of range for type real",
+                                       orig_num)));
         }
         else
             ereport(ERROR,
                     (errcode(ERRCODE_INVALID_TEXT_REPRESENTATION),
-                     errmsg("invalid input syntax for type %s: \"%s\"",
-                            "real", orig_num)));
+                            errmsg("invalid input syntax for type %s: \"%s\"",
+                                   "real", orig_num)));
     }
 #ifdef HAVE_BUGGY_SOLARIS_STRTOD
     else
@@ -968,15 +943,15 @@ float4 pg_float4_in(char* num)
 #endif /* HAVE_BUGGY_SOLARIS_STRTOD */
 
     /* skip trailing whitespace */
-    while (*endptr != '\0' && isspace((unsigned char)*endptr))
+    while (*endptr != '\0' && isspace((unsigned char) *endptr))
         endptr++;
 
     /* if there is any junk left at the end of the string, bail out */
     if (*endptr != '\0')
         ereport(ERROR,
                 (errcode(ERRCODE_INVALID_TEXT_REPRESENTATION),
-                 errmsg("invalid input syntax for type %s: \"%s\"",
-                        "real", orig_num)));
+                        errmsg("invalid input syntax for type %s: \"%s\"",
+                               "real", orig_num)));
 
     /*
      * if we get here, we have a legal double, still need to check to see if
@@ -984,7 +959,7 @@ float4 pg_float4_in(char* num)
      */
     //CHECKFLOATVAL((float4) val, isinf(val), val == 0);
 
-    return ((float4)val);
+    return ((float4) val);
 }
 
 /*
@@ -995,27 +970,27 @@ float4 pg_float4_in(char* num)
  * @return: an encrypted result. output format: BASE64(iv[12 bytes]||AES-GCM(s1+s2)[4 bytes]||AUTHTAG[16bytes])
  */
 PG_FUNCTION_INFO_V1(numeric_to_enc_float4);
+
 Datum
-    numeric_to_enc_float4(PG_FUNCTION_ARGS)
-{
+numeric_to_enc_float4(PG_FUNCTION_ARGS) {
     Numeric num = PG_GETARG_NUMERIC(0);
-    char* pDst = (char*)palloc((ENC_FLOAT4_LENGTH_B64) * sizeof(char));
+    char *pDst = (char *) palloc((ENC_FLOAT4_LENGTH_B64) * sizeof(char));
     int ans;
     float4 src;
-    char* tmp = DatumGetCString(DirectFunctionCall1(numeric_out, NumericGetDatum(num)));
+    char *tmp = DatumGetCString(DirectFunctionCall1(numeric_out, NumericGetDatum(num)));
 
-    if (debugMode == true)
-    {
+    if (debugMode == true) {
         src = pg_float4_in(tmp);
         ans = enc_float32_encrypt(src, pDst);
         sgxErrorHandler(ans);
     }
     else
-        ereport(ERROR, (errmsg("Cannot convert numeric to enc_float4, try 'select enable_debug_mode(1)' to allow auto encryption/decryption or select pg_enc_float4_encrypt()")));
+        ereport(ERROR,
+                (errmsg("Cannot convert numeric to enc_float4, try 'select enable_debug_mode(1)' to allow auto encryption/decryption or select pg_enc_float4_encrypt()")));
 
     pfree(tmp);
 
-    PG_RETURN_CSTRING((const char*)pDst);
+    PG_RETURN_CSTRING((const char *) pDst);
 }
 
 /*
@@ -1026,27 +1001,28 @@ Datum
  * @return: an encrypted result. output format: BASE64(iv[12 bytes]||AES-GCM(s1+s2)[4 bytes]||AUTHTAG[16bytes])
  */
 PG_FUNCTION_INFO_V1(double_to_enc_float4);
+
 Datum
-    double_to_enc_float4(PG_FUNCTION_ARGS)
-{
+double_to_enc_float4(PG_FUNCTION_ARGS) {
     float8 num = PG_GETARG_FLOAT8(0);
-    char* pDst = (char*)palloc((ENC_FLOAT4_LENGTH_B64) * sizeof(char));
+    char *pDst = (char *) palloc((ENC_FLOAT4_LENGTH_B64) * sizeof(char));
     int ans;
     float4 src;
-    char* tmp = DatumGetCString(DirectFunctionCall1(float8out, Float8GetDatum(num)));
+    char *tmp = DatumGetCString(DirectFunctionCall1(float8out, Float8GetDatum(num)));
 
-    if (debugMode == true)
-    {
+    if (debugMode == true) {
         src = pg_float4_in(tmp);
         ans = enc_float32_encrypt(src, pDst);
         sgxErrorHandler(ans);
     }
     else
-        ereport(ERROR, (errmsg("Cannot convert double to enc_float4, try 'select enable_debug_mode(1)' to allow auto encryption/decryption or select pg_enc_float4_encrypt(%f)", num)));
+        ereport(ERROR,
+                (errmsg("Cannot convert double to enc_float4, try 'select enable_debug_mode(1)' to allow auto encryption/decryption or select pg_enc_float4_encrypt(%f)",
+                        num)));
 
     pfree(tmp);
 
-    PG_RETURN_CSTRING((const char*)pDst);
+    PG_RETURN_CSTRING((const char *) pDst);
 }
 
 /*
@@ -1057,27 +1033,28 @@ Datum
  * @return: an encrypted result. output format: BASE64(iv[12 bytes]||AES-GCM(s1+s2)[4 bytes]||AUTHTAG[16bytes])
  */
 PG_FUNCTION_INFO_V1(int8_to_enc_float4);
+
 Datum
-    int8_to_enc_float4(PG_FUNCTION_ARGS)
-{
+int8_to_enc_float4(PG_FUNCTION_ARGS) {
     int8 num = PG_GETARG_INT64(0);
-    char* pDst = (char*)palloc((ENC_FLOAT4_LENGTH_B64) * sizeof(char));
+    char *pDst = (char *) palloc((ENC_FLOAT4_LENGTH_B64) * sizeof(char));
     int ans;
     float4 src;
-    char* tmp = DatumGetCString(DirectFunctionCall1(int8out, Int8GetDatum(num)));
+    char *tmp = DatumGetCString(DirectFunctionCall1(int8out, Int8GetDatum(num)));
 
-    if (debugMode == true)
-    {
+    if (debugMode == true) {
         src = pg_float4_in(tmp);
         ans = enc_float32_encrypt(src, pDst);
         sgxErrorHandler(ans);
     }
     else
-        ereport(ERROR, (errmsg("Cannot convert int8 to enc_float4, try 'select enable_debug_mode(1)' to allow auto encryption/decryption or select pg_enc_float4_encrypt(%d)", num)));
+        ereport(ERROR,
+                (errmsg("Cannot convert int8 to enc_float4, try 'select enable_debug_mode(1)' to allow auto encryption/decryption or select pg_enc_float4_encrypt(%d)",
+                        num)));
 
     pfree(tmp);
 
-    PG_RETURN_CSTRING((const char*)pDst);
+    PG_RETURN_CSTRING((const char *) pDst);
 }
 
 /*
@@ -1088,27 +1065,28 @@ Datum
  * @return: an encrypted result. output format: BASE64(iv[12 bytes]||AES-GCM(s1+s2)[4 bytes]||AUTHTAG[16bytes])
  */
 PG_FUNCTION_INFO_V1(int4_to_enc_float4);
+
 Datum
-    int4_to_enc_float4(PG_FUNCTION_ARGS)
-{
+int4_to_enc_float4(PG_FUNCTION_ARGS) {
     int num = PG_GETARG_INT32(0);
-    char* pDst = (char*)palloc((ENC_FLOAT4_LENGTH_B64) * sizeof(char));
+    char *pDst = (char *) palloc((ENC_FLOAT4_LENGTH_B64) * sizeof(char));
     int ans;
     float4 src;
-    char* tmp = DatumGetCString(DirectFunctionCall1(int4out, Int32GetDatum(num)));
+    char *tmp = DatumGetCString(DirectFunctionCall1(int4out, Int32GetDatum(num)));
 
-    if (debugMode == true)
-    {
+    if (debugMode == true) {
         src = pg_float4_in(tmp);
         ans = enc_float32_encrypt(src, pDst);
         sgxErrorHandler(ans);
     }
     else
-        ereport(ERROR, (errmsg("Cannot convert int4 to enc_float4, try 'select enable_debug_mode(1)' to allow auto encryption/decryption or select pg_enc_float4_encrypt(%d)", num)));
+        ereport(ERROR,
+                (errmsg("Cannot convert int4 to enc_float4, try 'select enable_debug_mode(1)' to allow auto encryption/decryption or select pg_enc_float4_encrypt(%d)",
+                        num)));
 
     pfree(tmp);
 
-    PG_RETURN_CSTRING((const char*)pDst);
+    PG_RETURN_CSTRING((const char *) pDst);
 }
 
 /*
@@ -1118,43 +1096,38 @@ Datum
  * @return: enc_float4 element as a string
  */
 PG_FUNCTION_INFO_V1(pg_enc_float4_in);
+
 Datum
-    pg_enc_float4_in(PG_FUNCTION_ARGS)
-{
-    char* pSrc = PG_GETARG_CSTRING(0);
-    char* pDst = (char*)palloc((ENC_FLOAT4_LENGTH_B64) * sizeof(char));
+pg_enc_float4_in(PG_FUNCTION_ARGS) {
+    char *pSrc = PG_GETARG_CSTRING(0);
+    char *pDst = (char *) palloc((ENC_FLOAT4_LENGTH_B64) * sizeof(char));
     float dst;
     int resp;
 
-    if (debugMode == true)
-    {
+    if (debugMode == true) {
         /*
          * if the length of string isnot expected
          * check if it is an float4 and encrypt it
          * pg_float4_in is almost postgres function that raises an error in case it exists
          */
-        if (strlen(pSrc) != ENC_FLOAT4_LENGTH_B64 - 1)
-        {
+        if (strlen(pSrc) != ENC_FLOAT4_LENGTH_B64 - 1) {
             dst = pg_float4_in(pSrc);
             resp = enc_float32_encrypt(dst, pDst);
             sgxErrorHandler(resp);
             //ereport(INFO, (errmsg("auto encryption: ENC(%f) = %s", dst, pDst)));
-            PG_RETURN_CSTRING((const char*)pDst);
+            PG_RETURN_CSTRING((const char *) pDst);
         }
-        else
-        {
+        else {
             memcpy(pDst, pSrc, ENC_FLOAT4_LENGTH_B64);
             pDst[ENC_FLOAT4_LENGTH_B64 - 1] = '\0';
         }
     }
-    else
-    {
-        if (strlen(pSrc) != ENC_FLOAT4_LENGTH_B64 - 1)
-        {
-            ereport(ERROR, (errmsg("Incorrect length of enc_float4 element, try 'select enable_debug_mode(1)' to allow auto encryption/decryption or select pg_enc_float4_encrypt")));
+    else {
+        if (strlen(pSrc) != ENC_FLOAT4_LENGTH_B64 - 1) {
+            ereport(ERROR,
+                    (errmsg("Incorrect length of enc_float4 element, try 'select enable_debug_mode(1)' to allow auto encryption/decryption or select pg_enc_float4_encrypt")));
         }
-        else
-        {
+        else {
             memcpy(pDst, pSrc, ENC_FLOAT4_LENGTH_B64);
             pDst[ENC_FLOAT4_LENGTH_B64 - 1] = '\0';
         }

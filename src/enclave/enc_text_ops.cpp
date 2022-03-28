@@ -13,24 +13,23 @@
  @return:
  * SGX_error, if there was an error during decryption
 */
-int enc_text_like(uint8_t* in1,
+int enc_text_like(uint8_t *in1,
                   size_t in1_size,
-                  uint8_t* in2,
+                  uint8_t *in2,
                   size_t in2_size,
-                  uint8_t* out,
-                  size_t out_size)
-{
+                  uint8_t *out,
+                  size_t out_size) {
     int str_raw_size = in1_size - SGX_AESGCM_IV_SIZE - SGX_AESGCM_MAC_SIZE;
     int pattern_raw_size = in2_size - SGX_AESGCM_IV_SIZE - SGX_AESGCM_MAC_SIZE;
     int resp, result;
-    char* str = (char*)malloc(str_raw_size + 1);
-    char* pattern = (char*)malloc(pattern_raw_size + 1);
+    char *str = (char *) malloc(str_raw_size + 1);
+    char *pattern = (char *) malloc(pattern_raw_size + 1);
 
-    resp = decrypt_bytes((uint8_t*)in1, in1_size, (uint8_t*)str, str_raw_size);
+    resp = decrypt_bytes((uint8_t *) in1, in1_size, (uint8_t *) str, str_raw_size);
     if (resp != SGX_SUCCESS)
         return resp;
 
-    resp = decrypt_bytes((uint8_t*)in2, in2_size, (uint8_t*)pattern, pattern_raw_size);
+    resp = decrypt_bytes((uint8_t *) in2, in2_size, (uint8_t *) pattern, pattern_raw_size);
     if (resp != SGX_SUCCESS)
         return resp;
 
@@ -47,6 +46,7 @@ int enc_text_like(uint8_t* in1,
 
     return resp;
 }
+
 /* Compare two encrypted by aes_gcm strings
  @input: uint8_t array - encrypted string1
          size_t - length of encrypted string1 (max lenght = SGX_AESGCM_IV_SIZE +
@@ -61,21 +61,21 @@ int enc_text_like(uint8_t* in1,
  @return:
  * SGX_error, if there was an error during decryption
 */
-int enc_text_cmp(uint8_t* string1,
+int enc_text_cmp(uint8_t *string1,
                  size_t string1_len,
-                 uint8_t* string2,
+                 uint8_t *string2,
                  size_t string2_len,
-                 uint8_t* result,
-                 size_t res_len)
-{
-    if ((string1_len < SGX_AESGCM_IV_SIZE + SGX_AESGCM_MAC_SIZE) || (string2_len < SGX_AESGCM_IV_SIZE + SGX_AESGCM_MAC_SIZE))
+                 uint8_t *result,
+                 size_t res_len) {
+    if ((string1_len < SGX_AESGCM_IV_SIZE + SGX_AESGCM_MAC_SIZE) ||
+        (string2_len < SGX_AESGCM_IV_SIZE + SGX_AESGCM_MAC_SIZE))
         return MEMORY_COPY_ERROR;
 
     int raw_str1_len = string1_len - SGX_AESGCM_IV_SIZE - SGX_AESGCM_MAC_SIZE;
     int raw_str2_len = string2_len - SGX_AESGCM_IV_SIZE - SGX_AESGCM_MAC_SIZE;
     int resp, cmp;
-    uint8_t* dec_string1 = (uint8_t*)malloc(raw_str1_len + 1);
-    uint8_t* dec_string2 = (uint8_t*)malloc(raw_str2_len + 1);
+    uint8_t *dec_string1 = (uint8_t *) malloc(raw_str1_len + 1);
+    uint8_t *dec_string2 = (uint8_t *) malloc(raw_str2_len + 1);
 
     resp = decrypt_bytes(string1, string1_len, dec_string1, raw_str1_len);
     if (resp != SGX_SUCCESS)
@@ -87,7 +87,7 @@ int enc_text_cmp(uint8_t* string1,
 
     dec_string1[raw_str1_len] = dec_string2[raw_str2_len] = '\0';
 
-    cmp = strcmp((const char*)dec_string1, (const char*)dec_string2);
+    cmp = strcmp((const char *) dec_string1, (const char *) dec_string2);
 
     memcpy(result, &cmp, res_len);
 
@@ -112,21 +112,20 @@ int enc_text_cmp(uint8_t* string1,
     * SGX_error, if there was an error during encryption/decryption
     0, otherwise
 */
-int enc_text_concatenate(uint8_t* string1,
+int enc_text_concatenate(uint8_t *string1,
                          size_t string1_len,
-                         uint8_t* string2,
+                         uint8_t *string2,
                          size_t string2_len,
-                         uint8_t* string3,
-                         size_t string3_len)
-{
+                         uint8_t *string3,
+                         size_t string3_len) {
     int raw_str1_len = string1_len - SGX_AESGCM_IV_SIZE - SGX_AESGCM_MAC_SIZE;
     int raw_str2_len = string2_len - SGX_AESGCM_IV_SIZE - SGX_AESGCM_MAC_SIZE;
     int raw_str3_len = string3_len - SGX_AESGCM_IV_SIZE - SGX_AESGCM_MAC_SIZE;
     int resp;
 
-    uint8_t* dec_string1 = (uint8_t*)malloc(raw_str1_len + 1);
-    uint8_t* dec_string2 = (uint8_t*)malloc(raw_str2_len + 1);
-    uint8_t* dec_string3 = (uint8_t*)malloc(raw_str3_len + 1);
+    uint8_t *dec_string1 = (uint8_t *) malloc(raw_str1_len + 1);
+    uint8_t *dec_string2 = (uint8_t *) malloc(raw_str2_len + 1);
+    uint8_t *dec_string3 = (uint8_t *) malloc(raw_str3_len + 1);
 
     resp = decrypt_bytes(string1, string1_len, dec_string1, raw_str1_len);
     if (resp != SGX_SUCCESS)
@@ -163,15 +162,14 @@ int enc_text_concatenate(uint8_t* string1,
     0, if the strings contains the substring
     1, it not
 */
-int enc_text_substring(uint8_t* in1,
+int enc_text_substring(uint8_t *in1,
                        size_t in1_size,
-                       uint8_t* in2,
+                       uint8_t *in2,
                        size_t in2_size,
-                       uint8_t* in3,
+                       uint8_t *in3,
                        size_t in3_size,
-                       uint8_t* out,
-                       size_t* out_size)
-{
+                       uint8_t *out,
+                       size_t *out_size) {
     size_t str_size = in1_size - SGX_AESGCM_IV_SIZE - SGX_AESGCM_MAC_SIZE;
 
     union {
@@ -179,19 +177,17 @@ int enc_text_substring(uint8_t* in1,
         unsigned char bytes[sizeof(val)];
     } from, n_chars;
 
-    char* str = (char*)malloc(str_size + 1);
-    uint8_t* result = (uint8_t*)malloc(*out_size + 1);
-    int resp = decrypt_bytes(in1, in1_size, (uint8_t*)str, str_size);
+    char *str = (char *) malloc(str_size + 1);
+    uint8_t *result = (uint8_t *) malloc(*out_size + 1);
+    int resp = decrypt_bytes(in1, in1_size, (uint8_t *) str, str_size);
     if (resp != SGX_SUCCESS)
         return resp;
 
-    if ((in2_size == INT32_LENGTH) && (in3_size == INT32_LENGTH))
-    {
+    if ((in2_size == INT32_LENGTH) && (in3_size == INT32_LENGTH)) {
         memcpy(from.bytes, in2, INT32_LENGTH);
         memcpy(n_chars.bytes, in3, INT32_LENGTH);
     }
-    else
-    {
+    else {
         resp = decrypt_bytes(in2, in2_size, from.bytes, INT32_LENGTH);
         if (resp != SGX_SUCCESS)
             return resp;
@@ -201,13 +197,11 @@ int enc_text_substring(uint8_t* in1,
             return resp;
     }
 
-    if ((from.val < 0 || n_chars.val < 0) || (from.val + n_chars.val > str_size))
-    {
+    if ((from.val < 0 || n_chars.val < 0) || (from.val + n_chars.val > str_size)) {
         return OUT_OF_THE_RANGE_ERROR;
     }
 
-    for (size_t i = 0; i < n_chars.val; i++)
-    {
+    for (size_t i = 0; i < n_chars.val; i++) {
         result[i] = str[from.val + i - 1];
     }
 

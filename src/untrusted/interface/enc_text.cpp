@@ -53,7 +53,8 @@ int enc_text_concatenate(char *src1,
     while (true) {
         if (req->is_done == -1) {
             __asm__("pause");
-        } else {
+        }
+        else {
             memcpy(&len_raw_str3,
                    req->buffer + len_raw_str1 + 2 * INT32_LENGTH + len_raw_str2,
                    INT32_LENGTH);
@@ -118,7 +119,8 @@ int enc_text_substring(char *in1,
         memcpy(from, in2, in2_size);
         memcpy(n_chars, in3, in3_size);
         in_size = INT32_LENGTH;
-    } else {
+    }
+    else {
         if (!FromBase64Fast((const unsigned char *) in2,
                             ENC_INT32_LENGTH_B64 - 1,
                             from,
@@ -165,7 +167,8 @@ int enc_text_substring(char *in1,
     while (true) {
         if (req->is_done == -1) {
             __asm__("pause");
-        } else {
+        }
+        else {
             memcpy(&result_raw_size, req->buffer + buf_pos, INT32_LENGTH);
             buf_pos += INT32_LENGTH;
             memcpy(result, req->buffer + buf_pos, result_raw_size + 1);
@@ -227,7 +230,8 @@ int enc_text_like(char *in1, size_t in1_size, char *in2, size_t in2_size, int *o
     while (true) {
         if (req->is_done == -1) {
             __asm__("pause");
-        } else {
+        }
+        else {
             resp = req->resp;
             std::copy(
                     &req->buffer[buf_pos], &req->buffer[buf_pos + INT32_LENGTH], out);
@@ -266,7 +270,8 @@ int enc_text_encrypt(char *pSrc, size_t src_len, char *pDst, size_t dst_len) {
     while (true) {
         if (req->is_done == -1) {
             __asm__("pause");
-        } else {
+        }
+        else {
             memcpy(&raw_dst_len, req->buffer + src_len + INT32_LENGTH, INT32_LENGTH);
             memcpy(dst, req->buffer + src_len + 2 * INT32_LENGTH, raw_dst_len);
             resp = req->resp;
@@ -324,7 +329,8 @@ int enc_text_cmp(char *src1,
     while (true) {
         if (req->is_done == -1) {
             __asm__("pause");
-        } else {
+        }
+        else {
             resp = req->resp;
             std::copy(&req->buffer[len_raw_str1 + 2 * INT32_LENGTH + len_raw_str2],
                       &req->buffer[len_raw_str1 + 2 * INT32_LENGTH + len_raw_str2 + INT32_LENGTH],
@@ -369,7 +375,8 @@ int enc_text_decrypt(char *pSrc, size_t src_len, char *pDst, size_t dst_len) {
     while (true) {
         if (req->is_done == -1) {
             __asm__("pause");
-        } else {
+        }
+        else {
             memcpy(
                     &dst_len, req->buffer + src_bytearray_len + INT32_LENGTH, INT32_LENGTH);
             memcpy(pDst,

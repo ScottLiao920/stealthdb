@@ -12,7 +12,7 @@ extern Queue *inQueue;
 extern bool status;
 
 
-int enc_compress(char *pSrc, size_t src_len, char *pDst) {
+int enc_compress(char *pSrc, size_t src_len, char *pDst, size_t dst_len) {
     if (!status) {
         int resp = initMultithreading();
         resp = loadKey(0);
@@ -20,33 +20,33 @@ int enc_compress(char *pSrc, size_t src_len, char *pDst) {
             return resp;
     }
     int compBytes = 0;
-    int resp = 0;
-    size_t comp_len = LZ4_compressBound(src_len);
-    char *comp_buffer = NULL;
-    request *comp_req = new request;
+    auto comp_req = new request;
     comp_req->ocall_index = CMD_COMPRESS;
     comp_req->is_done = -1;
     memcpy(comp_req->buffer, &src_len, sizeof(size_t));
-    memcpy(comp_req->buffer + sizeof(size_t), &comp_len, sizeof(size_t));
+    memcpy(comp_req->buffer + sizeof(size_t), &dst_len, sizeof(size_t));
     memcpy(comp_req->buffer + 2 * sizeof(size_t), pSrc, src_len);
     inQueue->enqueue(comp_req);
 
     while (true) {
         if (comp_req->is_done == -1) {
             __asm__("pause");
-        } else {
+        }
+        else {
             compBytes = comp_req->resp;
-            comp_buffer = (char *) (malloc(compBytes * sizeof(char) + 2 * sizeof(int)));
-            memcpy(comp_buffer + 2 * sizeof(int), comp_req->buffer + 2 * sizeof(size_t) + src_len,
+            if (compBytes < 0) {
+                break;
+            }
+            memcpy(pDst, comp_req->buffer + 2 * sizeof(size_t) + src_len,
                    compBytes * sizeof(char));
             spin_unlock(&comp_req->is_done);
             break;
         }
     }
-    return resp;
+    return compBytes;
 }
 
-int enc_decompress(char *pSrc, size_t src_len, char *pDst) {
+int enc_decompress(char *pSrc, size_t src_len, char *pDst, size_t dst_len) {
     if (!status) {
         int resp = initMultithreading();
         resp = loadKey(0);
@@ -59,16 +59,20 @@ int enc_decompress(char *pSrc, size_t src_len, char *pDst) {
     req->ocall_index = CMD_DECOMPRESS;
     req->is_done = -1;
     memcpy(req->buffer, &src_len, sizeof(size_t));
-    memcpy(req->buffer + sizeof(size_t), &src_len, sizeof(size_t));
+    memcpy(req->buffer + sizeof(size_t), &dst_len, sizeof(size_t));
     memcpy(req->buffer + 2 * sizeof(size_t), pSrc, src_len);
     inQueue->enqueue(req);
 
     while (true) {
         if (req->is_done == -1) {
             __asm__("pause");
-        } else {
+        }
+        else {
             dec_len = req->resp;
-            memcpy(pDst, req->buffer + 2 * sizeof(size_t) + dec_len,
+            if (dec_len < 0) {
+                break;
+            }
+            memcpy(pDst, req->buffer + 2 * sizeof(size_t) + src_len,
                    dec_len * sizeof(char));
             spin_unlock(&req->is_done);
             break;

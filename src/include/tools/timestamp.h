@@ -1,4 +1,5 @@
 #pragma once
+
 #include <limits.h>
 #include <stdint.h>
 
@@ -7,7 +8,7 @@
  * We assume that int64 follows the C99 semantics for division (negative
  * quotients truncate towards zero).
 */
-#define TMODULO(t,q,u) \
+#define TMODULO(t, q, u) \
 do { \
     (q) = ((t) / (u)); \
     if ((q) != 0) (t) -= ((q) * (u)); \

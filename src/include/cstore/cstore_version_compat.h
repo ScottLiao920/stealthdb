@@ -23,33 +23,33 @@
 
 #if PG_VERSION_NUM < 110000
 #define ALLOCSET_DEFAULT_SIZES ALLOCSET_DEFAULT_MINSIZE, ALLOCSET_DEFAULT_INITSIZE, \
-	ALLOCSET_DEFAULT_MAXSIZE
+    ALLOCSET_DEFAULT_MAXSIZE
 #define ACLCHECK_OBJECT_TABLE ACL_KIND_CLASS
 #else
 #define ACLCHECK_OBJECT_TABLE OBJECT_TABLE
 
 #define ExplainPropertyLong(qlabel, value, es) \
-	ExplainPropertyInteger(qlabel, NULL, value, es)
+    ExplainPropertyInteger(qlabel, NULL, value, es)
 #endif
 
 #if PG_VERSION_NUM >= 130000
 #define CALL_PREVIOUS_UTILITY() \
-	PreviousProcessUtilityHook(plannedStatement, queryString, context, paramListInfo, \
-							   queryEnvironment, destReceiver, queryCompletion)
+    PreviousProcessUtilityHook(plannedStatement, queryString, context, paramListInfo, \
+                               queryEnvironment, destReceiver, queryCompletion)
 #elif PG_VERSION_NUM >= 100000
 #define CALL_PREVIOUS_UTILITY() \
-	PreviousProcessUtilityHook(plannedStatement, queryString, context, paramListInfo, \
-							   queryEnvironment, destReceiver, completionTag)
+    PreviousProcessUtilityHook(plannedStatement, queryString, context, paramListInfo, \
+                               queryEnvironment, destReceiver, completionTag)
 #else
 #define CALL_PREVIOUS_UTILITY() \
-	PreviousProcessUtilityHook(parseTree, queryString, context, paramListInfo, \
-							   destReceiver, completionTag)
+    PreviousProcessUtilityHook(parseTree, queryString, context, paramListInfo, \
+                               destReceiver, completionTag)
 #endif
 
 #if PG_VERSION_NUM < 120000
 #define TTS_EMPTY(slot) ((slot)->tts_isempty)
 #define ExecForceStoreHeapTuple(tuple, slot, shouldFree) \
-	ExecStoreTuple(newTuple, tupleSlot, InvalidBuffer, shouldFree);
+    ExecStoreTuple(newTuple, tupleSlot, InvalidBuffer, shouldFree);
 #define TableScanDesc HeapScanDesc
 #define table_beginscan heap_beginscan
 #define table_endscan heap_endscan

@@ -4,6 +4,7 @@
 //
 
 #pragma once
+
 #include <iostream>
 #include "sgx_urts.h"
 #include "sgx_tcrypto.h"

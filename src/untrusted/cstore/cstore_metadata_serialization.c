@@ -236,8 +236,9 @@ DeserializePostScript(StringInfo buffer, uint64 *tableFooterLength) {
         protobufPostScript->versionminor > CSTORE_VERSION_MINOR) {
         ereport(ERROR, (errmsg("could not unpack column store"),
                 errdetail("invalid column store version number")));
-    } else if (strncmp(protobufPostScript->magicnumber, CSTORE_MAGIC_NUMBER,
-                       NAMEDATALEN) != 0) {
+    }
+    else if (strncmp(protobufPostScript->magicnumber, CSTORE_MAGIC_NUMBER,
+                     NAMEDATALEN) != 0) {
         ereport(ERROR, (errmsg("could not unpack column store"),
                 errdetail("invalid magic number")));
     }
@@ -271,8 +272,9 @@ DeserializeTableFooter(StringInfo buffer) {
     if (!protobufTableFooter->has_blockrowcount) {
         ereport(ERROR, (errmsg("could not unpack column store"),
                 errdetail("missing required table footer metadata fields")));
-    } else if (protobufTableFooter->blockrowcount < BLOCK_ROW_COUNT_MINIMUM ||
-               protobufTableFooter->blockrowcount > BLOCK_ROW_COUNT_MAXIMUM) {
+    }
+    else if (protobufTableFooter->blockrowcount < BLOCK_ROW_COUNT_MINIMUM ||
+             protobufTableFooter->blockrowcount > BLOCK_ROW_COUNT_MAXIMUM) {
         ereport(ERROR, (errmsg("could not unpack column store"),
                 errdetail("invalid block row count")));
     }
@@ -508,10 +510,12 @@ DatumToProtobufBinary(Datum datum, bool datumTypeByValue, int datumTypeLength) {
     if (datumTypeLength > 0) {
         if (datumTypeByValue) {
             store_att_byval(datumBuffer, datum, datumTypeLength);
-        } else {
+        }
+        else {
             memcpy(datumBuffer, DatumGetPointer(datum), datumTypeLength);
         }
-    } else {
+    }
+    else {
         memcpy(datumBuffer, DatumGetPointer(datum), datumLength);
     }
 
