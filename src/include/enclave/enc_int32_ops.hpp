@@ -59,3 +59,9 @@ int enc_int32_sum_bulk(uint8_t *arg1,
                        size_t arg2_len,
                        uint8_t *result,
                        size_t res_len);
+
+int int32_sum_bulk(
+        char *arg1,
+        size_t arg1_len,
+        char *arg2
+);

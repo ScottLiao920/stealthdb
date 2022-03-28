@@ -56,3 +56,23 @@ pg_enc_decompress(PG_FUNCTION_ARGS) {
     pfree(pDst);
     PG_RETURN_CSTRING(str);
 }
+
+/*
+ * The function compress a string in enclave.
+ * @input: string
+ * @return: compressed string
+ */
+PG_FUNCTION_INFO_V1(pg_enc_int_sum_bulk);
+
+Datum
+pg_enc_int_sum_bulk(PG_FUNCTION_ARGS) {
+    char *pSrc = PG_GETARG_CSTRING(0);
+    int resp;
+    int src_len;
+    memcpy(&src_len, pSrc, sizeof(int));
+    char *pDst = (char *) palloc0(ENC_INT32_LENGTH_B64);
+
+    resp = enc_int_sum_bulk(pSrc + sizeof(int), src_len, pDst);
+    sgxErrorHandler(resp);
+    PG_RETURN_CSTRING(pDst);
+}

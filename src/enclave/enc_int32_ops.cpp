@@ -1,4 +1,5 @@
 #include "enclave/enc_int32_ops.hpp"
+#include "enclave/enclave.hpp"
 
 /* Compare two aes_gcm-encrypted integers
  @input: uint8_t array - encrypted integer1
@@ -542,5 +543,48 @@ int enc_int32_sum_bulk(uint8_t *arg1,
     free_allocated_memory(dec_int1_v);
     free_allocated_memory(dec_int2_v);
     free_allocated_memory(dec_int3_v);
+    return resp;
+}
+
+/*
+ * pSrc: string of encrypted & compressed data
+ * src_len: length of pSrc
+ * pDst: destination for encrypted sum
+ */
+int int32_sum_bulk(
+        char *pSrc,
+        size_t src_len,
+        char *pDst
+) {
+    int resp;
+    size_t decry_len = src_len - SGX_AESGCM_IV_SIZE - SGX_AESGCM_MAC_SIZE;
+    char *decry_data = (char *) malloc(decry_len);
+    resp = decrypt_bytes((uint8_t *) pSrc, src_len, (uint8_t *) decry_data, decry_len);
+    int dec_len = (resp
+            >> 4); // length of decrypted data (length of compress data + 2 * sizeof(int)), should be equal to decry_len
+    resp -= (dec_len << 4);
+    if (resp != SGX_SUCCESS) {
+        return resp;
+    }
+    size_t raw_bytes, comp_bytes;
+    memcpy(&raw_bytes, decry_data, sizeof(size_t)); // length of raw data
+    memcpy(&comp_bytes, decry_data + sizeof(size_t), sizeof(size_t)); // length of compressed data
+    char *decom_data = (char *) malloc(raw_bytes);
+    dec_len = decompressBufferEnclave(decry_data + 2 * sizeof(size_t), decom_data, comp_bytes,
+                                      raw_bytes); //dec_len is decompressed data length now
+    if (dec_len < 0) {
+        return SGX_ERROR_UNEXPECTED;
+    }
+    int curInt;
+    int result = 0;
+    for (size_t offset = 0; offset < raw_bytes; offset += 48) {
+        // 48 is a magic number, as enc_int4 is 45 bytes long so pg will align it by appending 3 bytes
+        curInt = atoi(decom_data + offset);
+        result += curInt;
+    }
+    resp = encrypt_bytes(reinterpret_cast<uint8_t *>(&result), INT32_LENGTH, reinterpret_cast<uint8_t *>(pDst),
+                         ENC_INT32_LENGTH);
+    free(decom_data);
+    free(decry_data);
     return resp;
 }

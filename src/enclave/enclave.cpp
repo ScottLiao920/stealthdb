@@ -475,6 +475,11 @@ int encrypt_bytes(uint8_t *pSrc, size_t src_len, uint8_t *pDst,
                                                         reinterpret_cast<char *>(req->buffer + src_len +
                                                                                  2 * sizeof(size_t)), src_len, dst_len);
                     break;
+
+                case CMD_INT_SUM_BULK:
+                    memcpy(&src_len, req->buffer, sizeof(size_t));
+                    req->resp = int32_sum_bulk(reinterpret_cast<char *>(req->buffer + sizeof(size_t)), src_len,
+                                               reinterpret_cast<char *>(req->buffer + sizeof(size_t) + src_len));
             }
             req->is_done = 1;
         }

@@ -220,7 +220,7 @@ int enc_int32_encrypt(int pSrc, char *pDst) {
             std::copy(&req->buffer[INT32_LENGTH],
                       &req->buffer[INT32_LENGTH + ENC_INT32_LENGTH], int1_v.begin());
             resp = req->resp;
-            // spin_unlock(&req->is_done);
+            spin_unlock(&req->is_done);
             break;
         }
     }

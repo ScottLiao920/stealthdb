@@ -97,6 +97,8 @@ int enc_compress(char *pSrc, size_t src_len, char *pDst, size_t dst_len);
 
 int enc_decompress(char *pSrc, size_t src_len, char *pDst, size_t dst_len);
 
+int enc_int_sum_bulk(char *pSrc, size_t src_len, char *pDst);
+
 #if defined(__cplusplus)
 }
 #endif

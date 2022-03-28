@@ -54,7 +54,7 @@ int enc_decompress(char *pSrc, size_t src_len, char *pDst, size_t dst_len) {
             return resp;
     }
     int dec_len;
-    // buffer format: (int) decrypted length, (int) expected no. of raw bytes, decrypted data
+    // buffer format: (size_t) decrypted length, (size_t) expected no. of raw bytes, decrypted data
     request *req = new request;
     req->ocall_index = CMD_DECOMPRESS;
     req->is_done = -1;
@@ -79,4 +79,49 @@ int enc_decompress(char *pSrc, size_t src_len, char *pDst, size_t dst_len) {
         }
     }
     return dec_len;
+}
+
+int enc_int_sum_bulk(char *pSrc, size_t src_len, char *pDst) {
+    if (!status) {
+        int resp = initMultithreading();
+        resp = loadKey(0);
+        if (resp != SGX_SUCCESS)
+            return resp;
+    }
+    int resp;
+    char *dec_data = (char *) malloc(src_len * 2);
+
+    size_t src_bytearray_len;
+    uint8_t *dst = new uint8_t[src_len];
+
+    src_bytearray_len = FromBase64Fast((const BYTE *) pSrc, src_len, dst, src_len);
+
+    std::array<BYTE, ENC_INT32_LENGTH> result_v;
+    // buffer format: (size_t) data length of source (encrypted & compressed, NOT in Base 64 format), data
+    request *req = new request;
+    req->ocall_index = CMD_INT_SUM_BULK;
+    req->is_done = -1;
+
+    memcpy(req->buffer, &src_bytearray_len, sizeof(size_t));
+    memcpy(req->buffer + sizeof(size_t), dst, src_bytearray_len);
+    inQueue->enqueue(req);
+
+    while (true) {
+        if (req->is_done == -1) {
+            __asm__("pause");
+        }
+        else {
+            resp = req->resp;
+            std::copy(&req->buffer[src_bytearray_len + sizeof(size_t)],
+                      &req->buffer[src_bytearray_len + sizeof(size_t) + ENC_INT32_LENGTH], result_v.begin());
+            spin_unlock(&req->is_done);
+            break;
+        }
+    }
+
+    if (!ToBase64Fast((const BYTE *) result_v.begin(), ENC_INT32_LENGTH, pDst,
+                      ENC_INT32_LENGTH_B64))
+        resp = BASE64DECODER_ERROR;
+    pDst[ENC_INT32_LENGTH_B64 - 1] = '\0';
+    return resp;
 }

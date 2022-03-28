@@ -214,7 +214,7 @@ int enc_text_decrypt_n_decompress(char *pSrc, size_t src_len, char *pDst, size_t
     resp = enc_text_decrypt(pSrc, src_len, decry_buffer, dst_len);
 
 
-    int dec_len = (resp >> 4); // length of decrypted data (length of compress data + 2 * sizeof(int) )
+    int dec_len = (resp >> 4); // length of decrypted data (length of compress data + 2 * sizeof(size_t) )
     resp -= (dec_len << 4);
     size_t raw_bytes, comp_bytes;
     memcpy(&raw_bytes, decry_buffer, sizeof(size_t)); // length of raw data

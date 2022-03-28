@@ -78,3 +78,4 @@ typedef unsigned long DWORD;  // 4bytes
 
 #define CMD_COMPRESS 920
 #define CMD_DECOMPRESS 626
+#define CMD_INT_SUM_BULK 520

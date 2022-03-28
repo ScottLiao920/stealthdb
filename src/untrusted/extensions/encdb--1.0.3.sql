@@ -486,6 +486,14 @@ AS
     LANGUAGE C IMMUTABLE
                STRICT;
 
+CREATE
+    OR REPLACE FUNCTION pg_enc_int_sum_bulk(enc_int4)
+    RETURNS enc_int4
+AS
+'$libdir/encdb'
+    LANGUAGE C IMMUTABLE
+               STRICT;
+
 --------------------------------------------------------------------------------
 --ENCRYPTED STRING TYPE (randomized)
 --------------------------------------------------------------------------------
@@ -620,7 +628,7 @@ CREATE TYPE enc_text
     OUTPUT = pg_enc_text_out, --    RECEIVE        = pg_enc_text_recv,
 --    SEND         = pg_enc_text_send,
 --      LIKE       = text,
-    INTERNALLENGTH = 1024, --    CATEGORY = 'S',
+    INTERNALLENGTH = 1024,    --    CATEGORY = 'S',
 --    PREFERRED = false
     ALIGNMENT = int4,
     STORAGE = PLAIN
