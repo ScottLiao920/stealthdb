@@ -12,7 +12,20 @@ create foreign table customer_enc(
     c_mktsegment char(10),
     c_comment varchar(117)
     )
-    server cstore_server options (compression 'enc_lz4', block_row_count '1000');
+    server cstore_server options (compression 'enc_lz4', block_row_count '1000', stripe_row_count '1000');
+
+create foreign table customer_vec(
+    c_custkey_enc integer,
+    c_name varchar(25),
+    c_address varchar(40),
+    c_nation_key_enc integer,
+    c_phone char(15),
+    c_acctbal numeric(15, 2),
+    c_mktsegment char(10),
+    c_comment varchar(117)
+    )
+    server cstore_server options (compression 'lz4', block_row_count '1000', stripe_row_count '1000');
+
 
 
 create foreign table lineitem_enc(
@@ -99,10 +112,11 @@ create foreign table supplier_enc(
     server cstore_server options (compression 'enc_lz4', block_row_count '1000');
 
 COPY customer_enc from '/home/scott/Projects/stealthdb/tpch/cust_3000.csv' With CSV DELIMITER ',' HEADER;
-COPY lineitem_enc from '/home/scott/Projects/stealthdb/tpch/tpch_public_lineitem.csv' With CSV DELIMITER ',' HEADER;
-COPY nation_enc from '/home/scott/Projects/stealthdb/tpch/tpch_public_nation.csv' With CSV DELIMITER ',' HEADER;
-COPY orders_enc from '/home/scott/Projects/stealthdb/tpch/tpch_public_orders.csv' With CSV DELIMITER ',' HEADER;
-COPY part_enc from '/home/scott/Projects/stealthdb/tpch/tpch_public_part.csv' With CSV DELIMITER ',' HEADER;
-COPY partsupp_enc from '/home/scott/Projects/stealthdb/tpch/tpch_public_partsupp.csv' With CSV DELIMITER ',' HEADER;
-COPY region_enc from '/home/scott/Projects/stealthdb/tpch/tpch_public_region.csv' With CSV DELIMITER ',' HEADER;
-COPY supplier_enc from '/home/scott/Projects/stealthdb/tpch/tpch_public_supplier.csv' With CSV DELIMITER ',' HEADER;
+COPY customer_vec from '/home/scott/Projects/stealthdb/tpch/tpch_public_customer.csv' With CSV DELIMITER ',' HEADER;
+-- COPY lineitem_enc from '/home/scott/Projects/stealthdb/tpch/tpch_public_lineitem.csv' With CSV DELIMITER ',' HEADER;
+-- COPY nation_enc from '/home/scott/Projects/stealthdb/tpch/tpch_public_nation.csv' With CSV DELIMITER ',' HEADER;
+-- COPY orders_enc from '/home/scott/Projects/stealthdb/tpch/tpch_public_orders.csv' With CSV DELIMITER ',' HEADER;
+-- COPY part_enc from '/home/scott/Projects/stealthdb/tpch/tpch_public_part.csv' With CSV DELIMITER ',' HEADER;
+-- COPY partsupp_enc from '/home/scott/Projects/stealthdb/tpch/tpch_public_partsupp.csv' With CSV DELIMITER ',' HEADER;
+-- COPY region_enc from '/home/scott/Projects/stealthdb/tpch/tpch_public_region.csv' With CSV DELIMITER ',' HEADER;
+-- COPY supplier_enc from '/home/scott/Projects/stealthdb/tpch/tpch_public_supplier.csv' With CSV DELIMITER ',' HEADER;

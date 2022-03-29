@@ -91,19 +91,33 @@ int enc_int_sum_bulk(char *pSrc, size_t src_len, char *pDst) {
     int resp;
     char *dec_data = (char *) malloc(src_len * 2);
 
-    size_t src_bytearray_len;
+    size_t src_bytearray_len, curTransValue_bytearray_len;
     uint8_t *dst = new uint8_t[src_len];
 
-    src_bytearray_len = FromBase64Fast((const BYTE *) pSrc, src_len, dst, src_len);
+    char *cmpStr = (char *) malloc(ENC_INT32_LENGTH_B64);
+    memset(cmpStr, 0, ENC_INT32_LENGTH_B64);
+    curTransValue_bytearray_len = FromBase64Fast((const BYTE *) pSrc, ENC_INT32_LENGTH_B64, dst,
+                                                 ENC_INT32_LENGTH);
+    if (curTransValue_bytearray_len != ENC_INT32_LENGTH && strncmp(cmpStr, pSrc, ENC_INT32_LENGTH_B64) != 0) {
+        return BASE64DECODER_ERROR;
+    }
+    else if (strncmp(cmpStr, pSrc, ENC_INT32_LENGTH_B64) == 0) {
+        dst[0] = '\0';
+        curTransValue_bytearray_len = ENC_INT32_LENGTH;
+    }
+    free(cmpStr);
+    src_bytearray_len = FromBase64Fast((const BYTE *) pSrc + ENC_INT32_LENGTH_B64, src_len - ENC_INT32_LENGTH_B64,
+                                       dst + curTransValue_bytearray_len, src_len);
 
     std::array<BYTE, ENC_INT32_LENGTH> result_v;
-    // buffer format: (size_t) data length of source (encrypted & compressed, NOT in Base 64 format), data
+    // buffer format: (size_t) data length of source (encrypted & compressed, NOT in Base 64 format) & previous sum, data
     request *req = new request;
     req->ocall_index = CMD_INT_SUM_BULK;
     req->is_done = -1;
 
-    memcpy(req->buffer, &src_bytearray_len, sizeof(size_t));
     memcpy(req->buffer + sizeof(size_t), dst, src_bytearray_len);
+    src_bytearray_len += curTransValue_bytearray_len;
+    memcpy(req->buffer, &src_bytearray_len, sizeof(size_t));
     inQueue->enqueue(req);
 
     while (true) {
