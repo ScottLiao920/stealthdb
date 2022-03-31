@@ -70,13 +70,11 @@ C_OBJS += $(CSTORE_DIR)/cstore.pb-c.o
 $(info $(C_OBJS) $(wildcard $(CSTORE_DIR)/*.c))
 
 $(EXTENSION_DIR)/%.o: $(EXTENSION_DIR)/%.c
-	@echo "$^ $@"
 	@$(CC) $(CFLAGS) $(PSQL_CPPFLAGS) -o $@ -c $^
 	@echo "CC extension <=  $<"
 
 cstore: $(CSTORE_DIR)/cstore.pb-c.c
 $(CSTORE_DIR)/%.o: $(CSTORE_DIR)/%.c
-	@echo "$^ $@"
 	@$(CC) $(CFLAGS) $(PSQL_CPPFLAGS) -o $@ -c $^
 	@echo "CC cstore <=  $<"
 #		cd $(CSTORE_DIR) && $(MAKE)

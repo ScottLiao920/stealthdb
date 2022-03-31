@@ -95,3 +95,60 @@ COPY (
            s_comment
     FROM supplier
     ) TO '/home/scott/Projects/stealthdb/tpch/enc_supplier.csv' With CSV DELIMITER ',' HEADER;
+
+COPY (
+
+    SELECT
+        *
+    FROM
+        customer
+    ) TO '/home/scott/Projects/stealthdb/tpch/customer.csv' With CSV DELIMITER ',' HEADER;
+COPY (
+
+    SELECT
+        *
+    FROM
+        lineitem
+    ) TO '/home/scott/Projects/stealthdb/tpch/lineitem.csv' With CSV DELIMITER ',' HEADER;
+COPY (
+
+    SELECT
+        *
+    FROM
+        nation
+    ) TO '/home/scott/Projects/stealthdb/tpch/nation.csv' With CSV DELIMITER ',' HEADER;
+COPY (
+
+    SELECT
+        *
+    FROM
+        orders
+    ) TO '/home/scott/Projects/stealthdb/tpch/orders.csv' With CSV DELIMITER ',' HEADER;
+COPY (
+
+    SELECT
+        *
+    FROM
+        part
+    ) TO '/home/scott/Projects/stealthdb/tpch/part.csv' With CSV DELIMITER ',' HEADER;
+COPY (
+
+    SELECT
+        *
+    FROM
+        partsupp
+    ) TO '/home/scott/Projects/stealthdb/tpch/partsupp.csv' With CSV DELIMITER ',' HEADER;
+COPY (
+
+    SELECT
+        *
+    FROM
+        region
+    ) TO '/home/scott/Projects/stealthdb/tpch/region.csv' With CSV DELIMITER ',' HEADER;
+COPY (
+
+    SELECT
+        *
+    FROM
+        supplier
+    ) TO '/home/scott/Projects/stealthdb/tpch/supplier.csv' With CSV DELIMITER ',' HEADER;

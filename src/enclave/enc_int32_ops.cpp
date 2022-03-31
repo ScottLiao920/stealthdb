@@ -559,11 +559,14 @@ int int32_sum_bulk(
     int resp;
     int result = 0;
     char cmpStr = '\0';
-    if (strncmp(pSrc, &cmpStr, sizeof(char))!=0){
-        resp = decrypt_bytes((uint8_t *) pSrc, ENC_INT32_LENGTH, (uint8_t *) &result, INT32_LENGTH);
+    if (strncmp(pSrc, &cmpStr, sizeof(char)) != 0) {
+        char *tmpPtr = (char *) malloc(INT32_LENGTH);
+        resp = decrypt_bytes((uint8_t *) pSrc, ENC_INT32_LENGTH, reinterpret_cast<uint8_t *>(tmpPtr), INT32_LENGTH);
         if (resp != SGX_SUCCESS) {
             return resp;
         }
+        memcpy(&result, tmpPtr, INT32_LENGTH);
+        free(tmpPtr);
     }
     pSrc += ENC_INT32_LENGTH;
     src_len -= ENC_INT32_LENGTH;
