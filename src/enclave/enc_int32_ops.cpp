@@ -594,7 +594,7 @@ int int32_sum_bulk(
         curInt = atoi(decom_data + offset);
         result += curInt;
     }
-        auto *result_v = (uint8_t *) malloc(INT32_LENGTH);
+    auto *result_v = (uint8_t *) malloc(INT32_LENGTH);
     if (int2bytearray((int32_t) result, result_v, INT32_LENGTH))
         return MEMORY_COPY_ERROR;
     resp = encrypt_bytes(reinterpret_cast<uint8_t *>(&result), INT32_LENGTH, reinterpret_cast<uint8_t *>(pDst),
