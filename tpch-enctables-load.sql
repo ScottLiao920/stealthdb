@@ -95,15 +95,15 @@ create foreign table supplier_enc(
     s_acctbal numeric(15, 2),
     s_comment varchar(101)
     )
-    server cstore_server options (compression 'enc_lz4', block_row_count '1000');
+    server cstore_server options (compression 'enc_lz4', block_row_count '1000', stripe_row_count '1000');
 
-COPY customer_enc from '/home/scott/Projects/stealthdb/tpch/customer.csv' With CSV DELIMITER ',' HEADER;
-COPY lineitem_enc from '/home/scott/Projects/stealthdb/tpch/lineitem.csv' With CSV DELIMITER ',' HEADER;
-COPY nation_enc from '/home/scott/Projects/stealthdb/tpch/nation.csv' With CSV DELIMITER ',' HEADER;
-COPY orders_enc from '/home/scott/Projects/stealthdb/tpch/orders.csv' With CSV DELIMITER ',' HEADER;
-COPY part_enc from '/home/scott/Projects/stealthdb/tpch/part.csv' With CSV DELIMITER ',' HEADER;
-COPY partsupp_enc from '/home/scott/Projects/stealthdb/tpch/partsupp.csv' With CSV DELIMITER ',' HEADER;
-COPY region_enc from '/home/scott/Projects/stealthdb/tpch/region.csv' With CSV DELIMITER ',' HEADER;
+-- COPY customer_enc from '/home/scott/Projects/stealthdb/tpch/customer.csv' With CSV DELIMITER ',' HEADER;
+-- COPY lineitem_enc from '/home/scott/Projects/stealthdb/tpch/lineitem.csv' With CSV DELIMITER ',' HEADER;
+-- COPY nation_enc from '/home/scott/Projects/stealthdb/tpch/nation.csv' With CSV DELIMITER ',' HEADER;
+-- COPY orders_enc from '/home/scott/Projects/stealthdb/tpch/orders.csv' With CSV DELIMITER ',' HEADER;
+-- COPY part_enc from '/home/scott/Projects/stealthdb/tpch/part.csv' With CSV DELIMITER ',' HEADER;
+-- COPY partsupp_enc from '/home/scott/Projects/stealthdb/tpch/partsupp.csv' With CSV DELIMITER ',' HEADER;
+-- COPY region_enc from '/home/scott/Projects/stealthdb/tpch/region.csv' With CSV DELIMITER ',' HEADER;
 COPY supplier_enc from '/home/scott/Projects/stealthdb/tpch/supplier.csv' With CSV DELIMITER ',' HEADER;
 
 create foreign table supplier_enc_nocomp(
@@ -115,16 +115,18 @@ create foreign table supplier_enc_nocomp(
     s_acctbal numeric(15, 2),
     s_comment varchar(101)
     )
-    server cstore_server options (compression 'lz4', block_row_count '1000');
+    server cstore_server options (compression 'lz4', block_row_count '1000', stripe_row_count '1000');
 COPY supplier_enc_nocomp from '/home/scott/Projects/stealthdb/tpch/enc_supplier.csv' With CSV DELIMITER ',' HEADER;
 
-create  table supplier_enc_pg(
-    s_suppkey enc_int4,
-    s_name char(25),
-    s_address varchar(40),
+drop table supplier_enc_pg;
+create table supplier_enc_pg
+(
+    s_suppkey   enc_int4,
+    s_name      char(25),
+    s_address   varchar(40),
     s_nationkey integer,
-    s_phone char(15),
-    s_acctbal numeric(15, 2),
-    s_comment varchar(101)
-    );
+    s_phone     char(15),
+    s_acctbal   numeric(15, 2),
+    s_comment   varchar(101)
+);
 COPY supplier_enc_pg from '/home/scott/Projects/stealthdb/tpch/enc_supplier.csv' With CSV DELIMITER ',' HEADER;

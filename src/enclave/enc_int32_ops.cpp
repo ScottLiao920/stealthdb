@@ -557,15 +557,17 @@ int int32_sum_bulk(
         char *pDst
 ) {
     int resp;
-    int result = 0;
+    int64_t result = 0;
     char cmpStr = '\0';
     if (strncmp(pSrc, &cmpStr, sizeof(char)) != 0) {
         char *tmpPtr = (char *) malloc(INT32_LENGTH);
+        int tmpInt = 0;
         resp = decrypt_bytes((uint8_t *) pSrc, ENC_INT32_LENGTH, reinterpret_cast<uint8_t *>(tmpPtr), INT32_LENGTH);
         if (resp != SGX_SUCCESS) {
             return resp;
         }
-        memcpy(&result, tmpPtr, INT32_LENGTH);
+        memcpy(&tmpInt, tmpPtr, INT32_LENGTH);
+        result = (int64_t) tmpInt;
         free(tmpPtr);
     }
     pSrc += ENC_INT32_LENGTH;
@@ -592,6 +594,9 @@ int int32_sum_bulk(
         curInt = atoi(decom_data + offset);
         result += curInt;
     }
+        auto *result_v = (uint8_t *) malloc(INT32_LENGTH);
+    if (int2bytearray((int32_t) result, result_v, INT32_LENGTH))
+        return MEMORY_COPY_ERROR;
     resp = encrypt_bytes(reinterpret_cast<uint8_t *>(&result), INT32_LENGTH, reinterpret_cast<uint8_t *>(pDst),
                          ENC_INT32_LENGTH);
     free(decom_data);
