@@ -1,4 +1,3 @@
-\timing on
 DO
 $$
     BEGIN
