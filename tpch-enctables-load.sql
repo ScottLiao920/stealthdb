@@ -106,7 +106,7 @@ create foreign table supplier_enc(
 -- COPY region_enc from '/home/scott/Projects/stealthdb/tpch/region.csv' With CSV DELIMITER ',' HEADER;
 COPY supplier_enc from '/home/scott/Projects/stealthdb/tpch/supplier.csv' With CSV DELIMITER ',' HEADER;
 
-create foreign table supplier_enc_nocomp(
+create foreign table supplier_enc_vec(
     s_suppkey enc_int4,
     s_name char(25),
     s_address varchar(40),
@@ -115,8 +115,8 @@ create foreign table supplier_enc_nocomp(
     s_acctbal numeric(15, 2),
     s_comment varchar(101)
     )
-    server cstore_server options (compression 'lz4', block_row_count '1000', stripe_row_count '1000');
-COPY supplier_enc_nocomp from '/home/scott/Projects/stealthdb/tpch/enc_supplier.csv' With CSV DELIMITER ',' HEADER;
+    server cstore_server options (compression 'lz4', block_row_count '1', stripe_row_count '1');
+COPY supplier_enc_vec from '/home/scott/Projects/stealthdb/tpch/enc_supplier.csv' With CSV DELIMITER ',' HEADER;
 
 drop table supplier_enc_pg;
 create table supplier_enc_pg

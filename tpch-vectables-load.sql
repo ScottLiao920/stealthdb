@@ -68,11 +68,11 @@ create foreign table LINEITEM_vec ( L_ORDERKEY INTEGER NOT NULL,
     L_SHIPMODE CHAR(10) NOT NULL,
     L_COMMENT VARCHAR(44) NOT NULL) server cstore_server options (compression 'enc_lz4', block_row_count '1000', stripe_row_count '1000');
 
-COPY customer_vec from '/home/scott/Projects/stealthdb/tpch/customer.csv' With CSV DELIMITER ',' HEADER;
-COPY lineitem_vec from '/home/scott/Projects/stealthdb/tpch/lineitem.csv' With CSV DELIMITER ',' HEADER;
-COPY nation_vec from '/home/scott/Projects/stealthdb/tpch/nation.csv' With CSV DELIMITER ',' HEADER;
-COPY orders_vec from '/home/scott/Projects/stealthdb/tpch/orders.csv' With CSV DELIMITER ',' HEADER;
-COPY part_vec from '/home/scott/Projects/stealthdb/tpch/part.csv' With CSV DELIMITER ',' HEADER;
-COPY partsupp_vec from '/home/scott/Projects/stealthdb/tpch/partsupp.csv' With CSV DELIMITER ',' HEADER;
-COPY region_vec from '/home/scott/Projects/stealthdb/tpch/region.csv' With CSV DELIMITER ',' HEADER;
+-- COPY customer_vec from '/home/scott/Projects/stealthdb/tpch/customer.csv' With CSV DELIMITER ',' HEADER;
+-- COPY lineitem_vec from '/home/scott/Projects/stealthdb/tpch/lineitem.csv' With CSV DELIMITER ',' HEADER;
+-- COPY nation_vec from '/home/scott/Projects/stealthdb/tpch/nation.csv' With CSV DELIMITER ',' HEADER;
+-- COPY orders_vec from '/home/scott/Projects/stealthdb/tpch/orders.csv' With CSV DELIMITER ',' HEADER;
+-- COPY part_vec from '/home/scott/Projects/stealthdb/tpch/part.csv' With CSV DELIMITER ',' HEADER;
+-- COPY partsupp_vec from '/home/scott/Projects/stealthdb/tpch/partsupp.csv' With CSV DELIMITER ',' HEADER;
+-- COPY region_vec from '/home/scott/Projects/stealthdb/tpch/region.csv' With CSV DELIMITER ',' HEADER;
 COPY supplier_vec from '/home/scott/Projects/stealthdb/tpch/supplier.csv' With CSV DELIMITER ',' HEADER;

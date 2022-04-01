@@ -36,7 +36,7 @@ C_OBJS := $(C_SRCS:.c=.o)
 
 CPPFLAGS := $(addprefix -I, include $(SGX_INCLUDE_PATH) $(SGX_INCLUDE_PATH)/tlibc)
 
-FLAGS:= -m64 -O0 -g -fvisibility=hidden -fpie -fstack-protector -fno-builtin-printf -Wall -Wextra -Wpedantic
+FLAGS:= -m64 -O0 -g -fvisibility=hidden -fpie -fstack-protector -fno-builtin-printf -Wall -Wextra -Wpedantic -fno-omit-frame-pointer
 CFLAGS := $(FLAGS) $(CPPFLAGS) -nostdinc -std=c11
 CXXFLAGS :=  $(FLAGS) $(CPPFLAGS) -nostdinc++ -std=c++11
 

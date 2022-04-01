@@ -32,7 +32,7 @@ CPPFLAGS := -DTOKEN_FILENAME=\"$(STEALTHDIR)/$(ENCLAVE_NAME).token\" \
 			-DDATA_FILENAME=\"$(STEALTHDIR)/stealthDB.data\" \
 			$(addprefix -I, $(CURDIR)/include $(SGX_INCLUDE_PATH) $(UNTRUSTED_DIR) $(CSTORE_DIR) $(LZ4_DIR)/lib)
 
-FLAGS := -m64 -O0 -g -fPIC -Wall -Wextra -Wpedantic
+FLAGS := -m64 -O0 -g -fPIC -Wall -Wextra -Wpedantic -fno-omit-frame-pointer
 CFLAGS := $(FLAGS) $(CPPFLAGS)
 CXXFLAGS := $(FLAGS) $(CPPFLAGS) -std=c++11
 LDFLAGS := -lsgx_urts -lpthread -lprotobuf-c -llz4 -Wl,--as-needed -Wl,-rpath $(PSQL_LIBDIR) --enable-new-dtags
