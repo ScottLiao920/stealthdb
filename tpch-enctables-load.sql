@@ -115,7 +115,7 @@ create foreign table supplier_enc_vec(
     s_acctbal numeric(15, 2),
     s_comment varchar(101)
     )
-    server cstore_server options (compression 'lz4', block_row_count '1', stripe_row_count '1');
+    server cstore_server options (compression 'lz4', block_row_count '1000', stripe_row_count '1000');
 COPY supplier_enc_vec from '/home/scott/Projects/stealthdb/tpch/enc_supplier.csv' With CSV DELIMITER ',' HEADER;
 
 drop table supplier_enc_pg;
